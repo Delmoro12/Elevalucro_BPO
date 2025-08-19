@@ -2,6 +2,7 @@
 
 import { CheckCircle, Clock, Shield, TrendingUp, Users, FileText, BarChart3, Heart, ArrowRight, Star, LineChart, Workflow, Smartphone, CreditCard, Banknote, Wallet, ShieldCheck, X, Building, Phone, Mail, UserCircle } from "lucide-react";
 import { useState } from "react";
+import PlanosGenericos from '../shared/PlanosGenericos';
 
 export default function LandingClinics() {
   const [showModal, setShowModal] = useState(false);
@@ -426,74 +427,7 @@ export default function LandingClinics() {
           </p>
 
           {/* Pricing table */}
-          <div className="mt-8 grid md:grid-cols-3 gap-6">
-            {/* Plano 1 – Controle */}
-            <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/10">
-              <div className="flex items-baseline justify-between">
-                <h3 className="text-xl font-semibold">Controle</h3>
-                <span className="text-emerald-300 font-semibold">R$ 950,00<span className="text-slate-400 text-sm"> / mês</span></span>
-              </div>
-              <p className="mt-2 text-sm text-slate-300/90">Básico organizado. Tiramos a clínica do operacional.</p>
-              <ul className="mt-4 space-y-2 text-sm text-slate-300/90">
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Elaboração/revisão de categorias (despesas, receitas) e centros de custos</li>
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Elaboração/revisão do budget anual de despesas fixas</li>
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Lançamento e pagamentos de Contas a Pagar</li>
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Lançamento e recebimentos de Contas a Receber</li>
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Conciliação bancária (cartão, PIX, boletos)</li>
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Organização e envio de documentos fiscais para contabilidade</li>
-              </ul>
-              <button 
-                onClick={() => handleOpenModal("Controle")}
-                className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-                Escolher Plano Controle
-              </button>
-            </div>
-
-            {/* Plano 2 – Gerencial */}
-            <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/10 ring-1 ring-emerald-300/30">
-              <div className="flex items-baseline justify-between">
-                <h3 className="text-xl font-semibold">Gerencial</h3>
-                <span className="text-emerald-300 font-semibold">R$ 1.300,00<span className="text-slate-400 text-sm"> / mês</span></span>
-              </div>
-              <p className="mt-2 text-sm text-slate-300/90">Tudo do Controle + visão de gestão e cobrança ativa.</p>
-              <ul className="mt-4 space-y-2 text-sm text-slate-300/90">
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Todos os serviços do Plano Controle</li>
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Cobrança de inadimplentes (contato ativo com clientes em atraso)</li>
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Emissão de NF (quando aplicável)</li>
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Relatório semanal de fluxo de caixa</li>
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Relatórios mensais simplificados (entradas x saídas, posição de caixa)</li>
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Apoio na gestão de contratos (fornecedores e convênios)</li>
-              </ul>
-              <button 
-                onClick={() => handleOpenModal("Gerencial")}
-                className="w-full mt-6 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-                🔥 Escolher Plano Gerencial
-              </button>
-            </div>
-
-            {/* Plano 3 – Avançado */}
-            <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/10">
-              <div className="flex items-baseline justify-between">
-                <h3 className="text-xl font-semibold">Avançado</h3>
-                <span className="text-emerald-300 font-semibold">R$ 1.700,00<span className="text-slate-400 text-sm"> / mês</span></span>
-              </div>
-              <p className="mt-2 text-sm text-slate-300/90">Tudo do Gerencial + inteligência financeira para crescer.</p>
-              <ul className="mt-4 space-y-2 text-sm text-slate-300/90">
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Todos os serviços do Plano Gerencial</li>
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Planejamento de fluxo de caixa projetado (curto prazo)</li>
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Projeções financeiras detalhadas (DRE projetada, cenários)</li>
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Relatórios analíticos detalhados (por área, médico, convênio, unidade)</li>
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Estudo de margens e lucratividade</li>
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Planejamento financeiro anual + acompanhamento de metas</li>
-                <li className="flex gap-2 items-start"><CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0"/> Suporte consultivo estratégico (reuniões com gestor/diretor)</li>
-              </ul>
-              <button 
-                onClick={() => handleOpenModal("Avançado")}
-                className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-                Escolher Plano Avançado
-              </button>
-            </div>
-          </div>
+          <PlanosGenericos onSelectPlan={handleOpenModal} />
 
           <p className="mt-6 text-xs text-slate-400">* O escopo final é ajustado via SLA no onboarding. Itens não selecionados não serão executados.</p>
         </div>
