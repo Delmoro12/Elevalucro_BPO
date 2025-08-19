@@ -1,19 +1,19 @@
 "use client";
 
-import { CheckCircle, Clock, Shield, TrendingUp, Users, FileText, BarChart3, Megaphone, ArrowRight, Star, LineChart, Workflow, Smartphone, CreditCard, Banknote, Wallet, ShieldCheck, X, Building, Phone, Mail, UserCircle, Target } from "lucide-react";
+import { CheckCircle, Clock, Shield, TrendingUp, Users, FileText, BarChart3, Hotel, ArrowRight, Star, LineChart, Workflow, Smartphone, CreditCard, Banknote, Wallet, ShieldCheck, X, Building, Phone, Mail, UserCircle, Target } from "lucide-react";
 import { useState } from "react";
 import PlanosGenericos from '../shared/PlanosGenericos';
 
-export default function LandingAgencies() {
+export default function LandingHotels() {
   const [showModal, setShowModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("");
   const [formData, setFormData] = useState({
     nome: "",
     email: "",
     telefone: "",
-    agencia: "",
+    hotel: "",
     cargo: "",
-    clientesAtivos: "",
+    quartos: "",
     faturamento: "",
     principalDesafio: "",
     melhorHorario: ""
@@ -34,9 +34,9 @@ export default function LandingAgencies() {
       nome: "",
       email: "",
       telefone: "",
-      agencia: "",
+      hotel: "",
       cargo: "",
-      clientesAtivos: "",
+      quartos: "",
       faturamento: "",
       principalDesafio: "",
       melhorHorario: ""
@@ -58,7 +58,7 @@ export default function LandingAgencies() {
           <div className="flex items-center">
             <img 
               src="/images/Logo ElevaLucro.png" 
-              alt="ElevaLucro - BPO Financeiro para Agências"
+              alt="ElevaLucro - BPO Financeiro para Hotéis"
               className="h-10 w-auto"
             />
           </div>
@@ -78,14 +78,14 @@ export default function LandingAgencies() {
         <div className="mx-auto max-w-6xl px-4 py-20 md:py-32 relative">
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-400/10 text-emerald-300 text-sm font-medium mb-6">
-              <Megaphone className="h-4 w-4" />
-              Especialistas em agências
+              <Hotel className="h-4 w-4" />
+              Especialistas em hotelaria
             </div>
             <h1 className="text-4xl md:text-6xl font-semibold leading-tight mb-6">
-              Gestão financeira <span className="text-emerald-300">descomplicada</span> para sua agência
+              Gestão financeira <span className="text-emerald-300">inteligente</span> para seu hotel
             </h1>
             <p className="text-xl text-slate-300/90 mb-8 max-w-3xl mx-auto">
-              Tenha controle total dos projetos, margens dos clientes e lucratividade por campanha, com relatórios sempre em dia.
+              Tenha controle total do financeiro, fluxo de caixa e custos organizados, com relatórios sempre em dia.
             </p>
             <div className="relative z-10">
               <button 
@@ -97,7 +97,7 @@ export default function LandingAgencies() {
                   }
                 }}
                 className="relative z-10 inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors cursor-pointer">
-                📊 Quero minha agência organizada
+                🏨 Quero meu hotel organizado
                 <ArrowRight className="h-5 w-5" />
               </button>
             </div>
@@ -110,25 +110,25 @@ export default function LandingAgencies() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-3xl md:text-4xl font-semibold mb-6">
-              Sua agência precisa de <span className="text-emerald-300">foco na criatividade</span>, não em planilhas complexas.
+              Sua hotelaria precisa de <span className="text-emerald-300">foco na experiência dos hóspedes</span>, não em planilhas complexas.
             </h2>
             <p className="text-slate-300/90 text-lg mb-8">
-              Criativos e gestores perdem tempo valioso com controles financeiros manuais que só geram dor de cabeça:
+              Hoteleiros perdem tempo valioso com controles financeiros manuais que só geram dor de cabeça:
             </p>
           </div>
           <div className="rounded-2xl border border-red-500/20 p-8 bg-red-500/5">
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full bg-red-400 mt-2 flex-shrink-0"></div>
-                <p className="text-slate-300/90">Margem real dos projetos calculada "no chute"</p>
+                <p className="text-slate-300/90">Margem real dos serviços calculada "no chute"</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full bg-red-400 mt-2 flex-shrink-0"></div>
-                <p className="text-slate-300/90">Horas trabalhadas não contabilizadas corretamente</p>
+                <p className="text-slate-300/90">Custos por centro não contabilizados corretamente</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full bg-red-400 mt-2 flex-shrink-0"></div>
-                <p className="text-slate-300/90">Falta de visibilidade sobre lucratividade por cliente</p>
+                <p className="text-slate-300/90">Falta de visibilidade sobre lucratividade por categoria</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full bg-red-400 mt-2 flex-shrink-0"></div>
@@ -143,15 +143,15 @@ export default function LandingAgencies() {
       <section id="solucao" className="mx-auto max-w-6xl px-4 py-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-semibold mb-6">
-            A <span className="text-emerald-300">retaguarda financeira</span> da sua agência, nas mãos de especialistas
+            A <span className="text-emerald-300">retaguarda financeira</span> do seu hotel, nas mãos de especialistas
           </h2>
           <p className="text-xl text-slate-300/90 max-w-4xl mx-auto">
-            Com a ElevaLucro, você terceiriza toda a operação financeira da sua agência para um time especializado em BPO financeiro para o setor criativo.
+            Com a ElevaLucro, você terceiriza toda a operação financeira do seu hotel para um time especializado em BPO financeiro para o setor hoteleiro.
           </p>
         </div>
         <div className="rounded-2xl border border-emerald-500/20 p-8 bg-emerald-500/5 text-center">
           <p className="text-lg text-slate-300/90">
-            Você não precisa mais se preocupar com controle de projetos, margem de clientes e conciliações: <span className="text-emerald-300 font-semibold">tudo é feito por nós</span>, com transparência e segurança.
+            Você não precisa mais se preocupar com indicadores hoteleiros, margens por área e conciliações: <span className="text-emerald-300 font-semibold">tudo é feito por nós</span>, com transparência e segurança.
           </p>
         </div>
       </section>
@@ -170,20 +170,20 @@ export default function LandingAgencies() {
 
         <div className="grid md:grid-cols-2 gap-10 items-start mb-12">
           <div>
-            <h3 className="text-2xl font-semibold mb-6">Nossa rotina diária para sua agência:</h3>
+            <h3 className="text-2xl font-semibold mb-6">Nossa rotina diária para seu hotel:</h3>
             <div className="space-y-4">
               <div className="flex items-start gap-4">
                 <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-sm flex-shrink-0">1</div>
                 <div>
                   <h4 className="font-semibold text-emerald-300">Recebemos seus documentos</h4>
-                  <p className="text-sm text-slate-300/90">Contratos de clientes, notas fiscais, timesheet de horas via nossa interface</p>
+                  <p className="text-sm text-slate-300/90">Notas fiscais, contratos, comprovantes via nossa interface</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-sm flex-shrink-0">2</div>
                 <div>
                   <h4 className="font-semibold text-emerald-300">Processamos e organizamos</h4>
-                  <p className="text-sm text-slate-300/90">Custos por projeto, margem por cliente e preparação dos pagamentos</p>
+                  <p className="text-sm text-slate-300/90">Custos por categoria, receitas e preparação dos pagamentos</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -234,13 +234,13 @@ export default function LandingAgencies() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="text-center">
               <Target className="h-8 w-8 text-emerald-300 mx-auto mb-3" />
-              <h4 className="font-semibold mb-2">Controle de Projetos</h4>
-              <p className="text-xs text-slate-300/90">Custos, horas e margem por cliente</p>
+              <h4 className="font-semibold mb-2">Controle Financeiro</h4>
+              <p className="text-xs text-slate-300/90">DRE, margens e custos por categoria</p>
             </div>
             <div className="text-center">
               <Banknote className="h-8 w-8 text-emerald-300 mx-auto mb-3" />
               <h4 className="font-semibold mb-2">Contas a Pagar/Receber</h4>
-              <p className="text-xs text-slate-300/90">Fornecedores, freelancers e clientes</p>
+              <p className="text-xs text-slate-300/90">Fornecedores, funcionários e hóspedes</p>
             </div>
             <div className="text-center">
               <BarChart3 className="h-8 w-8 text-emerald-300 mx-auto mb-3" />
@@ -271,7 +271,7 @@ export default function LandingAgencies() {
             <div className="aspect-video bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl flex items-center justify-center border border-white/10 overflow-hidden">
               <img 
                 src="/images/tela_app.png" 
-                alt="Interface da ElevaLucro - Sistema de gestão financeira para agências"
+                alt="Interface da ElevaLucro - Sistema de gestão financeira para hotéis"
                 className="max-w-full max-h-full object-contain"
               />
             </div>
@@ -282,19 +282,19 @@ export default function LandingAgencies() {
           <div>
             <h3 className="text-2xl font-semibold mb-4">Tudo que você precisa em um só lugar</h3>
             <p className="text-slate-300/90 mb-6">
-              Nossa interface foi desenvolvida pensando na rotina de agências de marketing e comunicação. 
+              Nossa interface foi desenvolvida pensando na rotina de hotéis e pousadas. 
               Simples, intuitiva e com todas as ferramentas que você precisa para acompanhar sua gestão financeira.
             </p>
             <p className="text-slate-300/90">
               <span className="text-emerald-300 font-semibold">Resultado:</span> você ganha tempo, 
-              tem mais clareza dos números e pode focar no que realmente importa - criar campanhas brilhantes e conquistar novos clientes.
+              tem mais clareza dos números e pode focar no que realmente importa - oferecer experiências incríveis e conquistar novos hóspedes.
             </p>
           </div>
           <div className="rounded-2xl border border-white/10 p-8 bg-white/5">
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <FileText className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />
-                <p className="text-slate-300/90">Enviar documentos facilmente (contratos, timesheet, notas fiscais)</p>
+                <p className="text-slate-300/90">Enviar documentos facilmente (notas fiscais, contratos, comprovantes)</p>
               </div>
               <div className="flex items-start gap-3">
                 <Users className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />
@@ -302,11 +302,11 @@ export default function LandingAgencies() {
               </div>
               <div className="flex items-start gap-3">
                 <Target className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />
-                <p className="text-slate-300/90">Consultar lucratividade por projeto e cliente em tempo real</p>
+                <p className="text-slate-300/90">Consultar lucratividade por categoria em tempo real</p>
               </div>
               <div className="flex items-start gap-3">
                 <BarChart3 className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />
-                <p className="text-slate-300/90">Acompanhar indicadores de performance e margem</p>
+                <p className="text-slate-300/90">Acompanhar indicadores financeiros e performance</p>
               </div>
               <div className="flex items-start gap-3">
                 <TrendingUp className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />
@@ -314,7 +314,7 @@ export default function LandingAgencies() {
               </div>
               <div className="flex items-start gap-3">
                 <CheckCircle className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />
-                <p className="text-slate-300/90">Ter visão clara do DRE com custos e receitas por projeto</p>
+                <p className="text-slate-300/90">Ter visão clara do DRE com custos e receitas por categoria</p>
               </div>
             </div>
             <div className="mt-6 p-4 rounded-xl bg-emerald-400/10 text-emerald-200 text-center">
@@ -328,14 +328,14 @@ export default function LandingAgencies() {
       <section id="beneficios" className="mx-auto max-w-6xl px-4 py-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-semibold mb-6">
-            Mais <span className="text-emerald-300">tranquilidade</span> e mais <span className="text-emerald-300">resultados</span> para sua agência
+            Mais <span className="text-emerald-300">tranquilidade</span> e mais <span className="text-emerald-300">resultados</span> para seu hotel
           </h2>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/10">
-            <Megaphone className="h-8 w-8 text-emerald-300 mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Foco na criatividade</h3>
-            <p className="text-sm text-slate-300/90">Mais tempo para criar campanhas e atender clientes, enquanto cuidamos da gestão</p>
+            <Hotel className="h-8 w-8 text-emerald-300 mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Foco na experiência</h3>
+            <p className="text-sm text-slate-300/90">Mais tempo para atender hóspedes e melhorar serviços, enquanto cuidamos da gestão</p>
           </div>
           <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/10">
             <Shield className="h-8 w-8 text-emerald-300 mb-4" />
@@ -350,7 +350,7 @@ export default function LandingAgencies() {
           <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/10">
             <CheckCircle className="h-8 w-8 text-emerald-300 mb-4" />
             <h3 className="text-lg font-semibold mb-2">Expertise especializada</h3>
-            <p className="text-sm text-slate-300/90">Mais confiável por sermos especialistas em BPO para agências</p>
+            <p className="text-sm text-slate-300/90">Mais confiável por sermos especialistas em BPO para hotéis</p>
           </div>
           <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/10">
             <Clock className="h-8 w-8 text-emerald-300 mb-4" />
@@ -373,13 +373,13 @@ export default function LandingAgencies() {
           </h2>
           <div className="max-w-4xl mx-auto space-y-6 text-lg text-slate-300/90">
             <p>
-              Cada vez mais agências estão adotando o modelo de BPO financeiro: terceirizar a retaguarda para quem realmente entende de números.
+              Cada vez mais hotéis estão adotando o modelo de BPO financeiro: terceirizar a retaguarda para quem realmente entende de números.
             </p>
             <p>
               Isso significa: <span className="text-emerald-300 font-semibold">menos custo fixo</span>, <span className="text-emerald-300 font-semibold">mais eficiência</span> e <span className="text-emerald-300 font-semibold">mais clareza</span> para tomar decisões inteligentes.
             </p>
             <p className="text-center font-medium">
-              Nós da ElevaLucro somos especialistas em BPO para agências e já ajudamos diversas empresas criativas a elevar seus lucros com simplicidade e segurança.
+              Nós da ElevaLucro somos especialistas em BPO para hotéis e já ajudamos diversos empreendimentos hoteleiros a elevar seus lucros com simplicidade e segurança.
             </p>
           </div>
         </div>
@@ -389,7 +389,7 @@ export default function LandingAgencies() {
       <section className="mx-auto max-w-6xl px-4 py-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-semibold mb-6">
-            Agências que já <span className="text-emerald-300">respiram tranquilas</span> com a ElevaLucro
+            Hotéis que já <span className="text-emerald-300">respiram tranquilos</span> com a ElevaLucro
           </h2>
         </div>
         <div className="max-w-4xl mx-auto">
@@ -400,10 +400,10 @@ export default function LandingAgencies() {
               ))}
             </div>
             <blockquote className="text-xl text-slate-300/90 mb-6 italic">
-              "Antes eu não sabia se estava ganhando ou perdendo dinheiro com cada cliente, hoje sei a margem exata de cada projeto."
+              "Antes eu não sabia a margem real dos serviços, hoje sei exatamente onde estou ganhando ou perdendo dinheiro."
             </blockquote>
             <cite className="text-emerald-300 font-semibold">
-              — Rafael Santos, Director Creative Agency
+              — Marina Silva, Hotel Beiramar
             </cite>
           </div>
         </div>
@@ -412,9 +412,9 @@ export default function LandingAgencies() {
       {/* SEÇÃO DE PLANOS */}
       <section id="planos" className="mx-auto max-w-6xl px-4 py-16">
         <div className="rounded-2xl border border-white/10 p-8 bg-white/5">
-          <h2 className="text-2xl md:text-3xl font-semibold flex items-center gap-2"><LineChart className="h-6 w-6 text-emerald-300"/>Escolha o plano ideal para sua agência</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold flex items-center gap-2"><LineChart className="h-6 w-6 text-emerald-300"/>Escolha o plano ideal para seu hotel</h2>
           <p className="mt-4 text-slate-300/90 max-w-3xl">
-            Comece com o que sua agência precisa hoje e evolua conforme cresce. Em todos os planos, <span className="text-white font-medium">você mantém o controle total</span> dos pagamentos enquanto nós cuidamos de toda a operação.
+            Comece com o que seu hotel precisa hoje e evolua conforme cresce. Em todos os planos, <span className="text-white font-medium">você mantém o controle total</span> dos pagamentos enquanto nós cuidamos de toda a operação.
           </p>
 
           {/* Pricing table */}
@@ -428,15 +428,15 @@ export default function LandingAgencies() {
       <section id="contato" className="mx-auto max-w-6xl px-4 py-20">
         <div className="text-center">
           <h2 className="text-4xl md:text-5xl font-semibold mb-6">
-            Eleve os <span className="text-emerald-300">resultados</span> da sua agência
+            Eleve os <span className="text-emerald-300">resultados</span> do seu hotel
           </h2>
           <p className="text-xl text-slate-300/90 mb-8 max-w-3xl mx-auto">
-            Simplifique sua gestão financeira e ganhe tempo para o que realmente importa: criar campanhas brilhantes e conquistar novos clientes.
+            Simplifique sua gestão financeira e ganhe tempo para o que realmente importa: oferecer experiências incríveis e conquistar novos hóspedes.
           </p>
           <button 
             onClick={() => handleOpenModal("Gerencial")}
             className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-10 py-5 rounded-xl font-semibold text-xl transition-colors">
-            Quero organizar minha agência
+            Quero organizar meu hotel
             <ArrowRight className="h-6 w-6" />
           </button>
         </div>
@@ -445,7 +445,7 @@ export default function LandingAgencies() {
       {/* FOOTER */}
       <footer className="border-t border-white/10">
         <div className="mx-auto max-w-6xl px-4 py-10 text-sm text-slate-400 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p>© {new Date().getFullYear()} ElevaLucro • BPO Financeiro para Agências</p>
+          <p>© {new Date().getFullYear()} ElevaLucro • BPO Financeiro para Hotéis</p>
           <p className="text-slate-500">Gestão financeira especializada</p>
         </div>
       </footer>
@@ -463,7 +463,7 @@ export default function LandingAgencies() {
                 <X className="h-5 w-5 text-slate-400" />
               </button>
               <h3 className="text-2xl font-semibold text-white">
-                Transforme sua agência com o <span className="text-emerald-300">Plano {selectedPlan}</span>
+                Transforme seu hotel com o <span className="text-emerald-300">Plano {selectedPlan}</span>
               </h3>
               <p className="mt-2 text-slate-300/90">
                 Preencha seus dados e nossa equipe entrará em contato em até 24h
@@ -491,7 +491,7 @@ export default function LandingAgencies() {
                       value={formData.nome}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-slate-800/50 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50"
-                      placeholder="Rafael Santos"
+                      placeholder="Marina Silva"
                     />
                   </div>
                   
@@ -508,11 +508,10 @@ export default function LandingAgencies() {
                     >
                       <option value="">Selecione...</option>
                       <option value="proprietario">Proprietário(a)</option>
+                      <option value="gerente-geral">Gerente Geral</option>
+                      <option value="gerente-financeiro">Gerente Financeiro</option>
                       <option value="diretor">Diretor(a)</option>
-                      <option value="socio">Sócio(a)</option>
-                      <option value="gerente">Gerente</option>
-                      <option value="diretor-criativo">Diretor Criativo</option>
-                      <option value="account">Account</option>
+                      <option value="controller">Controller</option>
                       <option value="outro">Outro</option>
                     </select>
                   </div>
@@ -530,7 +529,7 @@ export default function LandingAgencies() {
                       value={formData.email}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-slate-800/50 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50"
-                      placeholder="rafael@agencia.com.br"
+                      placeholder="marina@hotelbeiramar.com.br"
                     />
                   </div>
                   
@@ -551,45 +550,45 @@ export default function LandingAgencies() {
                 </div>
               </div>
 
-              {/* Dados da Agência */}
+              {/* Dados do Hotel */}
               <div className="space-y-4">
                 <h4 className="text-lg font-semibold text-emerald-300 flex items-center gap-2">
-                  <Megaphone className="h-5 w-5" />
-                  Sobre sua agência
+                  <Hotel className="h-5 w-5" />
+                  Sobre seu hotel
                 </h4>
                 
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Nome da agência *
+                    Nome do hotel *
                   </label>
                   <input
                     type="text"
-                    name="agencia"
+                    name="hotel"
                     required
-                    value={formData.agencia}
+                    value={formData.hotel}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 bg-slate-800/50 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50"
-                    placeholder="Creative Agency"
+                    placeholder="Hotel Beiramar"
                   />
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">
-                      Clientes ativos (aproximado)
+                      Número de quartos
                     </label>
                     <select
-                      name="clientesAtivos"
-                      value={formData.clientesAtivos}
+                      name="quartos"
+                      value={formData.quartos}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-slate-800/50 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50"
                     >
                       <option value="">Selecione...</option>
-                      <option value="1-5">1 a 5</option>
-                      <option value="5-15">5 a 15</option>
-                      <option value="15-30">15 a 30</option>
-                      <option value="30-50">30 a 50</option>
-                      <option value="50+">Mais de 50</option>
+                      <option value="ate-20">Até 20</option>
+                      <option value="20-50">20 a 50</option>
+                      <option value="50-100">50 a 100</option>
+                      <option value="100-200">100 a 200</option>
+                      <option value="200+">Mais de 200</option>
                     </select>
                   </div>
                   
@@ -604,11 +603,11 @@ export default function LandingAgencies() {
                       className="w-full px-4 py-3 bg-slate-800/50 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50"
                     >
                       <option value="">Selecione...</option>
-                      <option value="0-50k">Até R$ 50 mil</option>
-                      <option value="50k-100k">R$ 50 a 100 mil</option>
-                      <option value="100k-200k">R$ 100 a 200 mil</option>
-                      <option value="200k-500k">R$ 200 a 500 mil</option>
-                      <option value="500k+">Acima de R$ 500 mil</option>
+                      <option value="0-100k">Até R$ 100 mil</option>
+                      <option value="100k-300k">R$ 100 a 300 mil</option>
+                      <option value="300k-500k">R$ 300 a 500 mil</option>
+                      <option value="500k-1m">R$ 500 mil a 1 milhão</option>
+                      <option value="1m+">Acima de R$ 1 milhão</option>
                     </select>
                   </div>
                 </div>
@@ -623,7 +622,7 @@ export default function LandingAgencies() {
                     onChange={handleInputChange}
                     rows={3}
                     className="w-full px-4 py-3 bg-slate-800/50 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 resize-none"
-                    placeholder="Ex: Não sei a margem real dos serviços, controle de custos, lucratividade por categoria..."
+                    placeholder="Ex: Não sei a margem real, controle de custos por categoria, lucratividade..."
                   />
                 </div>
               </div>
