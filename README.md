@@ -2,6 +2,14 @@
 
 Sistema de gestão financeira BPO com dashboards, aprovações e integração com ERPs.
 
+## Funcionalidades Principais
+
+- **Formulários de Pre-Onboarding** para os 3 planos (Controle, Gerencial, Avançado)
+- **Integração com Asaas** para pagamentos e assinaturas
+- **Integração com D4Sign** para contratos automáticos
+- **Páginas de vendas** responsivas para cada segmento
+- **Sistema de planos configurável** com áreas específicas por plano
+
 ## Instalação
 
 ```bash
