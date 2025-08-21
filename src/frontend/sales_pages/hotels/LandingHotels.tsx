@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, Clock, Shield, TrendingUp, Users, FileText, BarChart3, Hotel, ArrowRight, Star, LineChart, Workflow, Smartphone, CreditCard, Banknote, Wallet, ShieldCheck, X, Building, Phone, Mail, UserCircle, Target } from "lucide-react";
+import { CheckCircle, Clock, Shield, TrendingUp, Users, FileText, BarChart3, Hotel, ArrowRight, Star, LineChart, Workflow, Smartphone, CreditCard, Banknote, Wallet, ShieldCheck, X, Building, Phone, Mail, UserCircle, Target, Calendar } from "lucide-react";
 import { useState } from "react";
 import PlanosGenericos from '../shared/PlanosGenericos';
 
@@ -270,7 +270,7 @@ export default function LandingHotels() {
           <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-8 mb-12">
             <div className="aspect-video bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl flex items-center justify-center border border-white/10 overflow-hidden">
               <img 
-                src="/images/tela_app.png" 
+                src="/images/Tela_app2.png" 
                 alt="Interface da ElevaLucro - Sistema de gestão financeira para hotéis"
                 className="max-w-full max-h-full object-contain"
               />
@@ -405,6 +405,57 @@ export default function LandingHotels() {
             <cite className="text-emerald-300 font-semibold">
               — Marina Silva, Hotel Beiramar
             </cite>
+          </div>
+        </div>
+      </section>
+
+      {/* SEÇÃO DE IMPACTO 30 DIAS */}
+      <section className="mx-auto max-w-6xl px-4 py-16">
+        <div className="text-center">
+          <div className="bg-gradient-to-r from-emerald-500/10 to-emerald-400/5 rounded-3xl p-12 border border-emerald-500/20">
+            <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-emerald-500/20 text-emerald-300 text-sm font-medium mb-6">
+              <Calendar className="h-5 w-5" />
+              Resultado garantido
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Seu financeiro <span className="text-emerald-300">100% organizado</span>
+              <br />em apenas 30 dias
+            </h2>
+            <p className="text-xl text-slate-300 mb-8 max-w-3xl mx-auto">
+              Da primeira reunião até a operação completa: um cronograma claro 
+              para transformar a gestão financeira do seu hotel rapidamente.
+            </p>
+            
+            <div className="grid md:grid-cols-4 gap-6 mt-12">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-emerald-300">1</span>
+                </div>
+                <h3 className="font-semibold text-white mb-2">Semana 1</h3>
+                <p className="text-sm text-slate-400">Diagnóstico e setup inicial</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-emerald-300">2</span>
+                </div>
+                <h3 className="font-semibold text-white mb-2">Semana 2</h3>
+                <p className="text-sm text-slate-400">Implementação completa</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-emerald-300">3</span>
+                </div>
+                <h3 className="font-semibold text-white mb-2">Semana 3</h3>
+                <p className="text-sm text-slate-400">Operação assistida</p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-emerald-300">✓</span>
+                </div>
+                <h3 className="font-semibold text-white mb-2">Semana 4</h3>
+                <p className="text-sm text-slate-400">100% operacional</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

@@ -279,7 +279,7 @@ export default function LandingClinics() {
           <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-8 mb-12">
             <div className="aspect-video bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl flex items-center justify-center border border-white/10 overflow-hidden">
               <img 
-                src="/images/tela_app.png" 
+                src="/images/Tela_app2.png" 
                 alt="Interface da ElevaLucro - Sistema de gestão financeira para clínicas"
                 className="max-w-full max-h-full object-contain"
               />

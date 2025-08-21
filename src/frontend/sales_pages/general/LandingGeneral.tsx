@@ -1,19 +1,19 @@
 "use client";
 
-import { CheckCircle, Clock, Shield, TrendingUp, Users, FileText, BarChart3, UtensilsCrossed, ArrowRight, Star, LineChart, Workflow, Smartphone, CreditCard, Banknote, Wallet, ShieldCheck, X, Building, Phone, Mail, UserCircle, Calendar } from "lucide-react";
+import { CheckCircle, Clock, Shield, TrendingUp, Users, FileText, BarChart3, Building, ArrowRight, Star, LineChart, Workflow, Smartphone, CreditCard, Banknote, Wallet, ShieldCheck, X, Phone, Mail, UserCircle, Calendar } from "lucide-react";
 import { useState } from "react";
 import PlanosGenericos from '../shared/PlanosGenericos';
 
-export default function LandingRestaurants() {
+export default function LandingGeneral() {
   const [showModal, setShowModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("");
   const [formData, setFormData] = useState({
     nome: "",
     email: "",
     telefone: "",
-    restaurante: "",
+    empresa: "",
     cargo: "",
-    clientesDia: "",
+    segmento: "",
     faturamento: "",
     principalDesafio: "",
     melhorHorario: ""
@@ -22,6 +22,16 @@ export default function LandingRestaurants() {
   const handleOpenModal = (planName: string) => {
     setSelectedPlan(planName);
     setShowModal(true);
+  };
+
+  const scrollToPlans = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const element = document.querySelector('#planos');
+    if (element) {
+      const yOffset = -80; // Offset para compensar o header fixo
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -34,9 +44,9 @@ export default function LandingRestaurants() {
       nome: "",
       email: "",
       telefone: "",
-      restaurante: "",
+      empresa: "",
       cargo: "",
-      clientesDia: "",
+      segmento: "",
       faturamento: "",
       principalDesafio: "",
       melhorHorario: ""
@@ -49,7 +59,6 @@ export default function LandingRestaurants() {
       [e.target.name]: e.target.value
     });
   };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
       {/* NAV */}
@@ -58,7 +67,7 @@ export default function LandingRestaurants() {
           <div className="flex items-center">
             <img 
               src="/images/Logo ElevaLucro.png" 
-              alt="ElevaLucro - BPO Financeiro para Restaurantes"
+              alt="ElevaLucro - BPO Financeiro"
               className="h-10 w-auto"
             />
           </div>
@@ -78,14 +87,14 @@ export default function LandingRestaurants() {
         <div className="mx-auto max-w-6xl px-4 py-20 md:py-32 relative">
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-400/10 text-emerald-300 text-sm font-medium mb-6">
-              <UtensilsCrossed className="h-4 w-4" />
-              Especialistas em restaurantes
+              <Building className="h-4 w-4" />
+              Especialistas em gestão financeira
             </div>
             <h1 className="text-4xl md:text-6xl font-semibold leading-tight mb-6">
-              Gestão financeira <span className="text-emerald-300">descomplicada</span> para seu restaurante
+              Gestão financeira <span className="text-emerald-300">descomplicada</span> para sua empresa
             </h1>
             <p className="text-xl text-slate-300/90 mb-8 max-w-3xl mx-auto">
-              Tenha controle total dos custos, margem dos pratos e lucratividade, com relatórios sempre em dia.
+              Tenha clareza absoluta dos números, com relatórios, fluxo de caixa e lucros sempre à mão.
             </p>
             <div className="relative z-10">
               <button 
@@ -97,7 +106,7 @@ export default function LandingRestaurants() {
                   }
                 }}
                 className="relative z-10 inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors cursor-pointer">
-                🍽️ Quero meu restaurante organizado
+                👉 Quero minha empresa organizada
                 <ArrowRight className="h-5 w-5" />
               </button>
             </div>
@@ -110,29 +119,29 @@ export default function LandingRestaurants() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-3xl md:text-4xl font-semibold mb-6">
-              Seu restaurante precisa de <span className="text-emerald-300">foco na cozinha</span>, não em planilhas.
+              Sua empresa precisa de <span className="text-emerald-300">atenção</span>, não de planilhas sem fim.
             </h2>
             <p className="text-slate-300/90 text-lg mb-8">
-              Chefs e gestores perdem tempo valioso com controles financeiros manuais que só geram dor de cabeça:
+              Empresários gastam tempo precioso com controles financeiros manuais que só geram dor de cabeça:
             </p>
           </div>
           <div className="rounded-2xl border border-red-500/20 p-8 bg-red-500/5">
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full bg-red-400 mt-2 flex-shrink-0"></div>
-                <p className="text-slate-300/90">Controle de custos desatualizado dos ingredientes</p>
+                <p className="text-slate-300/90">Planilhas confusas que nunca batem</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full bg-red-400 mt-2 flex-shrink-0"></div>
-                <p className="text-slate-300/90">Margem dos pratos calculada "no olho"</p>
+                <p className="text-slate-300/90">Falta de visibilidade sobre fluxo de caixa</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full bg-red-400 mt-2 flex-shrink-0"></div>
-                <p className="text-slate-300/90">Falta de visibilidade sobre lucratividade real</p>
+                <p className="text-slate-300/90">Decisões importantes tomadas sem números confiáveis</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full bg-red-400 mt-2 flex-shrink-0"></div>
-                <p className="text-slate-300/90">Desperdício não controlado e perda de dinheiro</p>
+                <p className="text-slate-300/90">Risco de erros e atrasos em pagamentos</p>
               </div>
             </div>
           </div>
@@ -143,15 +152,15 @@ export default function LandingRestaurants() {
       <section id="solucao" className="mx-auto max-w-6xl px-4 py-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-semibold mb-6">
-            A <span className="text-emerald-300">retaguarda financeira</span> do seu restaurante, nas mãos de especialistas
+            A <span className="text-emerald-300">retaguarda financeira</span> da sua empresa, nas mãos de especialistas
           </h2>
           <p className="text-xl text-slate-300/90 max-w-4xl mx-auto">
-            Com a ElevaLucro, você terceiriza toda a operação financeira do seu restaurante para um time especializado em BPO financeiro para o setor alimentício.
+            Com a ElevaLucro, você terceiriza toda a operação financeira da sua empresa para um time especializado em BPO financeiro.
           </p>
         </div>
         <div className="rounded-2xl border border-emerald-500/20 p-8 bg-emerald-500/5 text-center">
           <p className="text-lg text-slate-300/90">
-            Você não precisa mais se preocupar com lançamentos, controle de custos e conciliações: <span className="text-emerald-300 font-semibold">tudo é feito por nós</span>, com transparência e segurança.
+            Você não precisa mais se preocupar com lançamentos, pagamentos e conciliações: <span className="text-emerald-300 font-semibold">tudo é feito por nós</span>, com transparência e segurança.
           </p>
         </div>
       </section>
@@ -170,20 +179,20 @@ export default function LandingRestaurants() {
 
         <div className="grid md:grid-cols-2 gap-10 items-start mb-12">
           <div>
-            <h3 className="text-2xl font-semibold mb-6">Nossa rotina diária para seu restaurante:</h3>
+            <h3 className="text-2xl font-semibold mb-6">Nossa rotina diária para sua empresa:</h3>
             <div className="space-y-4">
               <div className="flex items-start gap-4">
                 <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-sm flex-shrink-0">1</div>
                 <div>
                   <h4 className="font-semibold text-emerald-300">Recebemos seus documentos</h4>
-                  <p className="text-sm text-slate-300/90">Notas de fornecedores, boletos, cardápio e vendas via nossa interface</p>
+                  <p className="text-sm text-slate-300/90">Notas fiscais, boletos e comprovantes via nossa interface</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-sm flex-shrink-0">2</div>
                 <div>
                   <h4 className="font-semibold text-emerald-300">Processamos e organizamos</h4>
-                  <p className="text-sm text-slate-300/90">Custos dos ingredientes, margem dos pratos e preparação dos pagamentos</p>
+                  <p className="text-sm text-slate-300/90">Lançamentos contábeis, conciliação bancária e preparação dos pagamentos</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -235,17 +244,17 @@ export default function LandingRestaurants() {
             <div className="text-center">
               <Wallet className="h-8 w-8 text-emerald-300 mx-auto mb-3" />
               <h4 className="font-semibold mb-2">Contas a Pagar/Receber</h4>
-              <p className="text-xs text-slate-300/90">Fornecedores, delivery e pagamentos</p>
+              <p className="text-xs text-slate-300/90">Lançamentos, atualizações e lembretes</p>
             </div>
             <div className="text-center">
-              <UtensilsCrossed className="h-8 w-8 text-emerald-300 mx-auto mb-3" />
-              <h4 className="font-semibold mb-2">Controle de Custos</h4>
-              <p className="text-xs text-slate-300/90">Ingredientes, receitas e margem</p>
+              <Banknote className="h-8 w-8 text-emerald-300 mx-auto mb-3" />
+              <h4 className="font-semibold mb-2">Conciliação Bancária</h4>
+              <p className="text-xs text-slate-300/90">Integrações e revisão humana</p>
             </div>
             <div className="text-center">
               <BarChart3 className="h-8 w-8 text-emerald-300 mx-auto mb-3" />
               <h4 className="font-semibold mb-2">Relatórios Gerenciais</h4>
-              <p className="text-xs text-slate-300/90">DRE, lucratividade e indicadores</p>
+              <p className="text-xs text-slate-300/90">DRE, fluxo de caixa e indicadores</p>
             </div>
             <div className="text-center">
               <ShieldCheck className="h-8 w-8 text-emerald-300 mx-auto mb-3" />
@@ -271,7 +280,7 @@ export default function LandingRestaurants() {
             <div className="aspect-video bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl flex items-center justify-center border border-white/10 overflow-hidden">
               <img 
                 src="/images/Tela_app2.png" 
-                alt="Interface da ElevaLucro - Sistema de gestão financeira para restaurantes"
+                alt="Interface da ElevaLucro - Sistema de gestão financeira"
                 className="max-w-full max-h-full object-contain"
               />
             </div>
@@ -282,31 +291,31 @@ export default function LandingRestaurants() {
           <div>
             <h3 className="text-2xl font-semibold mb-4">Tudo que você precisa em um só lugar</h3>
             <p className="text-slate-300/90 mb-6">
-              Nossa interface foi desenvolvida pensando na rotina de restaurantes e estabelecimentos alimentícios. 
+              Nossa interface foi desenvolvida pensando na rotina de empresas modernas. 
               Simples, intuitiva e com todas as ferramentas que você precisa para acompanhar sua gestão financeira.
             </p>
             <p className="text-slate-300/90">
               <span className="text-emerald-300 font-semibold">Resultado:</span> você ganha tempo, 
-              tem mais clareza dos números e pode focar no que realmente importa - criar pratos incríveis e atender bem seus clientes.
+              tem mais clareza dos números e pode focar no que realmente importa - fazer sua empresa crescer.
             </p>
           </div>
           <div className="rounded-2xl border border-white/10 p-8 bg-white/5">
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <FileText className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />
-                <p className="text-slate-300/90">Enviar documentos facilmente (notas fiscais, cardápio, vendas diárias)</p>
+                <p className="text-slate-300/90">Enviar documentos facilmente (notas fiscais, comprovantes, contratos)</p>
               </div>
               <div className="flex items-start gap-3">
                 <Users className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />
                 <p className="text-slate-300/90">Tirar dúvidas diretamente no painel, sem e-mails infinitos</p>
               </div>
               <div className="flex items-start gap-3">
-                <UtensilsCrossed className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />
-                <p className="text-slate-300/90">Consultar custo e margem de cada prato em tempo real</p>
+                <Clock className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />
+                <p className="text-slate-300/90">Acompanhar o trabalho em tempo real</p>
               </div>
               <div className="flex items-start gap-3">
                 <BarChart3 className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />
-                <p className="text-slate-300/90">Acompanhar indicadores de lucratividade e desperdício</p>
+                <p className="text-slate-300/90">Consultar indicadores financeiros prontos para análise</p>
               </div>
               <div className="flex items-start gap-3">
                 <TrendingUp className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />
@@ -314,7 +323,7 @@ export default function LandingRestaurants() {
               </div>
               <div className="flex items-start gap-3">
                 <CheckCircle className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />
-                <p className="text-slate-300/90">Ter visão clara do DRE com custos e receitas estruturados</p>
+                <p className="text-slate-300/90">Ter visão clara do DRE com lucros e custos estruturados</p>
               </div>
             </div>
             <div className="mt-6 p-4 rounded-xl bg-emerald-400/10 text-emerald-200 text-center">
@@ -328,14 +337,14 @@ export default function LandingRestaurants() {
       <section id="beneficios" className="mx-auto max-w-6xl px-4 py-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-semibold mb-6">
-            Mais <span className="text-emerald-300">tranquilidade</span> e mais <span className="text-emerald-300">resultados</span> para seu restaurante
+            Mais <span className="text-emerald-300">tranquilidade</span> e mais <span className="text-emerald-300">resultados</span> para sua empresa
           </h2>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/10">
-            <UtensilsCrossed className="h-8 w-8 text-emerald-300 mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Foco na cozinha</h3>
-            <p className="text-sm text-slate-300/90">Mais tempo para criar pratos e atender clientes, enquanto cuidamos da gestão</p>
+            <Building className="h-8 w-8 text-emerald-300 mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Foco no negócio</h3>
+            <p className="text-sm text-slate-300/90">Mais tempo para focar no core do negócio, enquanto cuidamos da gestão</p>
           </div>
           <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/10">
             <Shield className="h-8 w-8 text-emerald-300 mb-4" />
@@ -350,7 +359,7 @@ export default function LandingRestaurants() {
           <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/10">
             <CheckCircle className="h-8 w-8 text-emerald-300 mb-4" />
             <h3 className="text-lg font-semibold mb-2">Expertise especializada</h3>
-            <p className="text-sm text-slate-300/90">Mais confiável por sermos especialistas em BPO para restaurantes</p>
+            <p className="text-sm text-slate-300/90">Mais confiável por sermos especialistas em BPO financeiro</p>
           </div>
           <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/10">
             <Clock className="h-8 w-8 text-emerald-300 mb-4" />
@@ -373,13 +382,13 @@ export default function LandingRestaurants() {
           </h2>
           <div className="max-w-4xl mx-auto space-y-6 text-lg text-slate-300/90">
             <p>
-              Cada vez mais restaurantes estão adotando o modelo de BPO financeiro: terceirizar a retaguarda para quem realmente entende de números.
+              Cada vez mais empresas estão adotando o modelo de BPO financeiro: terceirizar a retaguarda para quem realmente entende de números.
             </p>
             <p>
               Isso significa: <span className="text-emerald-300 font-semibold">menos custo fixo</span>, <span className="text-emerald-300 font-semibold">mais eficiência</span> e <span className="text-emerald-300 font-semibold">mais clareza</span> para tomar decisões inteligentes.
             </p>
             <p className="text-center font-medium">
-              Nós da ElevaLucro somos especialistas em BPO para restaurantes e já ajudamos diversos estabelecimentos a elevar seus lucros com simplicidade e segurança.
+              Nós da ElevaLucro somos especialistas em BPO financeiro e já ajudamos diversas empresas a elevar seus lucros com simplicidade e segurança.
             </p>
           </div>
         </div>
@@ -389,7 +398,7 @@ export default function LandingRestaurants() {
       <section className="mx-auto max-w-6xl px-4 py-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-semibold mb-6">
-            Restaurantes que já <span className="text-emerald-300">respiram tranquilos</span> com a ElevaLucro
+            Empresas que já <span className="text-emerald-300">respiram tranquilas</span> com a ElevaLucro
           </h2>
         </div>
         <div className="max-w-4xl mx-auto">
@@ -400,10 +409,10 @@ export default function LandingRestaurants() {
               ))}
             </div>
             <blockquote className="text-xl text-slate-300/90 mb-6 italic">
-              "Antes eu não sabia quanto custava cada prato, hoje em 2 minutos sei a margem exata e se está dando lucro."
+              "Antes eu me perdia com notas fiscais e boletos, hoje em 5 minutos sei como está a saúde financeira da empresa."
             </blockquote>
             <cite className="text-emerald-300 font-semibold">
-              — Chef Carlos, Restaurante Bella Vista
+              — Carlos Silva, CEO da Silva & Associados
             </cite>
           </div>
         </div>
@@ -423,7 +432,7 @@ export default function LandingRestaurants() {
             </h2>
             <p className="text-xl text-slate-300 mb-8 max-w-3xl mx-auto">
               Da primeira reunião até a operação completa: um cronograma claro 
-              para transformar a gestão financeira do seu restaurante rapidamente.
+              para transformar a gestão financeira da sua empresa rapidamente.
             </p>
             
             <div className="grid md:grid-cols-4 gap-6 mt-12">
@@ -463,9 +472,9 @@ export default function LandingRestaurants() {
       {/* SEÇÃO DE PLANOS */}
       <section id="planos" className="mx-auto max-w-6xl px-4 py-16">
         <div className="rounded-2xl border border-white/10 p-8 bg-white/5">
-          <h2 className="text-2xl md:text-3xl font-semibold flex items-center gap-2"><LineChart className="h-6 w-6 text-emerald-300"/>Escolha o plano ideal para seu restaurante</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold flex items-center gap-2"><LineChart className="h-6 w-6 text-emerald-300"/>Escolha o plano ideal para sua empresa</h2>
           <p className="mt-4 text-slate-300/90 max-w-3xl">
-            Comece com o que seu restaurante precisa hoje e evolua conforme cresce. Em todos os planos, <span className="text-white font-medium">você mantém o controle total</span> dos pagamentos enquanto nós cuidamos de toda a operação.
+            Comece com o que sua empresa precisa hoje e evolua conforme cresce. Em todos os planos, <span className="text-white font-medium">você mantém o controle total</span> dos pagamentos enquanto nós cuidamos de toda a operação.
           </p>
 
           {/* Pricing table */}
@@ -479,15 +488,15 @@ export default function LandingRestaurants() {
       <section id="contato" className="mx-auto max-w-6xl px-4 py-20">
         <div className="text-center">
           <h2 className="text-4xl md:text-5xl font-semibold mb-6">
-            Eleve os <span className="text-emerald-300">resultados</span> do seu restaurante
+            Eleve os <span className="text-emerald-300">resultados</span> da sua empresa
           </h2>
           <p className="text-xl text-slate-300/90 mb-8 max-w-3xl mx-auto">
-            Simplifique sua gestão financeira e ganhe tempo para o que realmente importa: criar experiências gastronômicas incríveis.
+            Simplifique sua gestão financeira e ganhe tempo para o que realmente importa: fazer sua empresa crescer.
           </p>
           <button 
             onClick={() => handleOpenModal("Gerencial")}
             className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-10 py-5 rounded-xl font-semibold text-xl transition-colors">
-            Quero organizar meu restaurante
+            Quero organizar minha empresa
             <ArrowRight className="h-6 w-6" />
           </button>
         </div>
@@ -496,7 +505,7 @@ export default function LandingRestaurants() {
       {/* FOOTER */}
       <footer className="border-t border-white/10">
         <div className="mx-auto max-w-6xl px-4 py-10 text-sm text-slate-400 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p>© {new Date().getFullYear()} ElevaLucro • BPO Financeiro para Restaurantes</p>
+          <p>© {new Date().getFullYear()} ElevaLucro • BPO Financeiro</p>
           <p className="text-slate-500">Gestão financeira especializada</p>
         </div>
       </footer>
@@ -514,7 +523,7 @@ export default function LandingRestaurants() {
                 <X className="h-5 w-5 text-slate-400" />
               </button>
               <h3 className="text-2xl font-semibold text-white">
-                Transforme seu restaurante com o <span className="text-emerald-300">Plano {selectedPlan}</span>
+                Transforme sua empresa com o <span className="text-emerald-300">Plano {selectedPlan}</span>
               </h3>
               <p className="mt-2 text-slate-300/90">
                 Preencha seus dados e nossa equipe entrará em contato em até 24h
@@ -542,7 +551,7 @@ export default function LandingRestaurants() {
                       value={formData.nome}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-slate-800/50 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50"
-                      placeholder="Chef Maria Silva"
+                      placeholder="João Silva"
                     />
                   </div>
                   
@@ -559,9 +568,9 @@ export default function LandingRestaurants() {
                     >
                       <option value="">Selecione...</option>
                       <option value="proprietario">Proprietário(a)</option>
-                      <option value="chef">Chef</option>
+                      <option value="diretor">Diretor(a)</option>
                       <option value="gerente">Gerente</option>
-                      <option value="sócio">Sócio(a)</option>
+                      <option value="sócio">Sócio</option>
                       <option value="administrativo">Administrativo</option>
                       <option value="outro">Outro</option>
                     </select>
@@ -580,7 +589,7 @@ export default function LandingRestaurants() {
                       value={formData.email}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-slate-800/50 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50"
-                      placeholder="maria@restaurante.com.br"
+                      placeholder="joao@empresa.com.br"
                     />
                   </div>
                   
@@ -601,45 +610,48 @@ export default function LandingRestaurants() {
                 </div>
               </div>
 
-              {/* Dados do Restaurante */}
+              {/* Dados da Empresa */}
               <div className="space-y-4">
                 <h4 className="text-lg font-semibold text-emerald-300 flex items-center gap-2">
-                  <UtensilsCrossed className="h-5 w-5" />
-                  Sobre seu restaurante
+                  <Building className="h-5 w-5" />
+                  Sobre sua empresa
                 </h4>
                 
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Nome do restaurante *
+                    Nome da empresa *
                   </label>
                   <input
                     type="text"
-                    name="restaurante"
+                    name="empresa"
                     required
-                    value={formData.restaurante}
+                    value={formData.empresa}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 bg-slate-800/50 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50"
-                    placeholder="Restaurante Bella Vista"
+                    placeholder="Silva & Associados"
                   />
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">
-                      Clientes/dia (aproximado)
+                      Segmento de atuação
                     </label>
                     <select
-                      name="clientesDia"
-                      value={formData.clientesDia}
+                      name="segmento"
+                      value={formData.segmento}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-slate-800/50 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50"
                     >
                       <option value="">Selecione...</option>
-                      <option value="0-50">Até 50</option>
-                      <option value="50-100">50 a 100</option>
-                      <option value="100-200">100 a 200</option>
-                      <option value="200-500">200 a 500</option>
-                      <option value="500+">Mais de 500</option>
+                      <option value="consultoria">Consultoria</option>
+                      <option value="comercio">Comércio</option>
+                      <option value="servicos">Serviços</option>
+                      <option value="industria">Indústria</option>
+                      <option value="tecnologia">Tecnologia</option>
+                      <option value="saude">Saúde</option>
+                      <option value="educacao">Educação</option>
+                      <option value="outro">Outro</option>
                     </select>
                   </div>
                   
@@ -654,11 +666,11 @@ export default function LandingRestaurants() {
                       className="w-full px-4 py-3 bg-slate-800/50 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50"
                     >
                       <option value="">Selecione...</option>
-                      <option value="0-30k">Até R$ 30 mil</option>
-                      <option value="30k-60k">R$ 30 a 60 mil</option>
-                      <option value="60k-100k">R$ 60 a 100 mil</option>
+                      <option value="0-50k">Até R$ 50 mil</option>
+                      <option value="50k-100k">R$ 50 a 100 mil</option>
                       <option value="100k-200k">R$ 100 a 200 mil</option>
-                      <option value="200k+">Acima de R$ 200 mil</option>
+                      <option value="200k-500k">R$ 200 a 500 mil</option>
+                      <option value="500k+">Acima de R$ 500 mil</option>
                     </select>
                   </div>
                 </div>
@@ -673,7 +685,7 @@ export default function LandingRestaurants() {
                     onChange={handleInputChange}
                     rows={3}
                     className="w-full px-4 py-3 bg-slate-800/50 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 resize-none"
-                    placeholder="Ex: Não sei o custo real dos pratos, controle de desperdício, margem de lucro..."
+                    placeholder="Ex: Dificuldade com fluxo de caixa, controle de inadimplência, falta de visibilidade dos números..."
                   />
                 </div>
               </div>
