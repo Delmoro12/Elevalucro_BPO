@@ -141,15 +141,15 @@ IMPORTANTE: Use file_search para ler TODO o conteúdo do PDF e extrair todas as 
         });
 
         // Aguardar conclusão
-        let runStatus = await openai.beta.threads.runs.retrieve(thread.id, { run_id: run.id });
+        let runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id as any);
         while (runStatus.status === 'in_progress' || runStatus.status === 'queued') {
           await new Promise(resolve => setTimeout(resolve, 1000));
-          runStatus = await openai.beta.threads.runs.retrieve(thread.id, { run_id: run.id });
+          runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id as any);
         }
 
         // Obter resposta
         const threadMessages = await openai.beta.threads.messages.list(thread.id);
-        const content = threadMessages.data[0]?.content[0]?.text?.value || '{}';
+        const content = (threadMessages.data[0]?.content[0] as any)?.text?.value || '{}';
         console.log('📄 Resposta da API:', content);
 
         // Cleanup
