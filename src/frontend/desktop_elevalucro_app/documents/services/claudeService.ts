@@ -102,7 +102,7 @@ CAMPOS OPCIONAIS:
 IMPORTANTE: Leia TODO o conteúdo do documento e extraia todas as informações visíveis. Seja muito preciso com valores e datas.`
               },
               {
-                type: 'image',
+                type: file.type === 'application/pdf' ? 'document' as any : 'image',
                 source: {
                   type: 'base64',
                   media_type: mediaType as any,
