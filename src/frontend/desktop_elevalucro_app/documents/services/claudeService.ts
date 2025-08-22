@@ -102,10 +102,10 @@ CAMPOS OPCIONAIS:
 IMPORTANTE: Leia TODO o conteúdo do documento e extraia todas as informações visíveis. Seja muito preciso com valores e datas.`
               },
               {
-                type: 'document',
+                type: 'image',
                 source: {
                   type: 'base64',
-                  media_type: mediaType,
+                  media_type: mediaType as any,
                   data: base64
                 }
               }
@@ -114,7 +114,7 @@ IMPORTANTE: Leia TODO o conteúdo do documento e extraia todas as informações 
         ]
       });
 
-      const content = response.content[0]?.text || '{}';
+      const content = (response.content[0] as any)?.text || '{}';
       console.log('📄 Resposta do Claude:', content);
       
       // Extrair JSON da resposta
@@ -187,7 +187,7 @@ IMPORTANTE: Esta conversa NÃO tem memória - trate cada mensagem como independe
         messages: claudeMessages
       });
 
-      return response.content[0]?.text || 'Desculpe, não consegui processar sua mensagem.';
+      return (response.content[0] as any)?.text || 'Desculpe, não consegui processar sua mensagem.';
 
     } catch (error) {
       console.error('Erro no chat com Claude:', error);
