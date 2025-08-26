@@ -12,7 +12,8 @@ export const SUPABASE_CONFIG = {
     COMPANIES: 'companies',
     CONTRACTS: 'contracts',
     PAYMENTS: 'payments',
-    PRE_CONTRACTS: 'pre_contracts'
+    PRE_CONTRACTS: 'pre_contracts',
+    PROSPECTS: 'prospects'
   },
   
   // Configurações de storage

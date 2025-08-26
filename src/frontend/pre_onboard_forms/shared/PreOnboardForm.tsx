@@ -1,88 +1,27 @@
 "use client";
 
-import { useState } from "react";
 import { ChevronLeft, ChevronRight, Check, Building2, CreditCard, Settings, FileText, Target, Users, User, MapPin } from "lucide-react";
-
-interface FormData {
-  // Dados pessoais e da empresa
-  nomeContato: string;
-  cpfContato: string;
-  emailContato: string;
-  telefoneContato: string;
-  cargoContato: string;
-  nomeEmpresa: string;
-  cnpj: string;
-  endereco: string;
-  numero: string;
-  bairro: string;
-  cep: string;
-  cidade: string;
-  estado: string;
-  
-  // Dados técnicos
-  segmento: string;
-  areas: string[];
-  bancos: string[];
-  ferramentas: string[];
-  fornecedores: string[];
-  organizacao: string[];
-  relatorios: string[];
-  
-  // Expectativas e objetivos
-  expectativasSucesso: string;
-  
-  // Plano selecionado
-  plano: string;
-  valorMensal: number;
-}
-
-interface PlanConfig {
-  name: string;
-  value: number;
-  displayName: string;
-  enabledAreas: string[];
-  subtitle: string;
-}
+import { PlanConfig, FormData } from "../types";
+import { usePreOnboardForm } from "../hooks/usePreOnboardForm";
 
 interface PreOnboardFormProps {
   planConfig: PlanConfig;
 }
 
 export default function PreOnboardForm({ planConfig }: PreOnboardFormProps) {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<FormData>({
-    // Dados pessoais e da empresa
-    nomeContato: "",
-    cpfContato: "",
-    emailContato: "",
-    telefoneContato: "",
-    cargoContato: "",
-    nomeEmpresa: "",
-    cnpj: "",
-    endereco: "",
-    numero: "",
-    bairro: "",
-    cep: "",
-    cidade: "",
-    estado: "",
-    
-    // Dados técnicos
-    segmento: "",
-    // Pré-selecionar todas as áreas habilitadas para cada plano
-    areas: planConfig.enabledAreas,
-    bancos: [],
-    ferramentas: [],
-    fornecedores: [],
-    organizacao: [],
-    relatorios: [],
-    
-    // Expectativas e objetivos
-    expectativasSucesso: "",
-    
-    // Plano
-    plano: planConfig.name,
-    valorMensal: planConfig.value
-  });
+  const {
+    currentStep,
+    formData,
+    isSubmitting,
+    setCurrentStep,
+    handleInputChange,
+    handleCheckboxChange,
+    handleRadioChange,
+    handleMaskedInputChange,
+    nextStep,
+    prevStep,
+    handleSubmit
+  } = usePreOnboardForm(planConfig);
 
   const steps = [
     { title: "Dados Pessoais", icon: User, subtitle: "Informações do contato" },
@@ -120,35 +59,6 @@ export default function PreOnboardForm({ planConfig }: PreOnboardFormProps) {
     { value: "acoes_estrategicas", label: "Suporte para definição das ações estratégicas relacionadas às análises" },
   ];
 
-  const handleCheckboxChange = (field: keyof FormData, value: string) => {
-    // Só permite seleção se a área estiver habilitada para este plano
-    if (field === 'areas' && !planConfig.enabledAreas.includes(value)) {
-      return; // Não faz nada se a área não estiver habilitada
-    }
-
-    // Se for plano Avançado e campo áreas, não permite desmarcar
-    if (field === 'areas' && planConfig.name === "AVANÇADO") {
-      return; // Não permite alteração no plano Avançado
-    }
-
-    setFormData(prev => ({
-      ...prev,
-      [field]: Array.isArray(prev[field])
-        ? (prev[field] as string[]).includes(value)
-          ? (prev[field] as string[]).filter(item => item !== value)
-          : [...(prev[field] as string[]), value]
-        : [value]
-    }));
-  };
-
-  const handleRadioChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
   // Máscaras para formatação
   const maskCNPJ = (value: string) => {
     return value
@@ -184,11 +94,6 @@ export default function PreOnboardForm({ planConfig }: PreOnboardFormProps) {
       .slice(0, 14);
   };
 
-  const handleMaskedInputChange = (field: keyof FormData, value: string, maskFunction?: (value: string) => string) => {
-    const maskedValue = maskFunction ? maskFunction(value) : value;
-    setFormData(prev => ({ ...prev, [field]: maskedValue }));
-  };
-
   const estadosBrasil = [
     { value: 'AC', label: 'AC - Acre' },
     { value: 'AL', label: 'AL - Alagoas' },
@@ -219,485 +124,24 @@ export default function PreOnboardForm({ planConfig }: PreOnboardFormProps) {
     { value: 'TO', label: 'TO - Tocantins' }
   ];
 
-  const nextStep = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleSubmit = () => {
-    console.log(`Dados do formulário - Plano ${planConfig.displayName}:`, formData);
-    alert(`Formulário do Plano ${planConfig.displayName} enviado com sucesso! 
-    
-    Plano: ${formData.plano}
-    Valor: R$ ${formData.valorMensal.toLocaleString()},00/mês
-    
-    Entraremos em contato em breve.`);
-  };
-
-  const renderProgressBar = () => {
-    const progress = ((currentStep + 1) / steps.length) * 100;
-    return (
-      <div className="w-full bg-slate-800 rounded-full h-2 mb-8">
-        <div 
-          className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-2 rounded-full transition-all duration-500 ease-out"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-    );
-  };
-
-  const renderStepIndicator = () => {
-    return (
-      <div className="flex items-center justify-center mb-8 overflow-x-auto">
-        {steps.map((step, index) => {
-          const Icon = step.icon;
-          return (
-            <div key={index} className="flex items-center">
-              <div className={`
-                flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full transition-all duration-300
-                ${index <= currentStep 
-                  ? 'bg-emerald-500 text-white' 
-                  : 'bg-slate-800 text-slate-500 border border-slate-700'}
-              `}>
-                <Icon className="w-4 h-4 md:w-5 md:h-5" />
-              </div>
-              {index < steps.length - 1 && (
-                <div className={`
-                  w-8 md:w-12 h-0.5 transition-all duration-300
-                  ${index < currentStep ? 'bg-emerald-500' : 'bg-slate-700'}
-                `} />
-              )}
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
-  const CheckboxOption = ({ field, value, label }: { field: keyof FormData, value: string, label: string }) => {
-    const isChecked = Array.isArray(formData[field]) && (formData[field] as string[]).includes(value);
-    const isEnabled = field !== 'areas' || planConfig.enabledAreas.includes(value);
-    const isAdvancedPlan = planConfig.name === "AVANÇADO";
-    const isAdvancedArea = field === 'areas' && isAdvancedPlan && isEnabled;
-    
-    return (
-      <label className={`
-        flex items-center p-4 rounded-xl border-2 transition-all duration-200 
-        ${isEnabled && !isAdvancedArea ? 'cursor-pointer hover:border-emerald-400/50' : 'cursor-default'}
-        ${!isEnabled ? 'opacity-60' : ''}
-        ${isAdvancedArea ? 'cursor-default' : ''}
-        ${isChecked && isEnabled ? 'border-emerald-500 bg-emerald-500/10' : 'border-slate-700 bg-slate-800/50'}
-      `}>
-        <input
-          type="checkbox"
-          checked={isChecked}
-          onChange={() => handleCheckboxChange(field, value)}
-          disabled={!isEnabled || isAdvancedArea}
-          className="sr-only"
-        />
-        <div className={`
-          w-5 h-5 rounded border-2 mr-3 flex items-center justify-center transition-all duration-200
-          ${isChecked && isEnabled ? 'border-emerald-500 bg-emerald-500' : 'border-slate-600'}
-          ${!isEnabled ? 'border-slate-700 bg-slate-800' : ''}
-        `}>
-          {isChecked && isEnabled && <Check className="w-3 h-3 text-white" />}
-          {!isEnabled && <span className="text-xs text-slate-500">✕</span>}
-        </div>
-        <span className={`${isChecked && isEnabled ? 'text-white' : 'text-slate-300'} ${!isEnabled ? 'text-slate-500' : ''}`}>
-          {label}
-          {!isEnabled && <span className="ml-2 text-xs">(Não disponível neste plano)</span>}
-          {isAdvancedArea && <span className="ml-2 text-xs text-emerald-400">(Incluído automaticamente)</span>}
-        </span>
-      </label>
-    );
-  };
-
-  const RadioOption = ({ field, value, label }: { field: keyof FormData, value: string, label: string }) => {
-    const isChecked = formData[field] === value;
-    
-    return (
-      <label className={`
-        flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:border-emerald-400/50
-        ${isChecked ? 'border-emerald-500 bg-emerald-500/10' : 'border-slate-700 bg-slate-800/50'}
-      `}>
-        <input
-          type="radio"
-          checked={isChecked}
-          onChange={() => handleRadioChange(field, value)}
-          className="sr-only"
-        />
-        <div className={`
-          w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center transition-all duration-200
-          ${isChecked ? 'border-emerald-500' : 'border-slate-600'}
-        `}>
-          {isChecked && <div className="w-3 h-3 rounded-full bg-emerald-500" />}
-        </div>
-        <span className={`${isChecked ? 'text-white' : 'text-slate-300'}`}>{label}</span>
-      </label>
-    );
-  };
-
   const isStepValid = () => {
-    // Desabilitar validação para facilitar navegação durante testes
-    return true;
-  };
-
-  const renderStepContent = () => {
     switch (currentStep) {
-      case 0:
-        return (
-          <div className="space-y-6">
-            <h3 className="text-xl font-semibold text-emerald-300 mb-4">Informações de contato</h3>
-            <p className="text-slate-400 mb-6">Preencha seus dados para contato</p>
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Nome completo <span className="text-emerald-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.nomeContato}
-                    onChange={(e) => handleInputChange("nomeContato", e.target.value)}
-                    placeholder="João Silva"
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
-                  />
-                </div>
-                <div className="md:col-span-1">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    CPF <span className="text-emerald-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.cpfContato}
-                    onChange={(e) => handleMaskedInputChange("cpfContato", e.target.value, maskCPF)}
-                    placeholder="000.000.000-00"
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    E-mail corporativo <span className="text-emerald-400">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.emailContato}
-                    onChange={(e) => handleInputChange("emailContato", e.target.value)}
-                    placeholder="joao@empresa.com.br"
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Telefone/WhatsApp <span className="text-emerald-400">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.telefoneContato}
-                    onChange={(e) => handleMaskedInputChange("telefoneContato", e.target.value, maskPhone)}
-                    placeholder="(11) 99999-9999"
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Cargo <span className="text-emerald-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.cargoContato}
-                    onChange={(e) => handleInputChange("cargoContato", e.target.value)}
-                    placeholder="Diretor Financeiro"
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 1:
-        return (
-          <div className="space-y-6">
-            <h3 className="text-xl font-semibold text-emerald-300 mb-4">Dados da empresa</h3>
-            <p className="text-slate-400 mb-6">Informações necessárias para elaboração do contrato</p>
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
-                <div className="md:col-span-4">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Razão social ou nome da empresa <span className="text-emerald-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.nomeEmpresa}
-                    onChange={(e) => handleInputChange("nomeEmpresa", e.target.value)}
-                    placeholder="Empresa LTDA"
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    CNPJ <span className="text-emerald-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.cnpj}
-                    onChange={(e) => handleMaskedInputChange("cnpj", e.target.value, maskCNPJ)}
-                    placeholder="00.000.000/0001-00"
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-1">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    CEP <span className="text-emerald-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.cep}
-                    onChange={(e) => handleMaskedInputChange("cep", e.target.value, maskCEP)}
-                    placeholder="00000-000"
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Cidade <span className="text-emerald-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.cidade}
-                    onChange={(e) => handleInputChange("cidade", e.target.value)}
-                    placeholder="São Paulo"
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
-                <div className="md:col-span-4">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Endereço <span className="text-emerald-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.endereco}
-                    onChange={(e) => handleInputChange("endereco", e.target.value)}
-                    placeholder="Rua das Flores"
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Número <span className="text-emerald-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.numero}
-                    onChange={(e) => handleInputChange("numero", e.target.value)}
-                    placeholder="123"
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Bairro <span className="text-emerald-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.bairro}
-                    onChange={(e) => handleInputChange("bairro", e.target.value)}
-                    placeholder="Centro"
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
-                  />
-                </div>
-                <div className="md:col-span-1">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Estado <span className="text-emerald-400">*</span>
-                  </label>
-                  <select
-                    value={formData.estado}
-                    onChange={(e) => handleInputChange("estado", e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
-                  >
-                    <option value="">Selecione</option>
-                    {estadosBrasil.map(estado => (
-                      <option key={estado.value} value={estado.value}>{estado.label}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 2:
-        return (
-          <div className="space-y-6">
-            <h3 className="text-xl font-semibold text-emerald-300 mb-4">Segmento de atuação da sua empresa</h3>
-            <p className="text-slate-400 mb-6">Escolha apenas um segmento principal</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <RadioOption field="segmento" value="agencia" label="Agência de Marketing" />
-              <RadioOption field="segmento" value="clinica" label="Clínica (médica, odontológica, estética, etc.)" />
-              <RadioOption field="segmento" value="hotelaria" label="Hotelaria" />
-              <RadioOption field="segmento" value="petshop" label="Pet Shop" />
-              <RadioOption field="segmento" value="loja" label="Loja Física" />
-              <RadioOption field="segmento" value="ecommerce" label="Comércio Eletrônico" />
-              <RadioOption field="segmento" value="servicos" label="Escritório de Serviços (advocacia, contabilidade, arquitetura, etc.)" />
-              <RadioOption field="segmento" value="restaurante" label="Restaurante/Alimentação" />
-              <RadioOption field="segmento" value="consultoria" label="Consultoria" />
-              <RadioOption field="segmento" value="outros" label="Outros Serviços" />
-            </div>
-          </div>
-        );
-
-      case 3:
-        return (
-          <div className="space-y-6">
-            <h3 className="text-xl font-semibold text-emerald-300 mb-4">Áreas da empresa para incluir no BPO</h3>
-            <p className="text-slate-400 mb-6">
-              {planConfig.name === "AVANÇADO" 
-                ? "No plano Avançado, todas as áreas estão incluídas automaticamente. Você terá acesso completo a todos os serviços disponíveis."
-                : "Selecione as áreas que deseja terceirizar."
-              }
-              <span className="text-emerald-400 font-semibold"> 
-                {planConfig.name === "AVANÇADO" 
-                  ? " Plano mais completo com todos os serviços!"
-                  : ` Áreas disponíveis no seu plano ${planConfig.displayName.toUpperCase()}`
-                }
-              </span>
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {todasAreas.map((area) => (
-                <CheckboxOption 
-                  key={area.value}
-                  field="areas" 
-                  value={area.value} 
-                  label={area.label} 
-                />
-              ))}
-            </div>
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="space-y-6">
-            <h3 className="text-xl font-semibold text-emerald-300 mb-4">Bancos e ferramentas utilizadas</h3>
-            <div className="space-y-6">
-              <div>
-                <p className="text-slate-400 mb-4">Quais bancos sua empresa utiliza?</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <CheckboxOption field="bancos" value="banco_brasil" label="Banco do Brasil" />
-                  <CheckboxOption field="bancos" value="bradesco" label="Bradesco" />
-                  <CheckboxOption field="bancos" value="caixa" label="Caixa Econômica" />
-                  <CheckboxOption field="bancos" value="itau" label="Itaú" />
-                  <CheckboxOption field="bancos" value="santander" label="Santander" />
-                  <CheckboxOption field="bancos" value="inter" label="Inter" />
-                  <CheckboxOption field="bancos" value="nubank" label="Nubank" />
-                  <CheckboxOption field="bancos" value="outros" label="Outros" />
-                </div>
-              </div>
-              <div>
-                <p className="text-slate-400 mb-4">Quais ferramentas de gestão utiliza?</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <CheckboxOption field="ferramentas" value="excel" label="Excel/Planilhas" />
-                  <CheckboxOption field="ferramentas" value="contaazul" label="Conta Azul" />
-                  <CheckboxOption field="ferramentas" value="omie" label="Omie" />
-                  <CheckboxOption field="ferramentas" value="tiny" label="Tiny" />
-                  <CheckboxOption field="ferramentas" value="bling" label="Bling" />
-                  <CheckboxOption field="ferramentas" value="nenhuma" label="Nenhuma ferramenta" />
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 5:
-        return (
-          <div className="space-y-6">
-            <h3 className="text-xl font-semibold text-emerald-300 mb-4">Como sua empresa organiza o financeiro hoje?</h3>
-            <div className="space-y-6">
-              <div>
-                <p className="text-slate-400 mb-4">Estrutura atual</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <CheckboxOption field="organizacao" value="funcionario_interno" label="Funcionário interno" />
-                  <CheckboxOption field="organizacao" value="socio_faz" label="Sócio/proprietário faz" />
-                  <CheckboxOption field="organizacao" value="contador_externo" label="Contador externo" />
-                  <CheckboxOption field="organizacao" value="sem_organizacao" label="Sem organização estruturada" />
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 6:
-        return (
-          <div className="space-y-6">
-            <h3 className="text-xl font-semibold text-emerald-300 mb-4">Confirmação do Plano {planConfig.displayName}</h3>
-            
-            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-6 mb-6">
-              <h4 className="font-semibold text-emerald-300 mb-2">Plano Selecionado: {planConfig.displayName.toUpperCase()}</h4>
-              <p className="text-2xl font-bold text-white mb-2">R$ {planConfig.value.toLocaleString()},00/mês</p>
-              <p className="text-slate-300">Plano {planConfig.displayName} com todas as funcionalidades disponíveis</p>
-            </div>
-
-            <div className="space-y-4">
-              <h4 className="font-semibold text-slate-200">Resumo dos seus dados:</h4>
-              <div className="bg-slate-800/50 rounded-lg p-4 space-y-2 text-sm">
-                <p className="text-slate-300"><span className="text-slate-400">Empresa:</span> {formData.nomeEmpresa || "Não preenchido"}</p>
-                <p className="text-slate-300"><span className="text-slate-400">CNPJ:</span> {formData.cnpj || "Não preenchido"}</p>
-                <p className="text-slate-300"><span className="text-slate-400">Contato:</span> {formData.nomeContato || "Não preenchido"}</p>
-                <p className="text-slate-300"><span className="text-slate-400">Segmento:</span> {formData.segmento || "Não preenchido"}</p>
-                <p className="text-slate-300"><span className="text-slate-400">Áreas selecionadas:</span> {formData.areas.length} áreas</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h4 className="font-semibold text-slate-200">Medindo o sucesso da parceria:</h4>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Como você saberia que a parceria com a ElevaLucro foi um sucesso?
-                </label>
-                <p className="text-xs text-slate-400 mb-3">
-                  Descreva os resultados concretos que indicariam que os objetivos foram atingidos. O que mudaria na sua empresa?
-                </p>
-                <textarea
-                  value={formData.expectativasSucesso}
-                  onChange={(e) => handleInputChange("expectativasSucesso", e.target.value)}
-                  placeholder="Ex: Quando eu conseguir dedicar 80% do meu tempo ao comercial ao invés do administrativo, quando tiver relatórios financeiros atualizados em tempo real, quando não precisar mais me preocupar com conciliação bancária, quando conseguir tomar decisões baseadas em dados precisos do DRE..."
-                  rows={4}
-                  className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200 resize-none"
-                />
-              </div>
-            </div>
-
-            <div className="mt-8 p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-              <h4 className="font-semibold text-emerald-300 mb-3">🎉 Quase pronto!</h4>
-              <p className="text-slate-300 text-sm">
-                Você escolheu o plano {planConfig.displayName}! 
-                Clique em "Finalizar" para enviar suas informações e nossa equipe entrará em contato para finalizar o contrato e iniciar os serviços.
-              </p>
-            </div>
-          </div>
-        );
-
+      case 0: // Dados Pessoais
+        return formData.nomeContato && formData.cpfContato && formData.emailContato && formData.cargoContato;
+      case 1: // Dados da Empresa
+        return formData.nomeEmpresa && formData.cnpj && formData.endereco && formData.cidade && formData.estado;
+      case 2: // Segmento
+        return formData.segmento;
+      case 3: // Áreas
+        return formData.areas && formData.areas.length > 0;
+      case 4: // Bancos & Ferramentas
+        return true; // Opcional
+      case 5: // Organização
+        return true; // Opcional
+      case 6: // Finalizar
+        return formData.expectativasSucesso;
       default:
-        return null;
+        return true;
     }
   };
 
@@ -709,33 +153,572 @@ export default function PreOnboardForm({ planConfig }: PreOnboardFormProps) {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-white mb-4">
-            Formulário de Pré-Onboarding
-            <span className="block text-2xl text-emerald-400 mt-2">Plano {planConfig.displayName}</span>
+            Pré-Onboarding {planConfig.displayName}
           </h1>
+          <p className="text-xl text-slate-300 mb-2">
+            Valor: <span className="text-emerald-400 font-bold">R$ {planConfig.value.toLocaleString()}/mês</span>
+          </p>
           <p className="text-slate-400 max-w-2xl mx-auto">
-            Complete o formulário abaixo para iniciar sua jornada com o BPO Financeiro.
+            Vamos conhecer melhor sua empresa e necessidades para personalizar nossos serviços.
           </p>
         </div>
 
         {/* Progress Bar */}
-        {renderProgressBar()}
-        
-        {/* Step Indicator */}
-        {renderStepIndicator()}
-
-        {/* Form Card */}
-        <div className="bg-slate-900/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/10 p-8">
-          {/* Step Title */}
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-white">{steps[currentStep].title}</h2>
-            <p className="text-slate-400 text-sm mt-1">{steps[currentStep].subtitle}</p>
+        <div className="mb-12">
+          <div className="flex justify-between items-center mb-4">
+            {steps.map((step, index) => (
+              <div key={index} className="flex flex-col items-center flex-1">
+                <div className={`
+                  w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300
+                  ${index < currentStep 
+                    ? 'bg-emerald-500 text-white' 
+                    : index === currentStep 
+                      ? 'bg-emerald-500 text-white ring-4 ring-emerald-500/30' 
+                      : 'bg-slate-700 text-slate-400'
+                  }
+                `}>
+                  {index < currentStep ? (
+                    <Check className="w-5 h-5" />
+                  ) : (
+                    <step.icon className="w-5 h-5" />
+                  )}
+                </div>
+                <div className="mt-3 text-center">
+                  <p className={`text-sm font-medium ${
+                    index <= currentStep ? 'text-white' : 'text-slate-500'
+                  }`}>
+                    {step.title}
+                  </p>
+                  <p className={`text-xs mt-1 ${
+                    index <= currentStep ? 'text-slate-300' : 'text-slate-600'
+                  }`}>
+                    {step.subtitle}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
+          
+          <div className="w-full bg-slate-800 rounded-full h-2 mb-8">
+            <div 
+              className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-2 rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+            />
+          </div>
+        </div>
 
-          {/* Step Content */}
-          {renderStepContent()}
+        {/* Form Content */}
+        <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-8 mb-8">
+          
+          {/* Step 0: Dados Pessoais */}
+          {currentStep === 0 && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <User className="w-6 h-6 text-emerald-400" />
+                Dados Pessoais do Contato
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Nome Completo <span className="text-emerald-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.nomeContato}
+                    onChange={(e) => handleInputChange("nomeContato", e.target.value)}
+                    placeholder="Seu nome completo"
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    CPF <span className="text-emerald-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.cpfContato}
+                    onChange={(e) => handleMaskedInputChange("cpfContato", e.target.value, maskCPF)}
+                    placeholder="000.000.000-00"
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Email <span className="text-emerald-400">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.emailContato}
+                    onChange={(e) => handleInputChange("emailContato", e.target.value)}
+                    placeholder="seu@email.com"
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Telefone
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.telefoneContato}
+                    onChange={(e) => handleMaskedInputChange("telefoneContato", e.target.value, maskPhone)}
+                    placeholder="(11) 99999-9999"
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Cargo na Empresa <span className="text-emerald-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.cargoContato}
+                  onChange={(e) => handleInputChange("cargoContato", e.target.value)}
+                  placeholder="Ex: Diretor, Sócio, Gerente..."
+                  className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
+                />
+              </div>
+            </div>
+          )}
 
-          {/* Navigation */}
-          <div className="flex justify-between mt-8 pt-6 border-t border-slate-800">
+          {/* Step 1: Dados da Empresa */}
+          {currentStep === 1 && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <Building2 className="w-6 h-6 text-emerald-400" />
+                Dados da Empresa
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Razão Social / Nome da Empresa <span className="text-emerald-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.nomeEmpresa}
+                    onChange={(e) => handleInputChange("nomeEmpresa", e.target.value)}
+                    placeholder="Nome da sua empresa"
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    CNPJ <span className="text-emerald-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.cnpj}
+                    onChange={(e) => handleMaskedInputChange("cnpj", e.target.value, maskCNPJ)}
+                    placeholder="00.000.000/0000-00"
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    CEP
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.cep}
+                    onChange={(e) => handleMaskedInputChange("cep", e.target.value, maskCEP)}
+                    placeholder="00000-000"
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Endereço <span className="text-emerald-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.endereco}
+                    onChange={(e) => handleInputChange("endereco", e.target.value)}
+                    placeholder="Rua, Avenida..."
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Número
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.numero}
+                    onChange={(e) => handleInputChange("numero", e.target.value)}
+                    placeholder="Número"
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Bairro
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.bairro}
+                    onChange={(e) => handleInputChange("bairro", e.target.value)}
+                    placeholder="Bairro"
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Cidade <span className="text-emerald-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.cidade}
+                    onChange={(e) => handleInputChange("cidade", e.target.value)}
+                    placeholder="Cidade"
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Estado <span className="text-emerald-400">*</span>
+                  </label>
+                  <select
+                    value={formData.estado}
+                    onChange={(e) => handleInputChange("estado", e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
+                  >
+                    <option value="">Selecione o estado</option>
+                    {estadosBrasil.map(estado => (
+                      <option key={estado.value} value={estado.value}>{estado.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Segmento */}
+          {currentStep === 2 && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <Target className="w-6 h-6 text-emerald-400" />
+                Segmento da Empresa
+              </h2>
+              
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-4">
+                  Em qual segmento sua empresa atua? <span className="text-emerald-400">*</span>
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    "Comércio", "Serviços", "Indústria", "Agronegócio", 
+                    "Saúde", "Educação", "Construção Civil", "Tecnologia",
+                    "Alimentação", "Transporte", "Consultoria", "Outro"
+                  ].map(segment => (
+                    <label key={segment} className="flex items-center p-4 bg-slate-800/30 hover:bg-slate-700/30 rounded-lg cursor-pointer border border-slate-600 hover:border-emerald-500/30 transition-all duration-200">
+                      <input
+                        type="radio"
+                        name="segmento"
+                        value={segment}
+                        checked={formData.segmento === segment}
+                        onChange={(e) => handleRadioChange("segmento", e.target.value)}
+                        className="sr-only"
+                      />
+                      <div className={`w-4 h-4 rounded-full border-2 mr-3 transition-all duration-200 ${
+                        formData.segmento === segment 
+                          ? 'border-emerald-400 bg-emerald-400' 
+                          : 'border-slate-400'
+                      }`}>
+                        {formData.segmento === segment && (
+                          <div className="w-full h-full rounded-full bg-emerald-400 scale-50"></div>
+                        )}
+                      </div>
+                      <span className="text-white">{segment}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Áreas */}
+          {currentStep === 3 && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <Settings className="w-6 h-6 text-emerald-400" />
+                Áreas de Atuação - {planConfig.displayName}
+              </h2>
+              
+              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4 mb-6">
+                <p className="text-emerald-200 text-sm">
+                  <strong>Plano {planConfig.displayName}</strong> - R$ {planConfig.value.toLocaleString()}/mês
+                  <br />
+                  {planConfig.name === "AVANÇADO" 
+                    ? "Todas as áreas estão incluídas neste plano."
+                    : "Selecione as áreas que deseja incluir no seu plano."
+                  }
+                </p>
+              </div>
+              
+              <div className="space-y-4">
+                {todasAreas.map((area) => {
+                  const isEnabled = planConfig.enabledAreas.includes(area.value);
+                  const isSelected = formData.areas.includes(area.value);
+                  const isDisabled = !isEnabled || planConfig.name === "AVANÇADO";
+                  
+                  return (
+                    <label 
+                      key={area.value}
+                      className={`flex items-start p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
+                        isEnabled
+                          ? isSelected 
+                            ? 'bg-emerald-500/20 border-emerald-500/50 hover:border-emerald-400'
+                            : 'bg-slate-800/30 border-slate-600 hover:border-emerald-500/30'
+                          : 'bg-slate-800/20 border-slate-700 opacity-50 cursor-not-allowed'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        disabled={isDisabled}
+                        onChange={() => handleCheckboxChange("areas", area.value)}
+                        className="sr-only"
+                      />
+                      <div className={`w-5 h-5 rounded border-2 mr-4 mt-0.5 flex items-center justify-center transition-all duration-200 ${
+                        isSelected 
+                          ? 'border-emerald-400 bg-emerald-400' 
+                          : isEnabled 
+                            ? 'border-slate-400' 
+                            : 'border-slate-600'
+                      }`}>
+                        {isSelected && (
+                          <Check className="w-3 h-3 text-white" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <span className={`text-sm ${isEnabled ? 'text-white' : 'text-slate-500'}`}>
+                          {area.label}
+                        </span>
+                        {!isEnabled && (
+                          <span className="text-xs text-amber-400 block mt-1">
+                            Disponível nos planos superiores
+                          </span>
+                        )}
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Step 4: Bancos & Ferramentas */}
+          {currentStep === 4 && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <CreditCard className="w-6 h-6 text-emerald-400" />
+                Bancos & Ferramentas
+              </h2>
+              
+              <div className="space-y-8">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-4">
+                    Quais bancos a empresa utiliza? (Opcional)
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {[
+                      "Banco do Brasil", "Bradesco", "Itaú", "Santander", "Caixa",
+                      "Sicoob", "Sicredi", "Inter", "Nubank", "C6 Bank",
+                      "BTG Pactual", "Safra", "Outro"
+                    ].map(banco => (
+                      <label key={banco} className="flex items-center p-3 bg-slate-800/30 hover:bg-slate-700/30 rounded-lg cursor-pointer border border-slate-600 hover:border-emerald-500/30 transition-all duration-200">
+                        <input
+                          type="checkbox"
+                          checked={formData.bancos.includes(banco)}
+                          onChange={() => handleCheckboxChange("bancos", banco)}
+                          className="sr-only"
+                        />
+                        <div className={`w-4 h-4 rounded border-2 mr-3 flex items-center justify-center transition-all duration-200 ${
+                          formData.bancos.includes(banco) 
+                            ? 'border-emerald-400 bg-emerald-400' 
+                            : 'border-slate-400'
+                        }`}>
+                          {formData.bancos.includes(banco) && (
+                            <Check className="w-2.5 h-2.5 text-white" />
+                          )}
+                        </div>
+                        <span className="text-white text-sm">{banco}</span>
+                      </label>
+                    ))}
+                  </div>
+                  
+                  {/* Campo "Outros" para bancos */}
+                  {formData.bancos.includes('Outro') && (
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                        Especifique outros bancos:
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.bancosOutro}
+                        onChange={(e) => handleInputChange("bancosOutro", e.target.value)}
+                        placeholder="Digite os nomes dos outros bancos..."
+                        className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-4">
+                    Quais ferramentas/sistemas já utiliza? (Opcional)
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {[
+                      "Excel/Google Sheets", "ERP (SAP, TOTVS, etc)", "Conta Azul", "Omie",
+                      "Bling", "Tiny", "NFCom", "EmiteAí", "Nenhum sistema", "Outro"
+                    ].map(ferramenta => (
+                      <label key={ferramenta} className="flex items-center p-3 bg-slate-800/30 hover:bg-slate-700/30 rounded-lg cursor-pointer border border-slate-600 hover:border-emerald-500/30 transition-all duration-200">
+                        <input
+                          type="checkbox"
+                          checked={formData.ferramentas.includes(ferramenta)}
+                          onChange={() => handleCheckboxChange("ferramentas", ferramenta)}
+                          className="sr-only"
+                        />
+                        <div className={`w-4 h-4 rounded border-2 mr-3 flex items-center justify-center transition-all duration-200 ${
+                          formData.ferramentas.includes(ferramenta) 
+                            ? 'border-emerald-400 bg-emerald-400' 
+                            : 'border-slate-400'
+                        }`}>
+                          {formData.ferramentas.includes(ferramenta) && (
+                            <Check className="w-2.5 h-2.5 text-white" />
+                          )}
+                        </div>
+                        <span className="text-white text-sm">{ferramenta}</span>
+                      </label>
+                    ))}
+                  </div>
+                  
+                  {/* Campo "Outro" para ferramentas */}
+                  {formData.ferramentas.includes('Outro') && (
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                        Especifique outras ferramentas:
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.ferramentasOutro}
+                        onChange={(e) => handleInputChange("ferramentasOutro", e.target.value)}
+                        placeholder="Digite os nomes das outras ferramentas/sistemas..."
+                        className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 5: Organização */}
+          {currentStep === 5 && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <FileText className="w-6 h-6 text-emerald-400" />
+                Organização Financeira Atual
+              </h2>
+              
+              <div className="space-y-8">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-4">
+                    Como organiza as informações financeiras hoje? (Opcional)
+                  </label>
+                  <div className="grid grid-cols-1 gap-3">
+                    {[
+                      "Planilha Excel/Google Sheets",
+                      "Sistema ERP integrado",
+                      "Software de gestão financeira",
+                      "Anotações em caderno/papel",
+                      "Não tenho organização definida",
+                      "Outro método"
+                    ].map(organizacao => (
+                      <label key={organizacao} className="flex items-center p-4 bg-slate-800/30 hover:bg-slate-700/30 rounded-lg cursor-pointer border border-slate-600 hover:border-emerald-500/30 transition-all duration-200">
+                        <input
+                          type="checkbox"
+                          checked={formData.organizacao.includes(organizacao)}
+                          onChange={() => handleCheckboxChange("organizacao", organizacao)}
+                          className="sr-only"
+                        />
+                        <div className={`w-4 h-4 rounded border-2 mr-3 flex items-center justify-center transition-all duration-200 ${
+                          formData.organizacao.includes(organizacao) 
+                            ? 'border-emerald-400 bg-emerald-400' 
+                            : 'border-slate-400'
+                        }`}>
+                          {formData.organizacao.includes(organizacao) && (
+                            <Check className="w-2.5 h-2.5 text-white" />
+                          )}
+                        </div>
+                        <span className="text-white">{organizacao}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+          {/* Step 6: Finalizar */}
+          {currentStep === 6 && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <Check className="w-6 h-6 text-emerald-400" />
+                Finalizar - {planConfig.displayName}
+              </h2>
+              
+              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-6 mb-6">
+                <h3 className="text-lg font-semibold text-emerald-200 mb-4">Resumo do seu plano:</h3>
+                <div className="space-y-2 text-emerald-200">
+                  <p><strong>Plano:</strong> {planConfig.displayName}</p>
+                  <p><strong>Valor:</strong> R$ {planConfig.value.toLocaleString()}/mês</p>
+                  <p><strong>Contato:</strong> {formData.nomeContato} ({formData.emailContato})</p>
+                  <p><strong>Empresa:</strong> {formData.nomeEmpresa}</p>
+                  <p><strong>Segmento:</strong> {formData.segmento}</p>
+                  <p><strong>Áreas selecionadas:</strong> {formData.areas.length} área(s)</p>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-4">
+                  O que você espera alcançar com nossos serviços? <span className="text-emerald-400">*</span>
+                </label>
+                <textarea
+                  value={formData.expectativasSucesso}
+                  onChange={(e) => handleInputChange("expectativasSucesso", e.target.value)}
+                  placeholder="Descreva suas expectativas e objetivos..."
+                  rows={4}
+                  className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200 resize-none"
+                />
+              </div>
+              
+              <div className="bg-slate-700/30 rounded-lg p-4">
+                <p className="text-slate-300 text-sm">
+                  Ao finalizar, você receberá um contato da nossa equipe em até 24 horas para agendarmos uma reunião de alinhamento e início dos trabalhos.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between items-center mt-8 pt-6 border-t border-slate-600">
             <button
               onClick={prevStep}
               disabled={currentStep === 0}
@@ -752,17 +735,26 @@ export default function PreOnboardForm({ planConfig }: PreOnboardFormProps) {
             {currentStep === steps.length - 1 ? (
               <button
                 onClick={handleSubmit}
-                disabled={!isStepValid()}
+                disabled={!isStepValid() || isSubmitting}
                 className={`
                   flex items-center gap-2 px-8 py-3 rounded-lg font-semibold transition-all duration-200
-                  ${isStepValid()
+                  ${isStepValid() && !isSubmitting
                     ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
                     : 'bg-slate-700 text-slate-400 cursor-not-allowed'
                   }
                 `}
               >
-                <Check className="w-4 h-4" />
-                Finalizar Plano {planConfig.displayName}
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Enviando...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4" />
+                    Finalizar Plano {planConfig.displayName}
+                  </>
+                )}
               </button>
             ) : (
               <button

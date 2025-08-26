@@ -504,9 +504,8 @@ export default function OnboardingPresentation({ planName, planFeatures, monthly
                     <h3 className="font-semibold text-white mb-2">Diagnóstico e Organização</h3>
                     <ul className="space-y-1 text-sm text-slate-300">
                       <li>✓ Reunião de kick-off e alinhamento de expectativas</li>
-                      <li>✓ Coleta de documentos e acessos necessários</li>
-                      <li>✓ Mapeamento da situação financeira atual</li>
-                      <li>✓ Configuração das ferramentas e acessos</li>
+                      <li>✓ Coleta de informações e acessos necessários</li>
+                      <li>✓ Análise das informações e definição do fluxo operacional</li>
                     </ul>
                   </div>
                 </div>
@@ -520,9 +519,13 @@ export default function OnboardingPresentation({ planName, planFeatures, monthly
                   <div className="flex-1">
                     <h3 className="font-semibold text-white mb-2">Implementação</h3>
                     <ul className="space-y-1 text-sm text-slate-300">
+                      <li>✓ Configurações das ferramentas e acessos</li>
+                      <li>✓ Mapeamento da situação financeira atual</li>
                       <li>✓ Criação do plano de contas personalizado</li>
                       <li>✓ Categorização de despesas e receitas</li>
-                      <li>✓ Início da conciliação bancária</li>
+                      <li>✓ Elaboração do budget</li>
+                      <li>✓ Cadastros das contas bancárias e saldos iniciais</li>
+                      <li>✓ Cadastro das formas de pagamento e recebimento</li>
                       <li>✓ Treinamento no app e dashboard</li>
                     </ul>
                   </div>
@@ -537,6 +540,7 @@ export default function OnboardingPresentation({ planName, planFeatures, monthly
                   <div className="flex-1">
                     <h3 className="font-semibold text-white mb-2">Operação Assistida</h3>
                     <ul className="space-y-1 text-sm text-slate-300">
+                      <li>✓ Início da conciliação bancária</li>
                       <li>✓ Início do processo de aprovação de pagamentos</li>
                       <li>✓ Ajustes finos nos processos</li>
                       <li>✓ Resolução de pendências identificadas</li>

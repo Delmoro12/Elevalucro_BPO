@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 4000",
+    "dev:prod": "cp .env.production .env.local && next dev --port 4000",
+    "dev:local": "cp .env.local.backup .env.local && next dev --port 4000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
