@@ -28,9 +28,7 @@ export default function AuthCallbackRoute() {
           // Usuário autenticado com sucesso
           console.log('=== AUTH CALLBACK DEBUG ===');
           console.log('User:', data.session.user.email);
-          console.log('Full AMR:', data.session.user.amr);
           console.log('User metadata:', data.session.user.user_metadata);
-          console.log('App metadata:', data.session.user.app_metadata);
           console.log('URL:', window.location.href);
           
           // Verificar se veio de um convite (tem type=invite na URL)
