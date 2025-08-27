@@ -191,7 +191,8 @@ Por favor, me informe esses dados para que eu possa finalizar o processamento do
       console.log('✅ Documento salvo com sucesso:', savedDocument.id);
       
       // Mensagem de sucesso
-      alert(`Documento "${savedDocument.nome}" salvo com sucesso! ✅`);
+      // Removido alert de debug
+      console.log(`Documento "${savedDocument.nome}" salvo com sucesso! ✅`);
       
       // Reset form
       setDocumentInfo({

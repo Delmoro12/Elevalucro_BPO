@@ -59,30 +59,30 @@ export const MainPage: React.FC = () => {
     setCurrentPage(page);
   }, [pathname]);
 
-  // Buscar claims do usuário e mostrar modal
-  useEffect(() => {
-    const fetchUserClaims = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          const user = session.user as any; // Type assertion para acessar campos não tipados
-          console.log('🔍 User Claims from JWT:', user);
-          setUserClaims({
-            email: user.email,
-            user_metadata: user.user_metadata,
-            app_metadata: user.app_metadata,
-            id: user.id,
-            created_at: user.created_at
-          } as any);
-          setShowClaimsModal(true);
-        }
-      } catch (error) {
-        console.error('Error fetching claims:', error);
-      }
-    };
-
-    fetchUserClaims();
-  }, [pathname]); // Trigger on every page navigation
+  // DEBUG: Popup de JWT Claims - DESABILITADO
+  // useEffect(() => {
+  //   const fetchUserClaims = async () => {
+  //     try {
+  //       const { data: { session } } = await supabase.auth.getSession();
+  //       if (session?.user) {
+  //         const user = session.user as any; // Type assertion para acessar campos não tipados
+  //         console.log('🔍 User Claims from JWT:', user);
+  //         setUserClaims({
+  //           email: user.email,
+  //           user_metadata: user.user_metadata,
+  //           app_metadata: user.app_metadata,
+  //           id: user.id,
+  //           created_at: user.created_at
+  //         } as any);
+  //         setShowClaimsModal(true);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching claims:', error);
+  //     }
+  //   };
+  //
+  //   fetchUserClaims();
+  // }, [pathname]); // Trigger on every page navigation
 
   // Função para navegar entre páginas
   const handlePageChange = (page: string) => {
