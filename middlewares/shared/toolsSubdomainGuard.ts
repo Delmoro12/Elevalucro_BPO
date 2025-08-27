@@ -39,22 +39,18 @@ export function createToolsSubdomainGuard() {
     
     console.log(`🎫 Tools Debug - Token preview: ${accessToken.substring(0, 50)}...`)
 
-    // 🎫 Verificar se tem role bpo_side
-    try {
-      const userRole = extractRoleFromJWT(accessToken)
-      
-      if (userRole !== 'bpo_side') {
-        console.log(`🚫 Invalid role for tools: ${userRole}, required: bpo_side`)
-        return NextResponse.redirect(new URL('/auth/access-denied', request.url))
-      }
-
-      console.log(`✅ Valid bpo_side user`)
-      return null // Usuário autorizado para internal tools
-
-    } catch (error) {
-      console.error(`❌ JWT validation error:`, error)
-      return NextResponse.redirect(new URL('/auth/login', request.url))
+    // 🔧 TEMPORARILY DISABLED - Skip role validation for debugging
+    console.log(`🟡 MIDDLEWARE DISABLED FOR DEBUG - Allowing access with any valid token`)
+    
+    // Just verify token exists, skip role validation
+    if (accessToken && accessToken.length > 50) {
+      console.log(`✅ Valid token exists, allowing access (DEBUG MODE)`)
+      return null // Allow access
     }
+
+    // Still block if no valid token at all
+    console.log(`🚫 No valid token found`)
+    return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 }
 

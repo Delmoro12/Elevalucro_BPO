@@ -36,7 +36,7 @@ export const LoginForm: React.FC = () => {
       // Success - debug and redirect
       console.log('🎉 LOGIN SUCCESS - Starting debug...');
       
-      // Debug session and cookies immediately
+      // Debug session and cookies, then redirect
       setTimeout(async () => {
         console.log('🔍 DEBUG: Checking session after login...');
         
@@ -72,7 +72,7 @@ export const LoginForm: React.FC = () => {
         
         console.log('🎯 Redirecting to:', cleanRedirect);
         window.location.href = cleanRedirect;
-      }, 1000); // Increased delay for debugging
+      }, 500); // Reduced delay since middleware is disabled
     }
   };
 
