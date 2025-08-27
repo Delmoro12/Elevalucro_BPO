@@ -65,9 +65,9 @@ export const LoginForm: React.FC = () => {
           }
         }
         
-        // Now redirect - use router.push for clean navigation
+        // Now redirect - use window.location for full page navigation
         console.log('🎯 Redirecting to /prospects');
-        router.push('/prospects');
+        window.location.href = '/prospects';
       }, 500); // Reduced delay since middleware is disabled
     }
   };
