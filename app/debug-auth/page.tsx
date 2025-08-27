@@ -70,10 +70,61 @@ export default function DebugAuthPage() {
       
       console.log('Login result:', { data, error });
       
-      // Wait and refresh debug info
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
+      // Wait and refresh debug info (no redirect)
+      setTimeout(async () => {
+        const checkAuth = async () => {
+          try {
+            // Get session
+            const { data: { session }, error } = await supabase.auth.getSession();
+            
+            // Get cookies
+            const cookies = document.cookie;
+            
+            const debug: any = {
+              timestamp: new Date().toISOString(),
+              hostname: window.location.hostname,
+              session: session ? {
+                user_id: session.user?.id,
+                email: session.user?.email,
+                app_metadata: session.user?.app_metadata,
+                user_metadata: session.user?.user_metadata,
+                access_token_preview: session.access_token?.substring(0, 50) + '...'
+              } : null,
+              error: error?.message,
+              cookies: {
+                all: cookies,
+                hasAccessToken: cookies.includes('sb-access-token'),
+                hasRefreshToken: cookies.includes('sb-refresh-token')
+              }
+            };
+            
+            // Try to decode JWT
+            if (session?.access_token) {
+              try {
+                const payload = session.access_token.split('.')[1];
+                const decoded = JSON.parse(atob(payload));
+                debug.jwt = {
+                  app_metadata: decoded.app_metadata,
+                  user_metadata: decoded.user_metadata,
+                  role: decoded.role,
+                  aud: decoded.aud,
+                  exp: new Date(decoded.exp * 1000).toISOString()
+                };
+              } catch (e) {
+                debug.jwt_error = e instanceof Error ? e.message : 'JWT decode error';
+              }
+            }
+            
+            setDebugInfo(debug);
+            console.log('🔍 Auth Debug Info AFTER LOGIN:', debug);
+          } catch (error) {
+            console.error('Debug error:', error);
+            setDebugInfo({ error: error instanceof Error ? error.message : 'Unknown error' });
+          }
+        };
+        
+        await checkAuth();
+      }, 1000);
       
     } catch (error) {
       console.error('Login error:', error);
