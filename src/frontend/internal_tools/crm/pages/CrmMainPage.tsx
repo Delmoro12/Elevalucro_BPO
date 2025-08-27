@@ -52,7 +52,7 @@ export const CrmMainPage: React.FC<CrmMainPageProps> = ({
       onSubPageChange(tabId);
     }
     // Navegar para a rota correspondente
-    router.push(`/tools/${tabId}`);
+    router.push(`/internal_tools/${tabId}`);
   };
 
   const renderSubPageContent = () => {

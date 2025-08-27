@@ -19,6 +19,7 @@ interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
   currentPage: string;
+  currentSubPage?: string;
   onPageChange: (page: string) => void;
 }
 
@@ -34,6 +35,23 @@ const menuItems: MenuItem[] = [
     id: 'crm',
     label: 'CRM',
     icon: Building2,
+    children: [
+      {
+        id: 'leads',
+        label: 'Leads',
+        icon: Target,
+      },
+      {
+        id: 'prospects',
+        label: 'Prospects',
+        icon: Target,
+      },
+      {
+        id: 'customer-success',
+        label: 'Sucesso do Cliente',
+        icon: Users,
+      }
+    ]
   },
   {
     id: 'analytics',
@@ -50,7 +68,8 @@ const menuItems: MenuItem[] = [
 export const Sidebar: React.FC<SidebarProps> = ({ 
   collapsed, 
   onToggle, 
-  currentPage, 
+  currentPage,
+  currentSubPage, 
   onPageChange 
 }) => {
   const router = useRouter();
@@ -75,7 +94,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const renderMenuItem = (item: MenuItem, level: number = 0) => {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems.has(item.id);
-    const active = currentPage === item.id;
+    // Para itens pai, ativar se a página atual corresponder
+    // Para submenus, ativar se o currentSubPage corresponder ao id do item
+    const active = level === 0 
+      ? currentPage === item.id 
+      : currentSubPage === item.id;
     const Icon = item.icon;
 
     if (hasChildren) {

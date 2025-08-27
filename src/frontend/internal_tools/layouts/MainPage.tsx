@@ -133,7 +133,8 @@ export const MainPage: React.FC = () => {
         <Sidebar 
           collapsed={layoutProviderValue.sidebarCollapsed} 
           onToggle={layoutProviderValue.toggleSidebar}
-          currentPage={currentPage} // Mostrar a página principal como ativa
+          currentPage={currentPage}
+          currentSubPage={currentSubPage}
           onPageChange={handlePageChange}
         />
 
