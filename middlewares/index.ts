@@ -33,7 +33,7 @@ const defaultConfig: MiddlewareConfig = {
     domain: true,
     appGuard: false,     // 🔧 TEMPORARIAMENTE DESABILITADO PARA DEBUG
     toolsGuard: false,   // 🔧 TEMPORARIAMENTE DESABILITADO PARA DEBUG
-    auth: true,
+    auth: false,         // 🔧 TEMPORARIAMENTE DESABILITADO PARA DEBUG
     elevalucroBpoApp: false, // 🔧 TEMPORARIAMENTE DESABILITADO PARA DEBUG
     internalTools: false, // 🔧 TEMPORARIAMENTE DESABILITADO PARA DEBUG
     api: true
