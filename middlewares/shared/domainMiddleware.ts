@@ -59,6 +59,33 @@ function handleToolsSubdomain(request: NextRequest, pathname: string): NextRespo
 function handleMainDomain(request: NextRequest, pathname: string, hostname: string): NextResponse | null {
   console.log(`🏠 Main Domain: ${pathname}`)
   
+  // Lista de rotas públicas permitidas no domínio principal
+  const publicRoutes = [
+    '/',                          // Landing page
+    '/agencias',                  // Páginas de segmentos
+    '/clinicas',
+    '/geral', 
+    '/hoteis',
+    '/restaurantes',
+    '/obrigado',                  // Página de obrigado
+    '/pre-onboard-avancado',      // Formulários de pre-onboarding
+    '/pre-onboard-controle',
+    '/pre-onboard-gerencial',
+    '/onboarding-avancado',       // Formulários de onboarding
+    '/onboarding-controle',
+    '/onboarding-gerencial',
+    '/auth',                      // Páginas de autenticação (público)
+    '/_next',                     // Assets do Next.js
+    '/images',                    // Imagens públicas
+    '/favicon.ico',               // Favicon
+    '/api'                        // APIs públicas
+  ]
+
+  // Verificar se é uma rota pública permitida
+  const isPublicRoute = publicRoutes.some(route => 
+    pathname === route || pathname.startsWith(route + '/')
+  )
+
   // Redirecionar aplicações antigas para subdomínios corretos
   if (pathname.startsWith('/elevalucro_bpo_app')) {
     const newPath = pathname.replace('/elevalucro_bpo_app', '')
@@ -72,6 +99,12 @@ function handleMainDomain(request: NextRequest, pathname: string, hostname: stri
     const redirectUrl = `https://tools.${hostname}${newPath}${request.nextUrl.search}`
     console.log(`🔄 Main → Tools subdomain`)
     return NextResponse.redirect(new URL(redirectUrl))
+  }
+
+  // Se não for uma rota pública, bloquear acesso
+  if (!isPublicRoute) {
+    console.log(`🚫 Blocked access to protected/invalid route: ${pathname}`)
+    return NextResponse.redirect(new URL('/', request.url))
   }
 
   return null
