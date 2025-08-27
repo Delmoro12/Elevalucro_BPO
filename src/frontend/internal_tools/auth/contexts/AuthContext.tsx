@@ -51,23 +51,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
-        
-        // Handle successful sign in
-        if (event === 'SIGNED_IN' && session) {
-          console.log('User signed in, redirecting...');
-          // Small delay to ensure cookies are set
-          setTimeout(() => {
-            // Get redirect parameter from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const redirectTo = urlParams.get('redirect') || '/prospects';
-            
-            // Clean redirect to stay in tools
-            const cleanRedirect = redirectTo.startsWith('/elevalucro_bpo_app') ? '/prospects' : redirectTo;
-            
-            // Force navigation
-            window.location.href = cleanRedirect;
-          }, 100);
-        }
       }
     );
 

@@ -32,8 +32,18 @@ export const LoginForm: React.FC = () => {
         setError('Erro ao fazer login. Tente novamente.');
       }
     } else {
-      // Success - AuthContext will handle redirect automatically
-      console.log('Login successful, waiting for redirect...');
+      // Success - redirect after ensuring session is established
+      console.log('Login successful, redirecting...');
+      
+      // Wait a bit for session to be established
+      setTimeout(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectTo = urlParams.get('redirect') || '/prospects';
+        const cleanRedirect = redirectTo.startsWith('/elevalucro_bpo_app') ? '/prospects' : redirectTo;
+        
+        // Force page reload to ensure middleware recognizes auth state
+        window.location.href = cleanRedirect;
+      }, 500); // Increased delay
     }
   };
 
