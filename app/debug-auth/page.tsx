@@ -15,7 +15,7 @@ export default function DebugAuthPage() {
         // Get cookies
         const cookies = document.cookie;
         
-        const debug = {
+        const debug: any = {
           timestamp: new Date().toISOString(),
           hostname: window.location.hostname,
           session: session ? {
