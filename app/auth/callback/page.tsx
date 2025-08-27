@@ -26,9 +26,13 @@ export default function AuthCallbackRoute() {
 
         if (data.session) {
           // Usuário autenticado com sucesso
+          const user = data.session.user as any; // Type assertion para acessar campos não tipados
+          
           console.log('=== AUTH CALLBACK DEBUG ===');
-          console.log('User:', data.session.user.email);
-          console.log('User metadata:', data.session.user.user_metadata);
+          console.log('User:', user.email);
+          console.log('Full AMR:', user.amr);
+          console.log('User metadata:', user.user_metadata);
+          console.log('App metadata:', user.app_metadata);
           console.log('URL:', window.location.href);
           
           // Verificar se veio de um convite (tem type=invite na URL)
@@ -39,7 +43,7 @@ export default function AuthCallbackRoute() {
           
           // Se veio de convite ou se é primeira vez (não tem password metadata), vai para set-password
           const isInvite = inviteType === 'invite';
-          const needsPassword = !data.session.user.user_metadata?.password_set;
+          const needsPassword = !user.user_metadata?.password_set;
           
           console.log('Is Invite?', isInvite);
           console.log('Needs Password?', needsPassword);

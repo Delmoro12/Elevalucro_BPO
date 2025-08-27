@@ -348,8 +348,8 @@ export const DataTable = <T extends any>({
                     {columns.map((column) => (
                       <td key={column.key} className="py-4 px-4">
                         {column.render 
-                          ? column.render(item[column.key], item, index)
-                          : item[column.key]
+                          ? column.render((item as any)[column.key], item, index)
+                          : (item as any)[column.key]
                         }
                       </td>
                     ))}

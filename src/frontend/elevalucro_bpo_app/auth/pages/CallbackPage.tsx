@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '../../../lib/supabase';
 
 export default function CallbackPage() {
   const router = useRouter();
@@ -26,14 +26,16 @@ export default function CallbackPage() {
 
         if (data.session) {
           // Usuário autenticado com sucesso
+          const user = data.session.user as any; // Type assertion para acessar campos não tipados
+          
           console.log('=== AUTH CALLBACK DEBUG ===');
-          console.log('User:', data.session.user.email);
-          console.log('Full AMR:', data.session.user.amr);
-          console.log('User metadata:', data.session.user.user_metadata);
-          console.log('App metadata:', data.session.user.app_metadata);
+          console.log('User:', user.email);
+          console.log('Full AMR:', user.amr);
+          console.log('User metadata:', user.user_metadata);
+          console.log('App metadata:', user.app_metadata);
           
           // Verificar como o usuário se autenticou
-          const authMethods = data.session.user.amr?.map(m => m.method) || [];
+          const authMethods = user.amr?.map((m: any) => m.method) || [];
           console.log('Auth methods found:', authMethods);
           
           const isOtpLogin = authMethods.includes('otp');

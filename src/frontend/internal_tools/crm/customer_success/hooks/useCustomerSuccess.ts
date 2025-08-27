@@ -132,7 +132,7 @@ export function useCustomerSuccess(): UseCustomerSuccessReturn {
         // Atualizar o ticket local
         setTickets(prev => prev.map(ticket => 
           ticket.id === ticketId 
-            ? { ...ticket, ...data, updated_at: new Date().toISOString() }
+            ? { ...ticket, ...data, updated_at: new Date().toISOString() } as SupportTicket
             : ticket
         ));
         console.log('✅ Ticket atualizado com sucesso');

@@ -65,14 +65,15 @@ export const MainPage: React.FC = () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
-          console.log('🔍 User Claims from JWT:', session.user);
+          const user = session.user as any; // Type assertion para acessar campos não tipados
+          console.log('🔍 User Claims from JWT:', user);
           setUserClaims({
-            email: session.user.email,
-            user_metadata: session.user.user_metadata,
-            app_metadata: session.user.app_metadata,
-            id: session.user.id,
-            created_at: session.user.created_at
-          });
+            email: user.email,
+            user_metadata: user.user_metadata,
+            app_metadata: user.app_metadata,
+            id: user.id,
+            created_at: user.created_at
+          } as any);
           setShowClaimsModal(true);
         }
       } catch (error) {
@@ -176,32 +177,32 @@ export const MainPage: React.FC = () => {
               <div className="p-4 space-y-3 max-h-96 overflow-y-auto">
                 <div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Email:</span>
-                  <p className="text-sm text-gray-900 dark:text-white">{userClaims.email}</p>
+                  <p className="text-sm text-gray-900 dark:text-white">{(userClaims as any).email}</p>
                 </div>
 
                 <div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">User ID:</span>
-                  <p className="text-xs font-mono text-gray-600 dark:text-gray-400 break-all">{userClaims.id}</p>
+                  <p className="text-xs font-mono text-gray-600 dark:text-gray-400 break-all">{(userClaims as any).id}</p>
                 </div>
 
                 <div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">User Metadata:</span>
                   <pre className="text-xs bg-gray-100 dark:bg-slate-900 p-2 rounded mt-1 overflow-x-auto">
-                    {JSON.stringify(userClaims.user_metadata, null, 2)}
+                    {JSON.stringify((userClaims as any).user_metadata, null, 2)}
                   </pre>
                 </div>
 
                 <div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">App Metadata:</span>
                   <pre className="text-xs bg-gray-100 dark:bg-slate-900 p-2 rounded mt-1 overflow-x-auto">
-                    {JSON.stringify(userClaims.app_metadata, null, 2)}
+                    {JSON.stringify((userClaims as any).app_metadata, null, 2)}
                   </pre>
                 </div>
 
                 <div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Created At:</span>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {new Date(userClaims.created_at).toLocaleString()}
+                    {new Date((userClaims as any).created_at).toLocaleString()}
                   </p>
                 </div>
               </div>
