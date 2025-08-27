@@ -20,11 +20,9 @@ export const MainPage: React.FC = () => {
   const getPageFromPathname = (pathname: string): { page: string; subPage?: string } => {
     const segments = pathname.split('/').filter(Boolean);
     
-    // Encontrar 'internal_tools' e pegar o próximo segmento
-    const toolsIndex = segments.indexOf('internal_tools');
-    if (toolsIndex !== -1 && segments[toolsIndex + 1]) {
-      const mainPage = segments[toolsIndex + 1];
-      const subPage = segments[toolsIndex + 2];
+    // Para tools subdomain, as rotas são diretas (ex: /leads, /prospects)
+    if (segments.length > 0) {
+      const mainPage = segments[0];
       
       switch (mainPage) {
         case 'leads':
@@ -60,29 +58,29 @@ export const MainPage: React.FC = () => {
     if (page === 'crm') {
       setCurrentPage('crm');
       setCurrentSubPage('prospects');
-      router.push('/internal_tools/prospects');
+      router.push('/prospects');
       return;
     }
 
     setCurrentPage(page);
     
-    // Mapear página interna para URL
+    // Mapear página interna para URL (rotas diretas no tools subdomain)
     const urlMap: { [key: string]: string } = {
-      'leads': 'leads',
-      'prospects': 'prospects',
-      'customer-success': 'customer-success',
-      'analytics': 'analytics',
-      'settings': 'settings'
+      'leads': '/leads',
+      'prospects': '/prospects', 
+      'customer-success': '/customer-success',
+      'analytics': '/analytics',
+      'settings': '/settings'
     };
     
-    const url = urlMap[page] || 'prospects';
-    router.push(`/internal_tools/${url}`);
+    const url = urlMap[page] || '/prospects';
+    router.push(url);
   };
 
   // Função para navegar entre sub-páginas do CRM
   const handleSubPageChange = (subPage: string) => {
     setCurrentSubPage(subPage);
-    router.push(`/internal_tools/${subPage}`);
+    router.push(`/${subPage}`);
   };
 
   const renderCurrentPage = () => {
