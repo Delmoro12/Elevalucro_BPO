@@ -31,10 +31,10 @@ const defaultConfig: MiddlewareConfig = {
   appGuard: defaultAppGuardConfig,
   enabledFeatures: {
     domain: true,
-    appGuard: true,      // 🚨 PORTARIA APP (client_side)
+    appGuard: false,     // 🔧 TEMPORARIAMENTE DESABILITADO PARA DEBUG
     toolsGuard: false,   // 🔧 TEMPORARIAMENTE DESABILITADO PARA DEBUG
     auth: true,
-    elevalucroBpoApp: true,
+    elevalucroBpoApp: false, // 🔧 TEMPORARIAMENTE DESABILITADO PARA DEBUG
     internalTools: false, // 🔧 TEMPORARIAMENTE DESABILITADO PARA DEBUG
     api: true
   }
