@@ -35,7 +35,7 @@ const defaultConfig: MiddlewareConfig = {
     toolsGuard: false,   // 🔧 TEMPORARIAMENTE DESABILITADO PARA DEBUG
     auth: true,
     elevalucroBpoApp: true,
-    internalTools: true,
+    internalTools: false, // 🔧 TEMPORARIAMENTE DESABILITADO PARA DEBUG
     api: true
   }
 }
