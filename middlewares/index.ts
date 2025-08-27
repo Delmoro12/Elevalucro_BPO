@@ -32,7 +32,7 @@ const defaultConfig: MiddlewareConfig = {
   enabledFeatures: {
     domain: true,
     appGuard: true,      // 🚨 PORTARIA APP (client_side)
-    toolsGuard: true,    // 🚨 PORTARIA TOOLS (bpo_side)
+    toolsGuard: false,   // 🔧 TEMPORARIAMENTE DESABILITADO PARA DEBUG
     auth: true,
     elevalucroBpoApp: true,
     internalTools: true,
