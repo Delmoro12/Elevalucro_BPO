@@ -38,14 +38,7 @@ function handleAppSubdomain(request: NextRequest, pathname: string): NextRespons
   // Se acessar o subdomínio app na raiz, redirecionar para dashboard
   if (pathname === '/') {
     console.log(`🔄 App root → dashboard`)
-    return NextResponse.redirect(new URL('/elevalucro_bpo_app/dashboard', request.url))
-  }
-
-  // Bloquear internal_tools no subdomínio app
-  if (pathname.startsWith('/internal_tools')) {
-    const redirectUrl = `https://tools.elevalucro.com.br${pathname}${request.nextUrl.search}`
-    console.log(`🔄 App subdomain internal_tools → tools subdomain`)
-    return NextResponse.redirect(new URL(redirectUrl))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return null
@@ -56,15 +49,8 @@ function handleToolsSubdomain(request: NextRequest, pathname: string): NextRespo
   
   // Se acessar o subdomínio tools na raiz, redirecionar para prospects
   if (pathname === '/') {
-    console.log(`🔄 Tools root → internal_tools/prospects`)
-    return NextResponse.redirect(new URL('/internal_tools/prospects', request.url))
-  }
-
-  // Bloquear elevalucro_bpo_app no subdomínio tools
-  if (pathname.startsWith('/elevalucro_bpo_app')) {
-    const redirectUrl = `https://app.elevalucro.com.br${pathname}${request.nextUrl.search}`
-    console.log(`🔄 Tools subdomain bpo_app → app subdomain`)
-    return NextResponse.redirect(new URL(redirectUrl))
+    console.log(`🔄 Tools root → prospects`)
+    return NextResponse.redirect(new URL('/prospects', request.url))
   }
 
   return null
@@ -73,15 +59,17 @@ function handleToolsSubdomain(request: NextRequest, pathname: string): NextRespo
 function handleMainDomain(request: NextRequest, pathname: string, hostname: string): NextResponse | null {
   console.log(`🏠 Main Domain: ${pathname}`)
   
-  // Redirecionar aplicações para subdomínios corretos
+  // Redirecionar aplicações antigas para subdomínios corretos
   if (pathname.startsWith('/elevalucro_bpo_app')) {
-    const redirectUrl = `https://app.${hostname}${pathname}${request.nextUrl.search}`
+    const newPath = pathname.replace('/elevalucro_bpo_app', '')
+    const redirectUrl = `https://app.${hostname}${newPath}${request.nextUrl.search}`
     console.log(`🔄 Main → App subdomain`)
     return NextResponse.redirect(new URL(redirectUrl))
   }
 
   if (pathname.startsWith('/internal_tools')) {
-    const redirectUrl = `https://tools.${hostname}${pathname}${request.nextUrl.search}`
+    const newPath = pathname.replace('/internal_tools', '')
+    const redirectUrl = `https://tools.${hostname}${newPath}${request.nextUrl.search}`
     console.log(`🔄 Main → Tools subdomain`)
     return NextResponse.redirect(new URL(redirectUrl))
   }

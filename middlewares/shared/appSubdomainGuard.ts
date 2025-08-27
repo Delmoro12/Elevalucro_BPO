@@ -41,17 +41,17 @@ export function createAppSubdomainGuard(config: AppSubdomainGuardConfig) {
       return NextResponse.redirect(loginUrl)
     }
 
-    // 🎫 Verificar se JWT é válido (sem verificar role específica)
+    // 🎫 Verificar se tem role client_side
     try {
-      const jwtValid = validateBasicJWT(accessToken)
+      const userRole = extractRoleFromJWT(accessToken)
       
-      if (!jwtValid) {
-        console.log(`🚫 Invalid JWT → login`)
-        return NextResponse.redirect(new URL(config.loginUrl, request.url))
+      if (userRole !== config.requiredRole) {
+        console.log(`🚫 Invalid role for app: ${userRole}, required: ${config.requiredRole}`)
+        return NextResponse.redirect(new URL(config.accessDeniedUrl, request.url))
       }
 
-      console.log(`✅ Valid JWT - user authenticated`)
-      return null // JWT válido, continuar (role será verificada pelos middlewares específicos)
+      console.log(`✅ Valid ${config.requiredRole} user`)
+      return null // Usuário autorizado
 
     } catch (error) {
       console.error(`❌ JWT validation error:`, error)
@@ -62,7 +62,6 @@ export function createAppSubdomainGuard(config: AppSubdomainGuardConfig) {
 
 /**
  * Extrai a role do JWT token
- * Por enquanto simular até implementarmos a decodificação real
  */
 function extractRoleFromJWT(token: string): string | null {
   try {
