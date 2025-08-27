@@ -65,13 +65,9 @@ export const LoginForm: React.FC = () => {
           }
         }
         
-        // Now redirect
-        const urlParams = new URLSearchParams(window.location.search);
-        const redirectTo = urlParams.get('redirect') || '/prospects';
-        const cleanRedirect = redirectTo.startsWith('/elevalucro_bpo_app') ? '/prospects' : redirectTo;
-        
-        console.log('🎯 Redirecting to:', cleanRedirect);
-        window.location.href = cleanRedirect;
+        // Now redirect - use router.push for clean navigation
+        console.log('🎯 Redirecting to /prospects');
+        router.push('/prospects');
       }, 500); // Reduced delay since middleware is disabled
     }
   };
