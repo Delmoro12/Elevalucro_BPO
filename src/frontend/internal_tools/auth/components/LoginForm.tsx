@@ -32,17 +32,8 @@ export const LoginForm: React.FC = () => {
         setError('Erro ao fazer login. Tente novamente.');
       }
     } else {
-      // Success - redirect to internal tools dashboard
-      console.log('Login successful - redirecting to prospects');
-      
-      // Check if there's a redirect parameter
-      const urlParams = new URLSearchParams(window.location.search);
-      const redirectTo = urlParams.get('redirect') || '/prospects';
-      
-      // Make sure we stay within tools routes
-      const cleanRedirect = redirectTo.startsWith('/elevalucro_bpo_app') ? '/prospects' : redirectTo;
-      
-      router.push(cleanRedirect);
+      // Success - AuthContext will handle redirect automatically
+      console.log('Login successful, waiting for redirect...');
     }
   };
 
