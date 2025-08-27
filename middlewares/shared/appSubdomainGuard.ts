@@ -102,19 +102,20 @@ function extractRoleFromJWT(token: string): string | null {
 
 /**
  * Mapeia ID da role para nome da role
- * TODO: Implementar busca na base de dados ou cache
+ * Usando os IDs reais do banco de produção
  */
 function mapRoleIdToName(roleId: string): string | null {
-  // Por enquanto, mapeamento hardcoded para desenvolvimento
   const roleMap: Record<string, string> = {
+    '3e979a41-1ddb-452a-a6f8-7053b894856c': 'bpo_side',      // Equipe interna (produção)
+    '6da20e26-30a0-43a6-a9c7-287841b61e31': 'client_side',   // Clientes (produção)
+    // Legacy mapping for development
     '1': 'bpo_side',
     '2': 'client_side', 
     '3': 'admin',
-    // TODO: Substituir por consulta real na base de dados
   }
 
   const roleName = roleMap[roleId]
-  console.log(`🗺️  Role mapping: ${roleId} → ${roleName || 'unknown'}`)
+  console.log(`🗺️ App Role mapping: ${roleId} → ${roleName || 'unknown'}`)
   
   return roleName || null
 }

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { MainPage } from '../../src/frontend/internal_tools/layouts/MainPage';
+import { AuthProvider } from '../../src/frontend/internal_tools/auth/contexts/AuthContext';
 
 export const metadata: Metadata = {
   title: 'Internal Tools - ElevaLucro BPO',
@@ -27,7 +28,9 @@ export default function ToolsLayout({
           `,
         }}
       />
-      <MainPage />
+      <AuthProvider>
+        <MainPage />
+      </AuthProvider>
     </>
   );
 }

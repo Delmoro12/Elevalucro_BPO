@@ -1,8 +1,5 @@
--- =============================================================================
--- Custom Access Token Hook - JWT Enhancement with Subscription Plan
--- =============================================================================
--- Version: 1.2.0
--- Description: Enriches JWT tokens with user context for authorization
+-- Fix JWT hook to handle missing users gracefully
+-- Version: 1.2.1 - Tolerance for missing users
 
 CREATE OR REPLACE FUNCTION public.custom_access_token_hook(event jsonb)
 RETURNS jsonb
@@ -85,7 +82,7 @@ BEGIN
   -- Add hook execution metadata
   v_existing_metadata := v_existing_metadata || jsonb_build_object(
     'jwt_hook_executed', true,
-    'jwt_hook_version', '1.2.0'
+    'jwt_hook_version', '1.2.1'
   );
 
   -- Update claims with metadata
