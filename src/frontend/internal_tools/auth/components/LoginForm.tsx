@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../../../lib/supabase';
 
 export const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');

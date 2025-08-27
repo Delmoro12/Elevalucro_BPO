@@ -46,7 +46,7 @@ export default function DebugAuthPage() {
               exp: new Date(decoded.exp * 1000).toISOString()
             };
           } catch (e) {
-            debug.jwt_error = e.message;
+            debug.jwt_error = e instanceof Error ? e.message : 'JWT decode error';
           }
         }
         
@@ -54,7 +54,7 @@ export default function DebugAuthPage() {
         console.log('🔍 Auth Debug Info:', debug);
       } catch (error) {
         console.error('Debug error:', error);
-        setDebugInfo({ error: error.message });
+        setDebugInfo({ error: error instanceof Error ? error.message : 'Unknown error' });
       }
     };
     
