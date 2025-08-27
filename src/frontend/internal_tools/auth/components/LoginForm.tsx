@@ -32,18 +32,46 @@ export const LoginForm: React.FC = () => {
         setError('Erro ao fazer login. Tente novamente.');
       }
     } else {
-      // Success - redirect after ensuring session is established
-      console.log('Login successful, redirecting...');
+      // Success - debug and redirect
+      console.log('🎉 LOGIN SUCCESS - Starting debug...');
       
-      // Wait a bit for session to be established
-      setTimeout(() => {
+      // Debug session and cookies immediately
+      setTimeout(async () => {
+        console.log('🔍 DEBUG: Checking session after login...');
+        
+        // Get current session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        console.log('📋 Current session:', session);
+        console.log('❌ Session error:', sessionError);
+        
+        // Check cookies
+        const cookies = document.cookie;
+        console.log('🍪 All cookies:', cookies);
+        
+        const accessToken = cookies.split('; ').find(row => row.startsWith('sb-access-token='));
+        console.log('🎫 Access token cookie:', accessToken);
+        
+        // Try to decode JWT if available
+        if (session?.access_token) {
+          try {
+            const payload = session.access_token.split('.')[1];
+            const decoded = JSON.parse(atob(payload));
+            console.log('🔓 JWT Payload:', decoded);
+            console.log('🎭 App metadata:', decoded.app_metadata);
+            console.log('👤 User metadata:', decoded.user_metadata);
+          } catch (e) {
+            console.error('❌ Error decoding JWT:', e);
+          }
+        }
+        
+        // Now redirect
         const urlParams = new URLSearchParams(window.location.search);
         const redirectTo = urlParams.get('redirect') || '/prospects';
         const cleanRedirect = redirectTo.startsWith('/elevalucro_bpo_app') ? '/prospects' : redirectTo;
         
-        // Force page reload to ensure middleware recognizes auth state
+        console.log('🎯 Redirecting to:', cleanRedirect);
         window.location.href = cleanRedirect;
-      }, 500); // Increased delay
+      }, 1000); // Increased delay for debugging
     }
   };
 

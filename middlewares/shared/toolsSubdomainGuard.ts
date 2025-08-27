@@ -25,6 +25,10 @@ export function createToolsSubdomainGuard() {
 
     // 🔐 Verificar se usuário está logado
     const accessToken = request.cookies.get('sb-access-token')?.value
+    const refreshToken = request.cookies.get('sb-refresh-token')?.value
+    
+    console.log(`🍪 Tools Debug - Access token exists: ${!!accessToken}`)
+    console.log(`🍪 Tools Debug - Refresh token exists: ${!!refreshToken}`)
     
     if (!accessToken) {
       console.log(`🚫 No access token → login`)
@@ -32,6 +36,8 @@ export function createToolsSubdomainGuard() {
       loginUrl.searchParams.set('redirect', pathname)
       return NextResponse.redirect(loginUrl)
     }
+    
+    console.log(`🎫 Tools Debug - Token preview: ${accessToken.substring(0, 50)}...`)
 
     // 🎫 Verificar se tem role bpo_side
     try {
@@ -58,19 +64,29 @@ export function createToolsSubdomainGuard() {
  */
 function extractRoleFromJWT(token: string): string | null {
   try {
+    console.log(`🔍 Tools Debug - Extracting role from JWT...`)
     const payload = token.split('.')[1]
-    if (!payload) return null
+    if (!payload) {
+      console.log(`🚫 Tools Debug - No payload in JWT`)
+      return null
+    }
     
     const decoded = JSON.parse(atob(payload))
+    console.log(`🎭 Tools Debug - Full JWT payload:`, decoded)
+    console.log(`🎭 Tools Debug - App metadata:`, decoded.app_metadata)
+    console.log(`👤 Tools Debug - User metadata:`, decoded.user_metadata)
+    
     const roleId = decoded.app_metadata?.role
+    console.log(`🎯 Tools Debug - Role ID from app_metadata:`, roleId)
     
     if (!roleId) {
       console.log(`🚫 No role ID in app_metadata`)
       return null
     }
 
-    // TODO: Mapear ID para nome da role via base de dados
-    return mapRoleIdToName(roleId)
+    const mappedRole = mapRoleIdToName(roleId)
+    console.log(`🗺️ Tools Debug - Final mapped role:`, mappedRole)
+    return mappedRole
     
   } catch (error) {
     console.error(`❌ Error extracting role from JWT:`, error)
