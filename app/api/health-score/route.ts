@@ -45,14 +45,14 @@ export async function GET(request: NextRequest) {
     // Calculate aggregated stats
     const stats = {
       total_companies: healthScores?.length || 0,
-      excellent: healthScores?.filter(c => c.health_classification === 'excellent').length || 0,
-      good: healthScores?.filter(c => c.health_classification === 'good').length || 0,
-      warning: healthScores?.filter(c => c.health_classification === 'warning').length || 0,
-      critical: healthScores?.filter(c => c.health_classification === 'critical').length || 0,
+      excellent: healthScores?.filter((c: any) => c.health_classification === 'excellent').length || 0,
+      good: healthScores?.filter((c: any) => c.health_classification === 'good').length || 0,
+      warning: healthScores?.filter((c: any) => c.health_classification === 'warning').length || 0,
+      critical: healthScores?.filter((c: any) => c.health_classification === 'critical').length || 0,
       average_score: healthScores?.length ? 
-        (healthScores.reduce((sum, c) => sum + c.health_score, 0) / healthScores.length).toFixed(1) : 0,
-      companies_in_onboarding: healthScores?.filter(c => c.lifecycle_stage === 'onboarding').length || 0,
-      companies_operational: healthScores?.filter(c => c.lifecycle_stage === 'operational').length || 0
+        (healthScores.reduce((sum: number, c: any) => sum + c.health_score, 0) / healthScores.length).toFixed(1) : 0,
+      companies_in_onboarding: healthScores?.filter((c: any) => c.lifecycle_stage === 'onboarding').length || 0,
+      companies_operational: healthScores?.filter((c: any) => c.lifecycle_stage === 'operational').length || 0
     };
 
     return NextResponse.json({

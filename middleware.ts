@@ -173,9 +173,9 @@ export function middleware(request: NextRequest) {
     // Tentar outros formatos possíveis de cookies do Supabase
     if (!accessToken) {
       // Padrão completo com project ref - verificar todos os cookies
-      const cookieStore = request.cookies
-      for (const [name, cookie] of cookieStore) {
-        if (name.startsWith('sb-') && name.includes('-auth-token')) {
+      const allCookies = request.cookies.getAll()
+      for (const cookie of allCookies) {
+        if (cookie.name.startsWith('sb-') && cookie.name.includes('-auth-token')) {
           accessToken = cookie.value
           break
         }
@@ -191,7 +191,8 @@ export function middleware(request: NextRequest) {
     
     // Se não há cookie, verificar se há token no header (enviado via sessionStorage)
     if (!accessToken) {
-      accessToken = request.headers.get('x-supabase-auth-token')
+      const headerToken = request.headers.get('x-supabase-auth-token')
+      accessToken = headerToken || undefined
       tokenSource = accessToken ? 'header' : 'none'
     }
     
@@ -204,11 +205,12 @@ export function middleware(request: NextRequest) {
     }
     
     // Log todos os cookies para debug
-    const allCookies: string[] = []
-    for (const [name, cookie] of request.cookies) {
-      allCookies.push(`${name}=${cookie.value.substring(0, 20)}...`)
+    const allCookiesDebug: string[] = []
+    const cookiesList = request.cookies.getAll()
+    for (const cookie of cookiesList) {
+      allCookiesDebug.push(`${cookie.name}=${cookie.value.substring(0, 20)}...`)
     }
-    console.log(`🍪 All cookies:`, allCookies)
+    console.log(`🍪 All cookies:`, allCookiesDebug)
     
     console.log(`🎫 Tools: Token found via ${tokenSource}`)
     

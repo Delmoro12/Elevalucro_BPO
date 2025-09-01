@@ -49,68 +49,103 @@ interface OnboardingClient {
 // Mock data
 const mockClients: OnboardingClient[] = [
   {
-    id: '1',
+    company_id: '1',
     nome_empresa: 'Tech Solutions Ltda',
-    nome_contato: 'João Silva',
     email: 'joao@techsolutions.com',
     telefone: '(11) 99999-9999',
+    segmento: 'Tecnologia',
+    plano: 'Avançado',
     valor_mensal: 2500,
     data_inicio: '2024-01-15',
     semana_onboarding: 'semana_1',
     progresso_onboarding: 25,
+    lifecycle_stage: 'onboarding',
+    dias_desde_criacao: 5,
+    total_checklist_items: 20,
+    completed_items: 5,
+    pending_items: 15,
     proxima_acao: 'Configurar sistema financeiro',
+    subscription_status: 'active',
     responsavel: 'Ana Costa'
   },
   {
-    id: '2',
+    company_id: '2',
     nome_empresa: 'Inovação Digital',
-    nome_contato: 'Maria Santos',
     email: 'maria@inovacaodigital.com',
     telefone: '(11) 88888-8888',
+    segmento: 'Digital',
+    plano: 'Gerencial',
     valor_mensal: 1800,
     data_inicio: '2024-01-10',
     semana_onboarding: 'semana_2',
     progresso_onboarding: 50,
+    lifecycle_stage: 'onboarding',
+    dias_desde_criacao: 10,
+    total_checklist_items: 20,
+    completed_items: 10,
+    pending_items: 10,
     proxima_acao: 'Treinamento equipe contábil',
+    subscription_status: 'active',
     responsavel: 'Carlos Lima'
   },
   {
-    id: '3',
+    company_id: '3',
     nome_empresa: 'Construtora ABC',
-    nome_contato: 'Pedro Oliveira',
     email: 'pedro@construtorabc.com',
     telefone: '(11) 77777-7777',
+    segmento: 'Construção',
+    plano: 'Avançado',
     valor_mensal: 3200,
     data_inicio: '2024-01-05',
     semana_onboarding: 'semana_3',
     progresso_onboarding: 75,
+    lifecycle_stage: 'onboarding',
+    dias_desde_criacao: 15,
+    total_checklist_items: 20,
+    completed_items: 15,
+    pending_items: 5,
     proxima_acao: 'Revisão relatórios DRE',
+    subscription_status: 'active',
     responsavel: 'Ana Costa'
   },
   {
-    id: '4',
+    company_id: '4',
     nome_empresa: 'Consultoria Premium',
-    nome_contato: 'Lucas Costa',
     email: 'lucas@consultoriapremium.com',
     telefone: '(11) 66666-6666',
+    segmento: 'Consultoria',
+    plano: 'Avançado',
     valor_mensal: 4500,
     data_inicio: '2024-01-01',
     semana_onboarding: 'semana_4',
     progresso_onboarding: 90,
+    lifecycle_stage: 'onboarding',
+    dias_desde_criacao: 20,
+    total_checklist_items: 20,
+    completed_items: 18,
+    pending_items: 2,
     proxima_acao: 'Finalizar documentação',
+    subscription_status: 'active',
     responsavel: 'Carlos Lima'
   },
   {
-    id: '5',
+    company_id: '5',
     nome_empresa: 'Startup Fintech',
-    nome_contato: 'Fernanda Lima',
     email: 'fernanda@startupfintech.com',
     telefone: '(11) 55555-5555',
+    segmento: 'Fintech',
+    plano: 'Controle',
     valor_mensal: 1200,
     data_inicio: '2024-01-20',
     semana_onboarding: 'semana_1',
     progresso_onboarding: 15,
+    lifecycle_stage: 'onboarding',
+    dias_desde_criacao: 2,
+    total_checklist_items: 20,
+    completed_items: 3,
+    pending_items: 17,
     proxima_acao: 'Coleta documentos iniciais',
+    subscription_status: 'active',
     responsavel: 'Ana Costa'
   }
 ];
@@ -461,7 +496,7 @@ export const OnboardingKanban: React.FC = () => {
                 setClients(data.companies);
                 // Atualizar o cliente selecionado com os novos dados
                 const updatedSelectedClient = data.companies.find(
-                  c => c.company_id === selectedClient?.company_id
+                  (c: any) => c.company_id === selectedClient?.company_id
                 );
                 if (updatedSelectedClient) {
                   setSelectedClient(updatedSelectedClient);

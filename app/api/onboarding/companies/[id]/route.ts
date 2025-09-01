@@ -104,7 +104,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
       if (!statsError && checklistStats) {
         const totalItems = checklistStats.length;
-        const completedItems = checklistStats.filter(item => item.is_checked).length;
+        const completedItems = checklistStats.filter((item: any) => item.is_checked).length;
         const progressPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
         // Update the companies table with new progress
