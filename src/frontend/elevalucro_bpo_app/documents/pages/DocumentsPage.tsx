@@ -6,7 +6,7 @@ import { ExcelUploadModal } from '../components/ExcelUploadModal';
 import { DocumentsTableView } from '../components/DocumentsTableView';
 import { FileText } from 'lucide-react';
 
-export const DocumentsPage: React.FC = () => {
+const DocumentsPage: React.FC = () => {
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
   const [isExcelModalOpen, setIsExcelModalOpen] = useState(false);
 
@@ -52,3 +52,4 @@ export const DocumentsPage: React.FC = () => {
     </div>
   );
 };
+export default DocumentsPage;

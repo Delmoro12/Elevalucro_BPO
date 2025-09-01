@@ -3,7 +3,7 @@
 import React from 'react';
 import { Zap } from 'lucide-react';
 
-export const IntegrationsPage: React.FC = () => {
+const IntegrationsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
@@ -21,3 +21,4 @@ export const IntegrationsPage: React.FC = () => {
     </div>
   );
 };
+export default IntegrationsPage;
