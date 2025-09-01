@@ -1,6 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '../../../../src/lib/supabase';
-import { prospectService } from '../../../../src/services/prospectService';
+import { NextRequest, NextResponse } from 'next/server'
+import { getSupabaseAdmin } from '../../../../src/lib/supabase'
 
 // GET - Buscar prospect por ID
 export async function GET(
@@ -8,180 +7,208 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
-
-    const { data, error } = await supabaseAdmin
+    const { id } = params
+    
+    console.log(`🔍 API: Getting prospect by ID: ${id}`)
+    
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
+      return NextResponse.json(
+        { success: false, error: 'Supabase client not available' },
+        { status: 500 }
+      )
+    }
+    
+    // Buscar prospect específico
+    const { data: prospect, error } = await supabase
       .from('prospects')
       .select('*')
       .eq('id', id)
-      .single();
+      .single()
 
     if (error) {
-      console.error('Erro ao buscar prospect:', error);
+      console.error('❌ Database error:', error)
+      if (error.code === 'PGRST116') {
+        return NextResponse.json(
+          { success: false, error: 'Prospect não encontrado' },
+          { status: 404 }
+        )
+      }
       return NextResponse.json(
-        { success: false, error: 'Prospect não encontrado' }, 
-        { status: 404 }
-      );
+        { success: false, error: 'Erro ao buscar prospect' },
+        { status: 500 }
+      )
     }
+
+    console.log(`✅ Found prospect: ${prospect?.nome_contato}`)
 
     return NextResponse.json({
       success: true,
-      data
-    });
+      data: prospect
+    })
 
   } catch (error) {
-    console.error('Erro na API GET prospect:', error);
+    console.error('❌ API Error:', error)
     return NextResponse.json(
-      { success: false, error: 'Erro interno do servidor' }, 
+      { success: false, error: 'Erro interno do servidor' },
       { status: 500 }
-    );
+    )
   }
 }
 
-// PATCH - Atualizar prospect por ID
+// PATCH - Atualizar prospect
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
-    const body = await request.json();
-
-    // Validar status se estiver sendo atualizado
-    const validStatuses = ['pending', 'contacted', 'contract_sent', 'signed', 'rejected'];
-    if (body.status && !validStatuses.includes(body.status)) {
+    const { id } = params
+    const updateData = await request.json()
+    
+    console.log(`🔄 API: Updating prospect ${id}:`, updateData)
+    
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Status inválido. Use: pending, contacted, contract_sent, signed ou rejected' 
-        }, 
-        { status: 400 }
-      );
+        { success: false, error: 'Supabase client not available' },
+        { status: 500 }
+      )
     }
-
-    // Atualizar o prospect
-    const { data, error } = await supabaseAdmin
+    
+    // Verificar se está mudando status para "signed"
+    const isBecomingSigned = updateData.status === 'signed'
+    
+    // Atualizar prospect
+    const { data: prospect, error } = await supabase
       .from('prospects')
       .update({
-        ...body,
+        ...updateData,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)
       .select()
-      .single();
+      .single()
 
     if (error) {
-      console.error('Erro ao atualizar prospect:', error);
-      
+      console.error('❌ Database error:', error)
       if (error.code === 'PGRST116') {
         return NextResponse.json(
-          { success: false, error: 'Prospect não encontrado' }, 
+          { success: false, error: 'Prospect não encontrado' },
           { status: 404 }
-        );
+        )
       }
-      
       return NextResponse.json(
-        { success: false, error: 'Erro ao atualizar prospect' }, 
+        { success: false, error: 'Erro ao atualizar prospect' },
         { status: 500 }
-      );
+      )
     }
 
-    // Se status foi alterado para 'signed', trigger automatic signup
-    if (body.status === 'signed') {
-      console.log('🎯 Status alterado para signed - iniciando auto signup');
+    console.log(`✅ Updated prospect: ${prospect?.nome_contato}`)
+
+    // Se mudou para "signed", disparar criação automática do cliente
+    if (isBecomingSigned) {
+      console.log('🎯 Prospect marcado como "signed" - disparando criação de cliente...')
       
       try {
-        const signupResult = await prospectService.triggerAutoSignup(id);
+        // Chamar a edge function para criar o cliente
+        const signupResponse = await supabase.functions.invoke('client-signup', {
+          body: { prospect_id: id }
+        })
         
-        if (signupResult.success) {
-          console.log('✅ Auto signup executado com sucesso');
+        const signupResult = signupResponse.data
+        
+        if (!signupResponse.error && signupResult?.success) {
+          console.log('✅ Cliente criado automaticamente:', signupResult)
+          
           return NextResponse.json({
             success: true,
-            data,
-            message: 'Status atualizado e cliente criado automaticamente',
-            autoSignup: signupResult
-          });
+            data: prospect,
+            clientCreated: true,
+            clientData: signupResult.data,
+            message: 'Prospect atualizado e cliente criado automaticamente'
+          })
         } else {
-          console.error('❌ Erro no auto signup:', signupResult.error);
+          console.error('❌ Erro ao criar cliente automaticamente:', signupResponse.error || signupResult)
+          
           return NextResponse.json({
             success: true,
-            data,
-            message: `Status atualizado para ${body.status}, mas houve erro no signup automático: ${signupResult.error}`,
-            autoSignup: signupResult
-          });
+            data: prospect,
+            clientCreated: false,
+            error: signupResponse.error?.message || signupResult?.error || 'Erro na criação automática do cliente',
+            message: 'Prospect atualizado, mas houve erro na criação do cliente'
+          })
         }
       } catch (signupError) {
-        console.error('❌ Erro fatal no auto signup:', signupError);
+        console.error('❌ Erro ao disparar criação de cliente:', signupError)
+        
         return NextResponse.json({
           success: true,
-          data,
-          message: `Status atualizado para ${body.status}, mas houve erro no signup automático`,
-          autoSignupError: String(signupError)
-        });
+          data: prospect,
+          clientCreated: false,
+          error: 'Erro ao disparar criação automática do cliente',
+          message: 'Prospect atualizado, mas houve erro na criação do cliente'
+        })
       }
     }
 
     return NextResponse.json({
       success: true,
-      data,
-      message: `Status atualizado para ${body.status || 'atualizado'}`
-    });
+      data: prospect
+    })
 
   } catch (error) {
-    console.error('Erro na API PATCH prospect:', error);
+    console.error('❌ API Error:', error)
     return NextResponse.json(
-      { success: false, error: 'Erro interno do servidor' }, 
+      { success: false, error: 'Erro interno do servidor' },
       { status: 500 }
-    );
+    )
   }
 }
 
-// DELETE - Deletar prospect por ID
+// DELETE - Deletar prospect
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
-
-    // Verificar se o prospect existe
-    const { data: existingProspect, error: fetchError } = await supabaseAdmin
-      .from('prospects')
-      .select('id, nome_contato, nome_empresa')
-      .eq('id', id)
-      .single();
-
-    if (fetchError) {
+    const { id } = params
+    
+    console.log(`🗑️ API: Deleting prospect ${id}`)
+    
+    const supabase = getSupabaseAdmin()
+    if (!supabase) {
       return NextResponse.json(
-        { success: false, error: 'Prospect não encontrado' }, 
-        { status: 404 }
-      );
+        { success: false, error: 'Supabase client not available' },
+        { status: 500 }
+      )
     }
-
-    // Deletar o prospect
-    const { error: deleteError } = await supabaseAdmin
+    
+    // Deletar prospect
+    const { error } = await supabase
       .from('prospects')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
 
-    if (deleteError) {
-      console.error('Erro ao deletar prospect:', deleteError);
+    if (error) {
+      console.error('❌ Database error:', error)
       return NextResponse.json(
-        { success: false, error: 'Erro ao deletar prospect' }, 
+        { success: false, error: 'Erro ao deletar prospect' },
         { status: 500 }
-      );
+      )
     }
+
+    console.log(`✅ Deleted prospect: ${id}`)
 
     return NextResponse.json({
       success: true,
-      message: `Prospect "${existingProspect.nome_contato}" (${existingProspect.nome_empresa}) deletado com sucesso`
-    });
+      message: 'Prospect deletado com sucesso'
+    })
 
   } catch (error) {
-    console.error('Erro na API DELETE prospect:', error);
+    console.error('❌ API Error:', error)
     return NextResponse.json(
-      { success: false, error: 'Erro interno do servidor' }, 
+      { success: false, error: 'Erro interno do servidor' },
       { status: 500 }
-    );
+    )
   }
 }

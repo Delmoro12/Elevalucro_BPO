@@ -89,7 +89,6 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
       "organizacao_documentos",
       // Adiciona do Gerencial
       "cobranca_inadimplentes",
-      "emissao_nf",
       "emissao_boletos",
       "relatorio_fluxo_caixa",
       "relatorios_entradas_saidas",
@@ -105,7 +104,6 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
       "conciliacao_bancaria",
       "organizacao_documentos",
       "cobranca_inadimplentes",
-      "emissao_nf",
       "emissao_boletos",
       "relatorio_fluxo_caixa",
       "relatorios_entradas_saidas",
@@ -473,7 +471,6 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                           
                           // Plano Gerencial (adiciona aos do Controle)
                           { value: "cobranca_inadimplentes", label: "Cobrança de inadimplentes" },
-                          { value: "emissao_nf", label: "Emissão de NF" },
                           { value: "emissao_boletos", label: "Emissão de boletos" },
                           { value: "relatorio_fluxo_caixa", label: "Relatório de fluxo de caixa" },
                           { value: "relatorios_entradas_saidas", label: "Relatórios de entradas e saídas" },

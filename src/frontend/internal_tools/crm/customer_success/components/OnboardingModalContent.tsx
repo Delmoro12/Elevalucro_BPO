@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Calendar,
   Settings,
@@ -15,17 +15,25 @@ import { ModalSidebar } from '../../../shared/components';
 import { Building2 } from 'lucide-react';
 
 interface OnboardingClient {
-  id: string;
+  company_id: string;
   nome_empresa: string;
-  nome_contato: string;
   email: string;
   telefone: string;
-  valor_mensal: number;
+  segmento: string;
+  plano: string;
+  progresso_onboarding: number;
+  lifecycle_stage: string;
   data_inicio: string;
   semana_onboarding: 'semana_1' | 'semana_2' | 'semana_3' | 'semana_4';
-  progresso_onboarding: number;
+  dias_desde_criacao: number;
+  total_checklist_items: number;
+  completed_items: number;
+  pending_items: number;
   proxima_acao: string;
+  subscription_status: string;
+  valor_mensal: number;
   responsavel: string;
+  checklist_items?: any[];
 }
 
 interface OnboardingModalProps {
@@ -44,6 +52,43 @@ export const OnboardingModalContent: React.FC<OnboardingModalProps> = ({
   onUpdate
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('semana_1');
+  const [detailedClient, setDetailedClient] = useState<OnboardingClient | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Carregar detalhes completos do cliente quando o modal abrir
+  useEffect(() => {
+    if (isOpen && client) {
+      const fetchClientDetails = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+          
+          const response = await fetch(`/api/onboarding/companies/${client.company_id}`);
+          const data = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(data.error || 'Erro ao carregar detalhes');
+          }
+          
+          if (data.success && data.company) {
+            setDetailedClient(data.company);
+          } else {
+            throw new Error('Resposta inválida do servidor');
+          }
+        } catch (err) {
+          console.error('Error fetching client details:', err);
+          setError(err instanceof Error ? err.message : 'Erro desconhecido');
+          // Usar dados básicos do cliente como fallback
+          setDetailedClient(client);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchClientDetails();
+    }
+  }, [isOpen, client]);
   
   // Estados para acordion
   const [acordionOpen, setAcordionOpen] = useState<{[key: string]: boolean}>({
@@ -56,39 +101,17 @@ export const OnboardingModalContent: React.FC<OnboardingModalProps> = ({
     acessos: false
   });
   
-  // Estados para checkboxes de cada semana
-  const [semana1Checks, setSemana1Checks] = useState({
-    kickoff: false,
-    coleta_info: false,
-    analise_fluxo: false
-  });
+  // Estado para checkboxes usando dados reais da API
+  const [checklistItems, setChecklistItems] = useState<any[]>([]);
+  
+  // Atualizar checklist quando detailedClient carrega
+  useEffect(() => {
+    if (detailedClient?.checklist_items) {
+      setChecklistItems(detailedClient.checklist_items);
+    }
+  }, [detailedClient]);
 
-  const [semana2Checks, setSemana2Checks] = useState({
-    config_ferramentas: false,
-    mapeamento_situacao: false,
-    plano_contas: false,
-    categorizacao: false,
-    elaboracao_budget: false,
-    cadastro_contas: false,
-    formas_pagamento: false,
-    treinamento: false
-  });
-
-  const [semana3Checks, setSemana3Checks] = useState({
-    conciliacao_bancaria: false,
-    aprovacao_pagamentos: false,
-    ajustes_processos: false,
-    resolucao_pendencias: false,
-    acompanhamento_diario: false
-  });
-
-  const [semana4Checks, setSemana4Checks] = useState({
-    processos_implementados: false,
-    primeiro_relatorio: false,
-    transicao_operacao: false
-  });
-
-  // Estados para informações coletadas
+  // Estados para informações coletadas (ANTIGO - mantido temporariamente)
   const [clientInfo, setClientInfo] = useState({
     // Semana 1
     expectativas: '',
@@ -118,18 +141,24 @@ export const OnboardingModalContent: React.FC<OnboardingModalProps> = ({
     { id: 'documentos', label: 'Documentos', icon: FileText }
   ];
 
+  // Função para obter progresso por semana usando dados reais
   const getProgressBySemana = () => {
-    const totalSemana1 = Object.keys(semana1Checks).length;
-    const completedSemana1 = Object.values(semana1Checks).filter(v => v).length;
+    const semana1Items = checklistItems.filter(item => item.week === 1);
+    const semana2Items = checklistItems.filter(item => item.week === 2);
+    const semana3Items = checklistItems.filter(item => item.week === 3);
+    const semana4Items = checklistItems.filter(item => item.week === 4);
     
-    const totalSemana2 = Object.keys(semana2Checks).length;
-    const completedSemana2 = Object.values(semana2Checks).filter(v => v).length;
+    const totalSemana1 = semana1Items.length;
+    const completedSemana1 = semana1Items.filter(item => item.is_checked).length;
     
-    const totalSemana3 = Object.keys(semana3Checks).length;
-    const completedSemana3 = Object.values(semana3Checks).filter(v => v).length;
+    const totalSemana2 = semana2Items.length;
+    const completedSemana2 = semana2Items.filter(item => item.is_checked).length;
     
-    const totalSemana4 = Object.keys(semana4Checks).length;
-    const completedSemana4 = Object.values(semana4Checks).filter(v => v).length;
+    const totalSemana3 = semana3Items.length;
+    const completedSemana3 = semana3Items.filter(item => item.is_checked).length;
+    
+    const totalSemana4 = semana4Items.length;
+    const completedSemana4 = semana4Items.filter(item => item.is_checked).length;
     
     const total = totalSemana1 + totalSemana2 + totalSemana3 + totalSemana4;
     const completed = completedSemana1 + completedSemana2 + completedSemana3 + completedSemana4;
@@ -142,6 +171,129 @@ export const OnboardingModalContent: React.FC<OnboardingModalProps> = ({
       ...prev,
       [key]: !prev[key]
     }));
+  };
+
+  // Função para atualizar checklist item
+  const handleChecklistChange = async (itemId: string, isChecked: boolean, notes?: string) => {
+    try {
+      // Atualizar localmente primeiro (optimistic update)
+      setChecklistItems(prev => 
+        prev.map(item => 
+          item.id === itemId 
+            ? { ...item, is_checked: isChecked, notes: notes || item.notes }
+            : item
+        )
+      );
+
+      // Atualizar no backend
+      const response = await fetch(`/api/onboarding/companies/${client.company_id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          checklist_item_id: itemId,
+          is_checked: isChecked,
+          notes: notes
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao salvar alteração');
+      }
+
+      const data = await response.json();
+      if (data.success && data.company?.checklist_items) {
+        setChecklistItems(data.company.checklist_items);
+      }
+    } catch (error) {
+      console.error('Error updating checklist:', error);
+      // Reverter mudança local em caso de erro
+      setChecklistItems(prev => 
+        prev.map(item => 
+          item.id === itemId 
+            ? { ...item, is_checked: !isChecked }
+            : item
+        )
+      );
+    }
+  };
+
+  // Função genérica para renderizar semana
+  const renderSemana = (weekNumber: number) => {
+    const weekItems = checklistItems.filter(item => item.week === weekNumber);
+    
+    if (loading) {
+      return (
+        <div className="space-y-4">
+          <div className="animate-pulse">
+            <div className="h-4 bg-slate-200 rounded w-1/3 mb-2"></div>
+            <div className="h-3 bg-slate-200 rounded w-2/3"></div>
+          </div>
+          {[1,2,3].map(i => (
+            <div key={i} className="animate-pulse p-3 bg-slate-50 rounded-lg">
+              <div className="h-4 bg-slate-200 rounded w-3/4 mb-1"></div>
+              <div className="h-3 bg-slate-200 rounded w-1/2"></div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    if (weekItems.length === 0) {
+      return (
+        <div className="text-center py-8">
+          <p className="text-slate-500">Nenhum item de checklist configurado para esta semana.</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        <div className="mb-4">
+          <h3 className="font-semibold text-slate-900 dark:text-white mb-1">
+            Semana {weekNumber}
+          </h3>
+          <p className="text-xs text-slate-600 dark:text-slate-400">
+            {weekItems.length} atividades configuradas
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          <h4 className="font-medium text-slate-900 dark:text-white">Checklist de Atividades</h4>
+          
+          {weekItems.map((item) => (
+            <label key={item.id} className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={item.is_checked || false}
+                onChange={(e) => handleChecklistChange(item.id, e.target.checked)}
+                className="mt-1 rounded text-emerald-600 focus:ring-emerald-500"
+              />
+              <div className="flex-1">
+                <p className="font-medium text-slate-900 dark:text-white">
+                  {item.title}
+                </p>
+                {item.description && (
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    {item.description}
+                  </p>
+                )}
+                {item.notes && (
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                    Nota: {item.notes}
+                  </p>
+                )}
+                {item.checked_at && (
+                  <p className="text-xs text-slate-500 mt-1">
+                    Concluído em: {new Date(item.checked_at).toLocaleDateString('pt-BR')}
+                    {item.checked_by && ` por ${item.checked_by}`}
+                  </p>
+                )}
+              </div>
+            </label>
+          ))}
+        </div>
+      </div>
+    );
   };
 
   const renderSemana1 = () => (
@@ -161,8 +313,8 @@ export const OnboardingModalContent: React.FC<OnboardingModalProps> = ({
         <label className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer">
           <input
             type="checkbox"
-            checked={semana1Checks.kickoff}
-            onChange={(e) => setSemana1Checks({...semana1Checks, kickoff: e.target.checked})}
+            checked={false}
+            onChange={(e) => {}}
             className="mt-1 rounded text-emerald-600 focus:ring-emerald-500"
           />
           <div className="flex-1">
@@ -178,8 +330,8 @@ export const OnboardingModalContent: React.FC<OnboardingModalProps> = ({
         <label className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer">
           <input
             type="checkbox"
-            checked={semana1Checks.coleta_info}
-            onChange={(e) => setSemana1Checks({...semana1Checks, coleta_info: e.target.checked})}
+            checked={false}
+            onChange={(e) => {}}
             className="mt-1 rounded text-emerald-600 focus:ring-emerald-500"
           />
           <div className="flex-1">
@@ -195,8 +347,8 @@ export const OnboardingModalContent: React.FC<OnboardingModalProps> = ({
         <label className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer">
           <input
             type="checkbox"
-            checked={semana1Checks.analise_fluxo}
-            onChange={(e) => setSemana1Checks({...semana1Checks, analise_fluxo: e.target.checked})}
+            checked={false}
+            onChange={(e) => {}}
             className="mt-1 rounded text-emerald-600 focus:ring-emerald-500"
           />
           <div className="flex-1">
@@ -346,8 +498,8 @@ export const OnboardingModalContent: React.FC<OnboardingModalProps> = ({
           <label key={item.key} className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer">
             <input
               type="checkbox"
-              checked={semana2Checks[item.key as keyof typeof semana2Checks]}
-              onChange={(e) => setSemana2Checks({...semana2Checks, [item.key]: e.target.checked})}
+              checked={false}
+              onChange={(e) => {}}
               className="mt-1 rounded text-emerald-600 focus:ring-emerald-500"
             />
             <div className="flex-1">
@@ -470,8 +622,8 @@ export const OnboardingModalContent: React.FC<OnboardingModalProps> = ({
           <label key={item.key} className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer">
             <input
               type="checkbox"
-              checked={semana3Checks[item.key as keyof typeof semana3Checks]}
-              onChange={(e) => setSemana3Checks({...semana3Checks, [item.key]: e.target.checked})}
+              checked={false}
+              onChange={(e) => {}}
               className="mt-1 rounded text-emerald-600 focus:ring-emerald-500"
             />
             <div className="flex-1">
@@ -592,8 +744,8 @@ export const OnboardingModalContent: React.FC<OnboardingModalProps> = ({
           <label key={item.key} className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer">
             <input
               type="checkbox"
-              checked={semana4Checks[item.key as keyof typeof semana4Checks]}
-              onChange={(e) => setSemana4Checks({...semana4Checks, [item.key]: e.target.checked})}
+              checked={false}
+              onChange={(e) => {}}
               className="mt-1 rounded text-emerald-600 focus:ring-emerald-500"
             />
             <div className="flex-1">
@@ -813,10 +965,10 @@ export const OnboardingModalContent: React.FC<OnboardingModalProps> = ({
 
       {/* Content */}
       <div className="p-6">
-        {activeTab === 'semana_1' && renderSemana1()}
-        {activeTab === 'semana_2' && renderSemana2()}
-        {activeTab === 'semana_3' && renderSemana3()}
-        {activeTab === 'semana_4' && renderSemana4()}
+        {activeTab === 'semana_1' && renderSemana(1)}
+        {activeTab === 'semana_2' && renderSemana(2)}
+        {activeTab === 'semana_3' && renderSemana(3)}
+        {activeTab === 'semana_4' && renderSemana(4)}
         {activeTab === 'documentos' && renderDocumentos()}
       </div>
     </>
@@ -857,7 +1009,7 @@ export const OnboardingModalContent: React.FC<OnboardingModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={`Onboarding: ${client.nome_empresa}`}
-      subtitle={`${client.nome_contato} • ${client.email}`}
+      subtitle={`${client.segmento} • ${client.email}`}
       icon={Building2}
       footer={modalFooter}
       width="lg"

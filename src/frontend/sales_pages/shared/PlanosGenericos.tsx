@@ -77,10 +77,6 @@ export default function PlanosGenericos({ onSelectPlan }: PlanosGenericosProps) 
           </li>
           <li className="flex gap-2 items-start">
             <CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0" />
-            Emissão de NF (quando aplicável)
-          </li>
-          <li className="flex gap-2 items-start">
-            <CheckCircle className="h-4 w-4 text-emerald-300 mt-0.5 flex-shrink-0" />
             Emissão de boletos
           </li>
           <li className="flex gap-2 items-start">

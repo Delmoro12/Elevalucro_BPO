@@ -1,4 +1,4 @@
-import { supabase } from '../../../lib/supabase';
+import { supabase } from '@/src/lib/supabase';
 
 // API de autenticação
 export async function signIn(email: string, password: string) {

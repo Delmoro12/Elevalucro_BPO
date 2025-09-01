@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   DndContext, 
   closestCenter, 
@@ -23,19 +23,27 @@ import { CSS } from '@dnd-kit/utilities';
 import { Building2, Phone, Mail, Calendar, CheckCircle } from 'lucide-react';
 import { OnboardingModalContent } from './OnboardingModalContent';
 
-// Tipos para onboarding
+// Tipos para onboarding - atualizado para corresponder à view
 interface OnboardingClient {
-  id: string;
+  company_id: string;
   nome_empresa: string;
-  nome_contato: string;
   email: string;
   telefone: string;
-  valor_mensal: number;
+  segmento: string;
+  plano: string;
+  progresso_onboarding: number;
+  lifecycle_stage: string;
   data_inicio: string;
   semana_onboarding: 'semana_1' | 'semana_2' | 'semana_3' | 'semana_4';
-  progresso_onboarding: number;
+  dias_desde_criacao: number;
+  total_checklist_items: number;
+  completed_items: number;
+  pending_items: number;
   proxima_acao: string;
+  subscription_status: string;
+  valor_mensal: number;
   responsavel: string;
+  checklist_items?: any[];
 }
 
 // Mock data
@@ -121,7 +129,7 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, setSelectedClient, setI
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: client.id });
+  } = useSortable({ id: client.company_id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -165,7 +173,7 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, setSelectedClient, setI
         {/* Contato */}
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
-            <span className="font-medium">{client.nome_contato}</span>
+            <span className="font-medium">{client.segmento}</span>
           </div>
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <Mail className="h-3 w-3" />
@@ -177,16 +185,19 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, setSelectedClient, setI
           </div>
         </div>
 
-        {/* Progresso */}
+        {/* Progresso - Nova versão */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Progresso</span>
-            <span className="text-xs text-slate-500">{client.progresso_onboarding}%</span>
+            <span className="text-xs text-slate-500">{client.progresso_onboarding || 0}%</span>
           </div>
-          <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
+          <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
             <div 
-              className="bg-emerald-500 h-1.5 rounded-full transition-all" 
-              style={{ width: `${client.progresso_onboarding}%` }}
+              className="bg-gradient-to-r from-emerald-500 to-emerald-600 h-2 rounded-full transition-all duration-300 ease-out" 
+              style={{ 
+                width: `${Math.max(0, Math.min(100, client.progresso_onboarding || 0))}%`,
+                minWidth: client.progresso_onboarding > 0 ? '2px' : '0px'
+              }}
             />
           </div>
         </div>
@@ -245,11 +256,11 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({ title, clients, weekKey, se
       </div>
 
       {/* Cards */}
-      <SortableContext items={clients.map(c => c.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext items={clients.map(c => c.company_id)} strategy={verticalListSortingStrategy}>
         <div className="space-y-3 flex-1">
           {clients.map((client) => (
             <ClientCard 
-              key={client.id} 
+              key={client.company_id} 
               client={client}
               setSelectedClient={setSelectedClient}
               setIsModalOpen={setIsModalOpen}
@@ -271,9 +282,48 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({ title, clients, weekKey, se
 };
 
 export const OnboardingKanban: React.FC = () => {
-  const [clients, setClients] = useState<OnboardingClient[]>(mockClients);
+  const [clients, setClients] = useState<OnboardingClient[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedClient, setSelectedClient] = useState<OnboardingClient | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Carregar dados do backend
+  useEffect(() => {
+    const fetchOnboardingCompanies = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch('/api/onboarding/companies?t=' + Date.now(), {
+          cache: 'no-cache',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Erro ao carregar empresas');
+        }
+        
+        if (data.success) {
+          setClients(data.companies);
+        } else {
+          throw new Error('Resposta inválida do servidor');
+        }
+      } catch (err) {
+        console.error('Error fetching onboarding companies:', err);
+        setError(err instanceof Error ? err.message : 'Erro desconhecido');
+        // Em caso de erro, usar dados mockados como fallback
+        setClients(mockClients);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOnboardingCompanies();
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -305,27 +355,53 @@ export const OnboardingKanban: React.FC = () => {
     if (activeId === overId) return;
 
     // Encontrar o cliente sendo movido
-    const activeClient = clients.find(c => c.id === activeId);
+    const activeClient = clients.find(c => c.company_id === activeId);
     if (!activeClient) return;
 
     // Determinar a nova semana baseada no destino
     let newWeek: OnboardingClient['semana_onboarding'] = activeClient.semana_onboarding;
     
     // Se o destino é outro cliente, pegar a semana dele
-    const targetClient = clients.find(c => c.id === overId);
+    const targetClient = clients.find(c => c.company_id === overId);
     if (targetClient) {
       newWeek = targetClient.semana_onboarding;
     }
 
-    // Atualizar o cliente
+    // Atualizar no frontend imediatamente (otimistic update)
     setClients(prev => prev.map(client => 
-      client.id === activeId 
+      client.company_id === activeId 
         ? { ...client, semana_onboarding: newWeek }
         : client
     ));
 
     console.log(`Cliente ${activeClient.nome_empresa} movido para ${newWeek}`);
+    
+    // TODO: Implementar atualização no backend quando necessário
+    // Para agora, a semana é calculada automaticamente baseada na data de criação
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+          <p className="text-slate-600 dark:text-slate-400">Carregando empresas em onboarding...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-red-600 dark:text-red-400 mb-2">Erro ao carregar dados</p>
+          <p className="text-sm text-slate-500">{error}</p>
+          <p className="text-sm text-slate-500 mt-2">Usando dados de exemplo...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -370,10 +446,30 @@ export const OnboardingKanban: React.FC = () => {
             setIsModalOpen(false);
             setSelectedClient(null);
           }}
-          onUpdate={(updatedClient) => {
-            setClients(prev => prev.map(c => 
-              c.id === updatedClient.id ? updatedClient : c
-            ));
+          onUpdate={async (updatedClient) => {
+            // Recarregar dados do servidor para obter os valores atualizados
+            try {
+              const response = await fetch('/api/onboarding/companies?t=' + Date.now(), {
+          cache: 'no-cache',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
+              const data = await response.json();
+              
+              if (data.success) {
+                setClients(data.companies);
+                // Atualizar o cliente selecionado com os novos dados
+                const updatedSelectedClient = data.companies.find(
+                  c => c.company_id === selectedClient?.company_id
+                );
+                if (updatedSelectedClient) {
+                  setSelectedClient(updatedSelectedClient);
+                }
+              }
+            } catch (error) {
+              console.error('Error reloading companies after update:', error);
+            }
           }}
         />
       )}

@@ -3,23 +3,59 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, AlertCircle, Trash2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../../../lib/supabase';
+import { supabase } from '@/src/lib/supabase';
+import { setupAuthInterceptor } from '@/src/lib/auth-interceptor';
 
 export const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string>('');
-  const { signIn, loading } = useAuth();
+  const { signIn, signing } = useAuth();
   const router = useRouter();
+
+  const handleClearData = () => {
+    try {
+      console.log('🧹 Limpando todos os dados...');
+      
+      // Limpar TODOS os cookies do domínio
+      document.cookie.split(";").forEach(cookie => {
+        const cookieName = cookie.split("=")[0].trim();
+        // Limpar para todos os domínios possíveis
+        const domains = ['', '.localhost', 'tools.localhost', 'localhost'];
+        const paths = ['/', '/auth', '/api'];
+        
+        domains.forEach(domain => {
+          paths.forEach(path => {
+            document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}; ${domain ? `domain=${domain};` : ''}`;
+          });
+        });
+      });
+      
+      // Limpar localStorage e sessionStorage
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      console.log('✅ Todos os dados limpos');
+      
+      // Recarregar a página
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('❌ Erro ao limpar dados:', error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🎯 Login form submitted:', { email, password: password ? '***' : 'empty' });
     setError('');
     
+    console.log('🔍 Calling signIn...');
     const { error: signInError } = await signIn(email, password);
+    console.log('📋 SignIn result:', signInError ? 'ERROR' : 'SUCCESS');
     
     if (signInError) {
       console.error('Login error:', signInError);
@@ -33,47 +69,47 @@ export const LoginForm: React.FC = () => {
         setError('Erro ao fazer login. Tente novamente.');
       }
     } else {
-      // Success - debug and redirect
-      console.log('🎉 LOGIN SUCCESS - Starting debug...');
+      // Success - check cookies before redirect
+      console.log('🎉 LOGIN SUCCESS - Checking cookies...');
       
-      // Debug session and cookies, then redirect
-      setTimeout(async () => {
-        console.log('🔍 DEBUG: Checking session after login...');
-        
-        // Get current session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        console.log('📋 Current session:', session);
-        console.log('❌ Session error:', sessionError);
-        
-        // Check cookies
+      // Check if cookies are set
+      setTimeout(() => {
         const cookies = document.cookie;
-        console.log('🍪 All cookies:', cookies);
+        console.log('🍪 Cookies after login:', cookies);
         
         const accessToken = cookies.split('; ').find(row => row.startsWith('sb-access-token='));
-        console.log('🎫 Access token cookie:', accessToken);
+        console.log('🎫 Access token found:', !!accessToken);
         
-        // Try to decode JWT if available
-        if (session?.access_token) {
-          try {
-            const payload = session.access_token.split('.')[1];
-            const decoded = JSON.parse(atob(payload));
-            console.log('🔓 JWT Payload:', decoded);
-            console.log('🎭 App metadata:', decoded.app_metadata);
-            console.log('👤 User metadata:', decoded.user_metadata);
-          } catch (e) {
-            console.error('❌ Error decoding JWT:', e);
-          }
+        if (accessToken) {
+          console.log('✅ Cookie token exists, redirecting...');
+          window.location.href = '/prospects';
+        } else {
+          console.log('❌ No cookie token, checking session...');
+          
+          // Buscar token da sessão atual e armazenar no sessionStorage
+          supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session?.access_token) {
+              console.log('✅ Session token found, storing and redirecting...');
+              sessionStorage.setItem('supabase-auth-token', session.access_token);
+              setupAuthInterceptor(); // Setup interceptor para futuras requisições
+              
+              // Para resolver o problema do middleware, vamos forçar um cookie manual
+              document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=3600; SameSite=Lax`;
+              console.log('🍪 Cookie set manually');
+              
+              window.location.href = '/prospects';
+            } else {
+              console.log('❌ No session token found');
+              setError('Erro interno: Não foi possível obter token de acesso.');
+            }
+          });
         }
-        
-        // Now redirect - use window.location for full page navigation
-        console.log('🎯 Redirecting to /prospects');
-        window.location.href = '/prospects';
-      }, 500); // Reduced delay since middleware is disabled
+      }, 200);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8">
         {/* Header com Logo */}
         <div className="text-center">
@@ -85,29 +121,29 @@ export const LoginForm: React.FC = () => {
               height={90}
               className="object-contain"
             />
-            <span className="text-[11px] font-medium text-slate-900 dark:text-white" style={{ marginLeft: '-12px' }}>
+            <span className="text-[11px] font-medium text-emerald-400" style={{ marginLeft: '-12px' }}>
               TOOLS
             </span>
           </div>
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">
+          <h2 className="text-3xl font-bold text-white">
             Acesso Funcionários
           </h2>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+          <p className="mt-2 text-sm text-slate-400">
             Entre com suas credenciais para acessar as ferramentas internas
           </p>
         </div>
 
         {/* Formulário */}
-        <div className="bg-white dark:bg-slate-800 py-8 px-6 shadow-lg rounded-lg border border-slate-200 dark:border-slate-700">
+        <div className="bg-slate-800 py-8 px-6 shadow-lg rounded-lg border border-slate-700">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Campo Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
                 Email
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-slate-400" />
+                  <Mail className="h-5 w-5 text-slate-500" />
                 </div>
                 <input
                   id="email"
@@ -117,7 +153,7 @@ export const LoginForm: React.FC = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none relative block w-full px-3 py-3 pl-10 border border-slate-300 dark:border-slate-600 placeholder-slate-500 dark:placeholder-slate-400 text-slate-900 dark:text-white bg-white dark:bg-slate-700 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                  className="appearance-none relative block w-full px-3 py-3 pl-10 border border-slate-600 placeholder-slate-400 text-white bg-slate-700 rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm transition-colors"
                   placeholder="Digite seu email"
                 />
               </div>
@@ -125,12 +161,12 @@ export const LoginForm: React.FC = () => {
 
             {/* Campo Senha */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
                 Senha
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-slate-400" />
+                  <Lock className="h-5 w-5 text-slate-500" />
                 </div>
                 <input
                   id="password"
@@ -140,14 +176,14 @@ export const LoginForm: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none relative block w-full px-3 py-3 pl-10 pr-10 border border-slate-300 dark:border-slate-600 placeholder-slate-500 dark:placeholder-slate-400 text-slate-900 dark:text-white bg-white dark:bg-slate-700 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                  className="appearance-none relative block w-full px-3 py-3 pl-10 pr-10 border border-slate-600 placeholder-slate-400 text-white bg-slate-700 rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm transition-colors"
                   placeholder="Digite sua senha"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    className="text-slate-400 hover:text-slate-300 transition-colors"
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5" />
@@ -173,21 +209,22 @@ export const LoginForm: React.FC = () => {
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 dark:border-slate-600 rounded"
+                className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-slate-600 bg-slate-700 rounded transition-colors"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-700 dark:text-slate-300">
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-300">
                 Lembrar de mim
               </label>
             </div>
 
-            {/* Botão de Login */}
-            <div>
+            {/* Botões */}
+            <div className="space-y-3">
+              {/* Botão de Login */}
               <button
                 type="submit"
-                disabled={loading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                disabled={signing}
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {loading ? (
+                {signing ? (
                   <div className="flex items-center">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                     Entrando...
@@ -195,6 +232,16 @@ export const LoginForm: React.FC = () => {
                 ) : (
                   'Entrar'
                 )}
+              </button>
+              
+              {/* Botão Limpar Dados */}
+              <button
+                type="button"
+                onClick={handleClearData}
+                className="group relative w-full flex justify-center py-2 px-4 border border-slate-600 text-sm font-medium rounded-md text-slate-300 bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-colors"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Limpar Dados do Navegador
               </button>
             </div>
           </form>

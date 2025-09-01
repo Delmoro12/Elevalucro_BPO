@@ -45,7 +45,6 @@ export default function PreOnboardForm({ planConfig }: PreOnboardFormProps) {
     
     // Plano Gerencial (adiciona aos do Controle)
     { value: "cobranca_inadimplentes", label: "Cobrança de inadimplentes (contato ativo com clientes em atraso)" },
-    { value: "emissao_nf", label: "Emissão de NF (quando aplicável)" },
     { value: "emissao_boletos", label: "Emissão de boletos" },
     { value: "relatorio_fluxo_caixa", label: "Relatório de fluxo de caixa" },
     { value: "relatorios_entradas_saidas", label: "Relatórios de entradas e saídas" },

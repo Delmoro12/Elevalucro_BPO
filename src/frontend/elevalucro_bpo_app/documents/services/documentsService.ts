@@ -1,4 +1,4 @@
-import { supabase } from '../../../lib/supabase';
+import { supabase } from '@/src/lib/supabase';
 import { Document, CreateDocumentRequest, UpdateDocumentRequest } from '../types';
 import { useAuth } from '../../auth/contexts/AuthContext';
 

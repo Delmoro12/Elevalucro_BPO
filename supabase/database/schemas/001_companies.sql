@@ -31,9 +31,9 @@ CREATE TABLE IF NOT EXISTS companies (
     
     -- Status e configurações
     is_active BOOLEAN DEFAULT true,
-    subscription_plan VARCHAR(50) DEFAULT 'free', -- free, basic, premium, enterprise
-    subscription_status VARCHAR(20) DEFAULT 'active', -- active, suspended, cancelled
-    trial_ends_at TIMESTAMPTZ,
+    subscription_plan VARCHAR(50) DEFAULT 'controle' CHECK (subscription_plan IN ('controle', 'gerencial', 'avancado')),
+    subscription_status VARCHAR(20) DEFAULT 'active' CHECK (subscription_status IN ('active', 'suspended', 'cancelled')),
+    lifecycle_stage VARCHAR(20) DEFAULT 'onboarding' CHECK (lifecycle_stage IN ('onboarding', 'production')),
     
     -- Limites por plano
     max_users INTEGER DEFAULT 3, -- Limite de usuários

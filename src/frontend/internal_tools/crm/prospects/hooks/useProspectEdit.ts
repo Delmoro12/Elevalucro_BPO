@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { ProspectEditData, ProspectUpdatePayload } from '../types/prospects';
-import { getProspectById, updateProspect } from '../services/prospects.api';
+import { getProspectById, updateProspect } from '../services/prospectsCrud';
 
 export interface UseProspectEditReturn {
   isOpen: boolean;

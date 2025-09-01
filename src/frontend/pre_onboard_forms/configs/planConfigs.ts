@@ -36,7 +36,6 @@ export const planConfigs: Record<string, PlanConfig> = {
       "organizacao_documentos",
       // Específicas do Gerencial
       "cobranca_inadimplentes",
-      "emissao_nf",
       "emissao_boletos",
       "relatorio_fluxo_caixa",
       "relatorios_entradas_saidas",
@@ -59,7 +58,6 @@ export const planConfigs: Record<string, PlanConfig> = {
       "conciliacao_bancaria",
       "organizacao_documentos",
       "cobranca_inadimplentes",
-      "emissao_nf",
       "emissao_boletos",
       "relatorio_fluxo_caixa",
       "relatorios_entradas_saidas",

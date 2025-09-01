@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { LayoutContext, useLayoutProvider } from '../shared/hooks/useLayout';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '@/src/lib/supabase';
 
 // Importar páginas das features
 import { DashboardFinanceiro } from '../dashboards/pages/DashboardFinanceiro';
@@ -59,30 +59,51 @@ export const MainPage: React.FC = () => {
     setCurrentPage(page);
   }, [pathname]);
 
-  // DEBUG: Popup de JWT Claims - DESABILITADO
-  // useEffect(() => {
-  //   const fetchUserClaims = async () => {
-  //     try {
-  //       const { data: { session } } = await supabase.auth.getSession();
-  //       if (session?.user) {
-  //         const user = session.user as any; // Type assertion para acessar campos não tipados
-  //         console.log('🔍 User Claims from JWT:', user);
-  //         setUserClaims({
-  //           email: user.email,
-  //           user_metadata: user.user_metadata,
-  //           app_metadata: user.app_metadata,
-  //           id: user.id,
-  //           created_at: user.created_at
-  //         } as any);
-  //         setShowClaimsModal(true);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching claims:', error);
-  //     }
-  //   };
-  //
-  //   fetchUserClaims();
-  // }, [pathname]); // Trigger on every page navigation
+  // DEBUG: Popup de JWT Claims - Apenas no Dashboard por 3 segundos
+  useEffect(() => {
+    const fetchUserClaims = async () => {
+      console.log('🎯 Current page:', currentPage);
+      
+      // Só mostrar no dashboard
+      if (currentPage !== 'dashboards') {
+        console.log('❌ Not on dashboard, skipping popup');
+        return;
+      }
+      
+      console.log('✅ On dashboard, fetching claims...');
+      
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('📦 Session:', session);
+        
+        if (session?.user) {
+          const user = session.user as any; // Type assertion para acessar campos não tipados
+          console.log('🔍 User Claims from JWT:', user);
+          setUserClaims({
+            email: user.email,
+            user_metadata: user.user_metadata,
+            app_metadata: user.app_metadata,
+            id: user.id,
+            created_at: user.created_at
+          } as any);
+          setShowClaimsModal(true);
+          console.log('✅ Modal shown!');
+          
+          // Auto-fechar após 3 segundos
+          setTimeout(() => {
+            setShowClaimsModal(false);
+            console.log('⏰ Modal closed after 3 seconds');
+          }, 3000);
+        } else {
+          console.log('❌ No user in session');
+        }
+      } catch (error) {
+        console.error('Error fetching claims:', error);
+      }
+    };
+
+    fetchUserClaims();
+  }, [currentPage]); // Trigger quando muda de página
 
   // Função para navegar entre páginas
   const handlePageChange = (page: string) => {

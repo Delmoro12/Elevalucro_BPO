@@ -145,6 +145,12 @@ BEGIN
     NOW()
   );
 
+  -- 8. Configurar checklist de onboarding para a nova empresa
+  PERFORM setup_company_onboarding_checklist(v_company_id, p_prospect_data->>'plano');
+
+  -- 9. Configurar rotinas baseadas no plano de assinatura
+  PERFORM setup_company_routines(v_company_id, p_prospect_data->>'plano');
+
   -- Preparar resultado
   v_result := jsonb_build_object(
     'success', true,

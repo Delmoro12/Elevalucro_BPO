@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ProspectListItem, ProspectFilters, ProspectStatus } from '../types/prospects';
-import { getProspects, deleteProspect, updateProspectStatus } from '../services/prospects.api';
+import { getProspects, deleteProspect, updateProspectStatus } from '../services/prospectsCrud';
 
 export function useProspects() {
   const [prospects, setProspects] = useState<ProspectListItem[]>([]);
@@ -15,7 +15,7 @@ export function useProspects() {
       
       const filtersToUse = currentFilters || filters;
       const response = await getProspects(filtersToUse);
-      setProspects(response.data);
+      setProspects(response.data.prospects || []);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
       setError(errorMessage);
