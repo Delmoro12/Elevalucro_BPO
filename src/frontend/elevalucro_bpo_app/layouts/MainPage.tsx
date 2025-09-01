@@ -9,12 +9,12 @@ import { supabase } from '@/src/lib/supabase';
 
 // Importar páginas das features
 import { DashboardFinanceiro } from '../dashboards/pages/DashboardFinanceiro';
-import { MyFinancePage } from '../my_finance/pages/MyFinancePage';
-import { ActionsPage } from '../actions/pages/ActionsPage';
-import { ApprovalsPage } from '../approvals/pages/ApprovalsPage';
-import { DocumentsPage } from '../documents/pages/DocumentsPage';
-import { TicketsPage } from '../tickets/pages/TicketsPage';
-import { IntegrationsPage } from '../integrations/pages/IntegrationsPage';
+import MyFinancePage from '../my_finance/pages/MyFinancePage';
+import ActionsPage from '../actions/pages/ActionsPage';
+import ApprovalsPage from '../approvals/pages/ApprovalsPage';
+import DocumentsPage from '../documents/pages/DocumentsPage';
+import TicketsPage from '../tickets/pages/TicketsPage';
+import IntegrationsPage from '../integrations/pages/IntegrationsPage';
 import { SignInPage } from '../auth/pages/SignInPage';
 
 export const MainPage: React.FC = () => {
