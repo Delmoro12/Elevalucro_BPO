@@ -132,6 +132,7 @@ export function middleware(request: NextRequest) {
     const protectedRoutes = [
       '/api',                // API routes protegidas
       '/prospects',          // Páginas internas
+      '/customer-success',   // Página de sucesso do cliente
       '/onboarding',
       '/dashboard'
     ]

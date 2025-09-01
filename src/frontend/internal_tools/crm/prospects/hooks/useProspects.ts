@@ -15,7 +15,7 @@ export function useProspects() {
       
       const filtersToUse = currentFilters || filters;
       const response = await getProspects(filtersToUse);
-      setProspects(response.data.prospects || []);
+      setProspects(response.data || []);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
       setError(errorMessage);
