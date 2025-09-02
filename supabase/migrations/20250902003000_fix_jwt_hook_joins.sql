@@ -1,8 +1,5 @@
--- =============================================================================
--- Custom Access Token Hook - JWT Enhancement with Subscription Plan
--- =============================================================================
--- Version: 1.2.0
--- Description: Enriches JWT tokens with user context for authorization
+-- Fix JWT hook joins to correctly fetch user data
+-- The previous version had complex joins that weren't working properly
 
 CREATE OR REPLACE FUNCTION public.custom_access_token_hook(event jsonb)
 RETURNS jsonb
@@ -27,7 +24,7 @@ BEGIN
   END IF;
 
   -- Get user data with role, company and subscription information
-  -- Use COALESCE to handle cases where user doesn't exist in public.users yet
+  -- Simplified joins based on actual table structure
   BEGIN
     SELECT 
       p.company_id,
@@ -84,7 +81,7 @@ BEGIN
   -- Add hook execution metadata
   v_existing_metadata := v_existing_metadata || jsonb_build_object(
     'jwt_hook_executed', true,
-    'jwt_hook_version', '1.2.0'
+    'jwt_hook_version', '1.2.1'
   );
 
   -- Update claims with metadata
@@ -102,13 +99,3 @@ EXCEPTION
     RETURN event;
 END;
 $$;
-
--- Grant necessary permissions to supabase_auth_admin role
-GRANT USAGE ON SCHEMA public TO supabase_auth_admin;
-GRANT EXECUTE ON FUNCTION public.custom_access_token_hook TO supabase_auth_admin;
-GRANT SELECT ON public.users TO supabase_auth_admin;
-GRANT SELECT ON public.user_profiles TO supabase_auth_admin;
-GRANT SELECT ON public.profiles TO supabase_auth_admin;
-GRANT SELECT ON public.roles TO supabase_auth_admin;
-GRANT SELECT ON public.companies TO supabase_auth_admin;
-GRANT SELECT ON public.subscriptions TO supabase_auth_admin;
