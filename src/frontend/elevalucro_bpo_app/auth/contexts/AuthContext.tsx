@@ -98,8 +98,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const resetPasswordForEmail = async (email: string) => {
     try {
       setLoading(true);
+      
+      // Always use app subdomain for password reset
+      let redirectUrl = 'https://app.elevalucro.com.br/auth/reset-password';
+      
+      // Check if we're in local development
+      if (typeof window !== 'undefined' && window.location.hostname.includes('localhost')) {
+        redirectUrl = 'http://app.localhost:4000/auth/reset-password';
+      }
+      
+      console.log('Password reset redirect URL:', redirectUrl);
+      
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`
+        redirectTo: redirectUrl
       });
 
       if (error) {

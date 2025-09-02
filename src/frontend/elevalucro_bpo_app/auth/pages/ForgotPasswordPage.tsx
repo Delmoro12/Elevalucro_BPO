@@ -25,7 +25,15 @@ export default function ForgotPasswordPage() {
 
     if (resetError) {
       console.error('Password reset error:', resetError);
-      setError('Erro ao enviar email de recuperação. Tente novamente.');
+      
+      // Handle specific error types
+      if (resetError.message.includes('rate limit exceeded')) {
+        setError('Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.');
+      } else if (resetError.message.includes('User not found')) {
+        setError('Email não encontrado. Verifique se o email está correto.');
+      } else {
+        setError('Erro ao enviar email de recuperação. Tente novamente.');
+      }
     } else {
       setSuccess(true);
     }
