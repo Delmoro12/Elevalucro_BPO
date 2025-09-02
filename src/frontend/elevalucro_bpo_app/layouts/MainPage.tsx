@@ -35,17 +35,17 @@ export const MainPage: React.FC = () => {
       case 'app':
       case 'dashboard':
         return 'dashboards';
-      case 'minhas-financas':
+      case 'my-finance':
         return 'my_finance';
-      case 'acoes':
+      case 'actions':
         return 'actions';
-      case 'aprovacoes':
+      case 'approvals':
         return 'approvals';
-      case 'documentos':
+      case 'documents':
         return 'documents';
-      case 'suporte':
+      case 'tickets':
         return 'tickets';
-      case 'integracoes':
+      case 'integrations':
         return 'integrations';
       case 'login':
         return 'auth';
@@ -111,17 +111,17 @@ export const MainPage: React.FC = () => {
     setCurrentPage(page);
     // Mapear ID interno para URL
     const urlMap: { [key: string]: string } = {
-      'my_finance': 'minhas-financas',
-      'actions': 'acoes',
+      'my_finance': 'my-finance',
+      'actions': 'actions',
       'dashboards': 'dashboard',
-      'approvals': 'aprovacoes',
-      'documents': 'documentos',
-      'tickets': 'suporte',
-      'integrations': 'integracoes',
-      'auth': 'login'
+      'approvals': 'approvals',
+      'documents': 'documents',
+      'tickets': 'tickets',
+      'integrations': 'integrations',
+      'auth': 'auth/login'
     };
     const url = urlMap[page] || page;
-    router.push(`/elevalucro_bpo_app/${url}`);
+    router.push(`/${url}`);
   };
 
   const renderCurrentPage = () => {
