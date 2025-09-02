@@ -135,8 +135,11 @@ export function middleware(request: NextRequest) {
     )
     
     if (isToolsOnlyRoute) {
-      console.log(`🚫 App: Trying to access tools-only route '${pathname}' → redirecting to dashboard`)
-      return NextResponse.redirect(new URL('/dashboard', request.url))
+      console.log(`🚫 App: Route '${pathname}' does not exist in app subdomain → 404`)
+      // Return 404 for routes that don't exist in this subdomain
+      return NextResponse.rewrite(new URL('/404', request.url), {
+        status: 404
+      })
     }
     
     // TODO: Adicionar verificação de autenticação para rotas protegidas
@@ -188,8 +191,11 @@ export function middleware(request: NextRequest) {
     )
     
     if (isAppOnlyRoute) {
-      console.log(`🚫 Tools: Trying to access app-only route '${pathname}' → redirecting to prospects`)
-      return NextResponse.redirect(new URL('/prospects', request.url))
+      console.log(`🚫 Tools: Route '${pathname}' does not exist in tools subdomain → 404`)
+      // Return 404 for routes that don't exist in this subdomain
+      return NextResponse.rewrite(new URL('/404', request.url), {
+        status: 404
+      })
     }
     
     // Lista de rotas que precisam de autenticação (mas são permitidas se autenticado)
