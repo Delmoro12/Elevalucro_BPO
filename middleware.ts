@@ -121,6 +121,24 @@ export function middleware(request: NextRequest) {
       // Continue processamento normal
     }
     
+    // Lista de rotas exclusivas do tools (não permitidas no app)
+    const toolsOnlyRoutes = [
+      '/prospects',
+      '/customer-success',
+      '/funcionarios',
+      '/tools-auth'
+    ]
+    
+    // Bloquear rotas exclusivas do tools
+    const isToolsOnlyRoute = toolsOnlyRoutes.some(route => 
+      pathname.startsWith(route)
+    )
+    
+    if (isToolsOnlyRoute) {
+      console.log(`🚫 App: Trying to access tools-only route '${pathname}' → redirecting to dashboard`)
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+    
     // TODO: Adicionar verificação de autenticação para rotas protegidas
     // TODO: Adicionar verificação de role (client_side)
   }
@@ -152,13 +170,35 @@ export function middleware(request: NextRequest) {
       '/favicon.ico'         // Favicon
     ]
     
+    // Lista de rotas exclusivas do app (não permitidas no tools)
+    const appOnlyRoutes = [
+      '/dashboard',
+      '/my-finance',
+      '/documents',
+      '/approvals',
+      '/actions',
+      '/tickets',
+      '/integrations',
+      '/auth'  // Auth de clientes (diferente de tools-auth)
+    ]
+    
+    // Bloquear rotas exclusivas do app
+    const isAppOnlyRoute = appOnlyRoutes.some(route => 
+      pathname.startsWith(route)
+    )
+    
+    if (isAppOnlyRoute) {
+      console.log(`🚫 Tools: Trying to access app-only route '${pathname}' → redirecting to prospects`)
+      return NextResponse.redirect(new URL('/prospects', request.url))
+    }
+    
     // Lista de rotas que precisam de autenticação (mas são permitidas se autenticado)
     const protectedRoutes = [
       '/api',                // API routes protegidas
       '/prospects',          // Páginas internas
       '/customer-success',   // Página de sucesso do cliente
       '/onboarding',
-      '/dashboard'
+      '/funcionarios'
     ]
     
     // Verifica se é uma rota pública
