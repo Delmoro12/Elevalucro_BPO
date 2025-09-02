@@ -1,10 +1,13 @@
 -- ======================================
--- View: Onboarding Companies Unified
+-- Migration: Rename onboarding_companies_unified to onboarding_companies_kanban
+-- Date: 2025-09-02
 -- ======================================
--- Single unified view for both kanban listing and modal details
--- Uses only companies_onboarding_checklist (denormalized) for performance
 
-CREATE OR REPLACE VIEW onboarding_companies_unified AS
+-- 1. Drop the old view
+DROP VIEW IF EXISTS onboarding_companies_unified CASCADE;
+
+-- 2. Create the new view with the new name
+CREATE OR REPLACE VIEW onboarding_companies_kanban AS
 SELECT 
   c.id as company_id,
   c.name as nome_empresa,
@@ -100,8 +103,9 @@ GROUP BY
   c.onboarding_progress, c.lifecycle_stage, c.created_at, s.status
 ORDER BY c.created_at ASC;  -- Mais antigas primeiro
 
--- Comentário
-COMMENT ON VIEW onboarding_companies_unified IS 
-'View unificada para onboarding - serve tanto para listagem do kanban quanto para detalhes do modal.
-Usa apenas companies_onboarding_checklist (desnormalizada) para melhor performance.
-Retorna lista vazia de checklist_items quando empresa não tem itens cadastrados.';
+-- 3. Add comment to the new view
+COMMENT ON VIEW onboarding_companies_kanban IS 
+'View principal para o kanban de onboarding - serve tanto para listagem quanto para detalhes do modal.
+Usa companies_onboarding_checklist (desnormalizada) para melhor performance.
+Retorna lista vazia de checklist_items quando empresa não tem itens cadastrados.
+Renomeada de onboarding_companies_unified para onboarding_companies_kanban em 2025-09-02.';

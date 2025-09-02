@@ -194,7 +194,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('✅ Logout concluído com sucesso');
       
       // Redirect to login page com reload forçado
-      window.location.href = '/auth/login';
+      window.location.href = '/tools-auth/login';
       
     } catch (error) {
       console.error('❌ Erro inesperado no logout:', error);

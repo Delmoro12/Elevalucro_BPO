@@ -5,10 +5,18 @@ interface DeleteUserResult {
   success: boolean;
   message: string;
   deleted?: {
-    user_companies: number;
-    user_company_roles: number;
-    user_profiles: number;
+    routine_executions: number;
+    companies_routines: number;
+    companies_onboarding_checklist: number;
+    documents: number;
+    entities: number;
     profiles: number;
+    subscriptions: number;
+    user_permissions: number;
+    user_company_roles: number;
+    user_companies: number;
+    user_profiles: number;
+    companies: number;
     users: number;
     auth_user: boolean;
   };

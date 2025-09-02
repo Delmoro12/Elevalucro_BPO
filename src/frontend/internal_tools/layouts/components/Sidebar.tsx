@@ -85,7 +85,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     } catch (error) {
       console.error('❌ Erro no logout:', error);
       // Mesmo com erro, redirecionar para login
-      window.location.href = '/auth/login';
+      window.location.href = '/tools-auth/login';
     }
   };
 

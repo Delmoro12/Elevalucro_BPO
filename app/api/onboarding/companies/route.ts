@@ -13,9 +13,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get companies from the unified view (now corrected to show real email, phone, segmento)
+    // Get companies from the kanban view
     const { data: companies, error } = await supabase
-      .from('onboarding_companies_unified')
+      .from('onboarding_companies_kanban')
       .select('*')
       .order('data_inicio', { ascending: true });
 

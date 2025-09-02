@@ -350,8 +350,8 @@ export const OnboardingKanban: React.FC = () => {
       } catch (err) {
         console.error('Error fetching onboarding companies:', err);
         setError(err instanceof Error ? err.message : 'Erro desconhecido');
-        // Em caso de erro, usar dados mockados como fallback
-        setClients(mockClients);
+        // Não usar dados mockados - mostrar array vazio
+        setClients([]);
       } finally {
         setLoading(false);
       }

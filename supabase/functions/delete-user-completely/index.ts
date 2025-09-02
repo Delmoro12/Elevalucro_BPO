@@ -15,10 +15,18 @@ interface DeleteUserResponse {
   success: boolean;
   message: string;
   deleted?: {
-    user_companies: number;
-    user_company_roles: number;
-    user_profiles: number;
+    routine_executions: number;
+    companies_routines: number;
+    companies_onboarding_checklist: number;
+    documents: number;
+    entities: number;
     profiles: number;
+    subscriptions: number;
+    user_permissions: number;
+    user_company_roles: number;
+    user_companies: number;
+    user_profiles: number;
+    companies: number;
     users: number;
     auth_user: boolean;
   };
@@ -129,64 +137,184 @@ serve(async (req) => {
 
     // Start deletion process (atomic - all or nothing)
     const deletionResults = {
-      user_companies: 0,
-      user_company_roles: 0,
-      user_profiles: 0,
+      routine_executions: 0,
+      companies_routines: 0,
+      companies_onboarding_checklist: 0,
+      documents: 0,
+      entities: 0,
       profiles: 0,
+      subscriptions: 0,
+      user_permissions: 0,
+      user_company_roles: 0,
+      user_companies: 0,
+      user_profiles: 0,
+      companies: 0,
       users: 0,
       auth_user: false
     };
 
     try {
-      // 1. Delete from user_companies
-      const { count: userCompaniesCount, error: userCompaniesError } = await supabaseAdmin
+      // First, get all companies associated with this user
+      const { data: userCompanies, error: getUserCompaniesError } = await supabaseAdmin
         .from('user_companies')
+        .select('company_id')
+        .eq('user_id', targetUserId);
+
+      if (getUserCompaniesError) {
+        console.error('Error fetching user companies:', getUserCompaniesError);
+      }
+
+      const companyIds = userCompanies?.map(uc => uc.company_id) || [];
+
+      // Delete in order to respect foreign key constraints
+      
+      // 1. Delete routine_executions (depends on companies_routines)
+      if (companyIds.length > 0) {
+        // First get companies_routines IDs
+        const { data: companiesRoutines } = await supabaseAdmin
+          .from('companies_routines')
+          .select('id')
+          .in('company_id', companyIds);
+
+        const routineIds = companiesRoutines?.map(r => r.id) || [];
+
+        if (routineIds.length > 0) {
+          const { count: routineExecutionsCount, error: routineExecutionsError } = await supabaseAdmin
+            .from('routine_executions')
+            .delete()
+            .in('company_routine_id', routineIds);
+          
+          if (routineExecutionsError) {
+            console.error('Error deleting routine_executions:', routineExecutionsError);
+          }
+          deletionResults.routine_executions = routineExecutionsCount || 0;
+        }
+
+        // 2. Delete companies_routines
+        const { count: companiesRoutinesCount, error: companiesRoutinesError } = await supabaseAdmin
+          .from('companies_routines')
+          .delete()
+          .in('company_id', companyIds);
+        
+        if (companiesRoutinesError) {
+          console.error('Error deleting companies_routines:', companiesRoutinesError);
+        }
+        deletionResults.companies_routines = companiesRoutinesCount || 0;
+
+        // 3. Delete companies_onboarding_checklist
+        const { count: companiesOnboardingCount, error: companiesOnboardingError } = await supabaseAdmin
+          .from('companies_onboarding_checklist')
+          .delete()
+          .in('company_id', companyIds);
+        
+        if (companiesOnboardingError) {
+          console.error('Error deleting companies_onboarding_checklist:', companiesOnboardingError);
+        }
+        deletionResults.companies_onboarding_checklist = companiesOnboardingCount || 0;
+
+        // 4. Delete documents (CASCADE will handle this, but explicit is safer)
+        const { count: documentsCount, error: documentsError } = await supabaseAdmin
+          .from('documents')
+          .delete()
+          .in('company_id', companyIds);
+        
+        if (documentsError) {
+          console.error('Error deleting documents:', documentsError);
+        }
+        deletionResults.documents = documentsCount || 0;
+
+        // 5. Delete entities (CASCADE will handle this, but explicit is safer)
+        const { count: entitiesCount, error: entitiesError } = await supabaseAdmin
+          .from('entities')
+          .delete()
+          .in('company_id', companyIds);
+        
+        if (entitiesError) {
+          console.error('Error deleting entities:', entitiesError);
+        }
+        deletionResults.entities = entitiesCount || 0;
+
+        // 6. Delete profiles (CASCADE will handle this, but explicit is safer)
+        const { count: profilesCount, error: profilesError } = await supabaseAdmin
+          .from('profiles')
+          .delete()
+          .in('company_id', companyIds);
+        
+        if (profilesError) {
+          console.error('Error deleting profiles:', profilesError);
+        }
+        deletionResults.profiles = profilesCount || 0;
+
+        // 7. Delete subscriptions (CASCADE will handle this, but explicit is safer)
+        const { count: subscriptionsCount, error: subscriptionsError } = await supabaseAdmin
+          .from('subscriptions')
+          .delete()
+          .in('company_id', companyIds);
+        
+        if (subscriptionsError) {
+          console.error('Error deleting subscriptions:', subscriptionsError);
+        }
+        deletionResults.subscriptions = subscriptionsCount || 0;
+      }
+
+      // 8. Delete user_permissions
+      const { count: userPermissionsCount, error: userPermissionsError } = await supabaseAdmin
+        .from('user_permissions')
         .delete()
         .eq('user_id', targetUserId);
       
-      if (userCompaniesError) {
-        console.error('Error deleting from user_companies:', userCompaniesError);
-        // Continue even if no records found
+      if (userPermissionsError) {
+        console.error('Error deleting user_permissions:', userPermissionsError);
       }
-      deletionResults.user_companies = userCompaniesCount || 0;
+      deletionResults.user_permissions = userPermissionsCount || 0;
 
-      // 2. Delete from user_company_roles
+      // 9. Delete user_company_roles
       const { count: userCompanyRolesCount, error: userCompanyRolesError } = await supabaseAdmin
         .from('user_company_roles')
         .delete()
         .eq('user_id', targetUserId);
       
       if (userCompanyRolesError) {
-        console.error('Error deleting from user_company_roles:', userCompanyRolesError);
-        // Continue even if no records found
+        console.error('Error deleting user_company_roles:', userCompanyRolesError);
       }
       deletionResults.user_company_roles = userCompanyRolesCount || 0;
 
-      // 3. Delete from user_profiles
+      // 10. Delete user_companies
+      const { count: userCompaniesCount, error: userCompaniesError } = await supabaseAdmin
+        .from('user_companies')
+        .delete()
+        .eq('user_id', targetUserId);
+      
+      if (userCompaniesError) {
+        console.error('Error deleting user_companies:', userCompaniesError);
+      }
+      deletionResults.user_companies = userCompaniesCount || 0;
+
+      // 11. Delete user_profiles
       const { count: userProfilesCount, error: userProfilesError } = await supabaseAdmin
         .from('user_profiles')
         .delete()
         .eq('user_id', targetUserId);
       
       if (userProfilesError) {
-        console.error('Error deleting from user_profiles:', userProfilesError);
-        // Continue even if no records found
+        console.error('Error deleting user_profiles:', userProfilesError);
       }
       deletionResults.user_profiles = userProfilesCount || 0;
 
-      // 4. Delete from profiles
-      const { count: profilesCount, error: profilesError } = await supabaseAdmin
-        .from('profiles')
-        .delete()
-        .eq('user_id', targetUserId);
-      
-      if (profilesError) {
-        console.error('Error deleting from profiles:', profilesError);
-        // Continue even if no records found
+      // 12. Delete companies (now that all references are gone)
+      if (companyIds.length > 0) {
+        const { count: companiesCount, error: companiesError } = await supabaseAdmin
+          .from('companies')
+          .delete()
+          .in('id', companyIds);
+        
+        if (companiesError) {
+          console.error('Error deleting companies:', companiesError);
+        }
+        deletionResults.companies = companiesCount || 0;
       }
-      deletionResults.profiles = profilesCount || 0;
 
-      // 5. Delete from users table
+      // 13. Delete from users table
       const { count: usersCount, error: usersError } = await supabaseAdmin
         .from('users')
         .delete()
@@ -194,11 +322,10 @@ serve(async (req) => {
       
       if (usersError) {
         console.error('Error deleting from users:', usersError);
-        // Continue even if no records found
       }
       deletionResults.users = usersCount || 0;
 
-      // 4. Finally, delete from auth.users
+      // 14. Finally, delete from auth.users
       const { error: authDeleteError } = await supabaseAdmin.auth.admin.deleteUser(targetUserId);
       
       if (authDeleteError) {
