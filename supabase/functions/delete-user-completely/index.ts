@@ -15,7 +15,9 @@ interface DeleteUserResponse {
   success: boolean;
   message: string;
   deleted?: {
-    company_users: number;
+    user_companies: number;
+    user_company_roles: number;
+    user_profiles: number;
     profiles: number;
     users: number;
     auth_user: boolean;
@@ -127,26 +129,52 @@ serve(async (req) => {
 
     // Start deletion process (atomic - all or nothing)
     const deletionResults = {
-      company_users: 0,
+      user_companies: 0,
+      user_company_roles: 0,
+      user_profiles: 0,
       profiles: 0,
       users: 0,
       auth_user: false
     };
 
     try {
-      // 1. Delete from company_users
-      const { count: companyUsersCount, error: companyUsersError } = await supabaseAdmin
-        .from('company_users')
+      // 1. Delete from user_companies
+      const { count: userCompaniesCount, error: userCompaniesError } = await supabaseAdmin
+        .from('user_companies')
         .delete()
         .eq('user_id', targetUserId);
       
-      if (companyUsersError) {
-        console.error('Error deleting from company_users:', companyUsersError);
+      if (userCompaniesError) {
+        console.error('Error deleting from user_companies:', userCompaniesError);
         // Continue even if no records found
       }
-      deletionResults.company_users = companyUsersCount || 0;
+      deletionResults.user_companies = userCompaniesCount || 0;
 
-      // 2. Delete from profiles
+      // 2. Delete from user_company_roles
+      const { count: userCompanyRolesCount, error: userCompanyRolesError } = await supabaseAdmin
+        .from('user_company_roles')
+        .delete()
+        .eq('user_id', targetUserId);
+      
+      if (userCompanyRolesError) {
+        console.error('Error deleting from user_company_roles:', userCompanyRolesError);
+        // Continue even if no records found
+      }
+      deletionResults.user_company_roles = userCompanyRolesCount || 0;
+
+      // 3. Delete from user_profiles
+      const { count: userProfilesCount, error: userProfilesError } = await supabaseAdmin
+        .from('user_profiles')
+        .delete()
+        .eq('user_id', targetUserId);
+      
+      if (userProfilesError) {
+        console.error('Error deleting from user_profiles:', userProfilesError);
+        // Continue even if no records found
+      }
+      deletionResults.user_profiles = userProfilesCount || 0;
+
+      // 4. Delete from profiles
       const { count: profilesCount, error: profilesError } = await supabaseAdmin
         .from('profiles')
         .delete()
@@ -158,7 +186,7 @@ serve(async (req) => {
       }
       deletionResults.profiles = profilesCount || 0;
 
-      // 3. Delete from users table
+      // 5. Delete from users table
       const { count: usersCount, error: usersError } = await supabaseAdmin
         .from('users')
         .delete()
