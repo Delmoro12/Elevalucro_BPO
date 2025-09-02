@@ -97,7 +97,31 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
     
-    // TODO: Adicionar verificação de autenticação
+    // Lista de rotas públicas (que não precisam de autenticação)
+    const publicRoutes = [
+      '/auth/login',               // Página de login
+      '/auth/forgot-password',     // Página de recuperação de senha
+      '/auth/reset-password',      // Página de redefinição de senha
+      '/auth/set-password',        // Página de definir senha
+      '/auth/callback',            // Callback de autenticação
+      '/api/auth',                 // API routes de autenticação
+      '/_next',                    // Assets do Next.js
+      '/images',                   // Imagens públicas
+      '/favicon.ico'               // Favicon
+    ]
+    
+    // Verifica se é uma rota pública
+    const isPublicRoute = publicRoutes.some(route => 
+      pathname.startsWith(route)
+    )
+    
+    // Se é rota pública, permitir acesso
+    if (isPublicRoute) {
+      console.log(`✅ App public route allowed: ${pathname}`)
+      // Continue processamento normal
+    }
+    
+    // TODO: Adicionar verificação de autenticação para rotas protegidas
     // TODO: Adicionar verificação de role (client_side)
   }
   

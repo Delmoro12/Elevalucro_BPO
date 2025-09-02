@@ -20,6 +20,7 @@ export interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  resetPasswordForEmail: (email: string) => Promise<{ error: Error | null }>;
   isAuthenticated: boolean;
   companyId: string | null;
   profileId: string | null;

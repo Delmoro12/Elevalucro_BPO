@@ -95,6 +95,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const resetPasswordForEmail = async (email: string) => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`
+      });
+
+      if (error) {
+        console.error('Error sending password reset email:', error);
+        return { error };
+      }
+
+      return { error: null };
+    } catch (error) {
+      console.error('Error sending password reset email:', error);
+      return { error: error as Error };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Helper computed properties
   const isAuthenticated = !!user;
   const companyId = user?.user_metadata?.company_id || null;
@@ -107,6 +128,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     loading,
     signIn,
     signOut,
+    resetPasswordForEmail,
     isAuthenticated,
     companyId,
     profileId,

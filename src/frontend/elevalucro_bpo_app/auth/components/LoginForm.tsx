@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export const LoginForm: React.FC = () => {
@@ -11,8 +11,25 @@ export const LoginForm: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState<string>('');
   const { signIn, loading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const message = searchParams?.get('message');
+    if (message === 'password_reset_success') {
+      setSuccessMessage('Senha redefinida com sucesso! Faça login com sua nova senha.');
+      // Clear the URL parameters
+      const newUrl = window.location.pathname;
+      window.history.replaceState(null, '', newUrl);
+    } else if (message === 'password_set') {
+      setSuccessMessage('Senha definida com sucesso! Você pode fazer login agora.');
+      // Clear the URL parameters
+      const newUrl = window.location.pathname;
+      window.history.replaceState(null, '', newUrl);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +51,7 @@ export const LoginForm: React.FC = () => {
     } else {
       // Success - redirect will happen automatically via AuthContext
       console.log('Login successful');
-      router.push('/elevalucro_bpo_app/dashboard');
+      router.push('/dashboard');
     }
   };
 
@@ -125,6 +142,14 @@ export const LoginForm: React.FC = () => {
               </div>
             </div>
 
+            {/* Success Message */}
+            {successMessage && (
+              <div className="flex items-center p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 mr-2 flex-shrink-0" />
+                <span className="text-sm text-green-700 dark:text-green-300">{successMessage}</span>
+              </div>
+            )}
+
             {/* Error Message */}
             {error && (
               <div className="flex items-center p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
@@ -148,9 +173,13 @@ export const LoginForm: React.FC = () => {
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-emerald-600 hover:text-emerald-500">
+                <button
+                  type="button"
+                  onClick={() => router.push('/auth/forgot-password')}
+                  className="font-medium text-emerald-600 hover:text-emerald-500"
+                >
                   Esqueceu a senha?
-                </a>
+                </button>
               </div>
             </div>
 
