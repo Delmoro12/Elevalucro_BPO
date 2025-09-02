@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseClient } from '../../../../src/lib/supabase';
+import { getSupabaseAdmin } from '../../../../src/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,8 +12,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Initialize Supabase client
-    const supabase = getSupabaseClient();
+    // Initialize Supabase admin client
+    const supabase = getSupabaseAdmin();
+    
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Supabase admin client not available' },
+        { status: 500 }
+      );
+    }
 
     // Get the current user to verify permissions using the token
     const token = authHeader.replace('Bearer ', '');
@@ -46,15 +53,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get the auth token for the edge function
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-    if (sessionError || !session) {
-      return NextResponse.json(
-        { error: 'Failed to get session' },
-        { status: 401 }
-      );
-    }
+    // Use the token we already have from the authorization header (already defined above)
 
     // Call the edge function
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -64,7 +63,7 @@ export async function POST(request: NextRequest) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           user_email,
