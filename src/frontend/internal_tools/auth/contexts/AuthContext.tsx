@@ -59,10 +59,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setJwtDebugData(debugInfo);
       setShowJwtDebug(true);
       
-      // Auto-fechar após 3 segundos
+      // Auto-fechar após 1 segundo
       setTimeout(() => {
         setShowJwtDebug(false);
-      }, 3000);
+      }, 1000);
       
     } catch (error) {
       console.error('Erro ao decodificar JWT:', error);

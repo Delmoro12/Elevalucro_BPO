@@ -89,11 +89,11 @@ export const MainPage: React.FC = () => {
           setShowClaimsModal(true);
           console.log('✅ Modal shown!');
           
-          // Auto-fechar após 3 segundos
+          // Auto-fechar após 1 segundo
           setTimeout(() => {
             setShowClaimsModal(false);
-            console.log('⏰ Modal closed after 3 seconds');
-          }, 3000);
+            console.log('⏰ Modal closed after 1 second');
+          }, 1000);
         } else {
           console.log('❌ No user in session');
         }

@@ -119,9 +119,9 @@ export function middleware(request: NextRequest) {
     
     // Lista de rotas públicas (que não precisam de autenticação)
     const publicRoutes = [
-      '/auth/login',         // Página de login
-      '/auth/signup',        // Página de signup para operadores BPO
-      '/auth/callback',      // Callback de autenticação
+      '/tools-auth/login',         // Página de login
+      '/tools-auth/signup',        // Página de signup para operadores BPO
+      '/tools-auth/callback',      // Callback de autenticação
       '/api/auth',           // API routes de autenticação
       '/_next',              // Assets do Next.js
       '/images',             // Imagens públicas
@@ -199,7 +199,7 @@ export function middleware(request: NextRequest) {
     if (!accessToken) {
       console.log(`🚫 Tools: No access token found → redirecting to login`)
       console.log(`🚫 Checked cookies: sb-access-token, supabase.auth.token, sb-*-auth-token patterns`)
-      const loginUrl = new URL('/auth/login', request.url)
+      const loginUrl = new URL('/tools-auth/login', request.url)
       loginUrl.searchParams.set('redirect', pathname)
       return NextResponse.redirect(loginUrl)
     }
@@ -220,7 +220,7 @@ export function middleware(request: NextRequest) {
       
       if (userRole !== 'bpo_side') {
         console.log(`🚫 Tools: Invalid role '${userRole}', required 'bpo_side' → login`)
-        const loginUrl = new URL('/auth/login', request.url)
+        const loginUrl = new URL('/tools-auth/login', request.url)
         loginUrl.searchParams.set('error', 'insufficient_permissions')
         return NextResponse.redirect(loginUrl)
       }
@@ -229,7 +229,7 @@ export function middleware(request: NextRequest) {
       
     } catch (error) {
       console.error(`❌ Tools: JWT validation error:`, error)
-      const loginUrl = new URL('/auth/login', request.url)
+      const loginUrl = new URL('/tools-auth/login', request.url)
       loginUrl.searchParams.set('error', 'invalid_token')
       return NextResponse.redirect(loginUrl)
     }
