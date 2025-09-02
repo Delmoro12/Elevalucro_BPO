@@ -103,7 +103,15 @@ export async function getProspectById(id: string): Promise<ProspectEditData> {
       throw new Error(`Erro ao buscar prospect: ${response.statusText}`);
     }
     
-    const result = await response.json();
+    let result;
+    try {
+      result = await response.json();
+    } catch (parseError) {
+      console.error('Erro ao fazer parse da resposta:', parseError);
+      const responseText = await response.text();
+      console.error('Resposta recebida:', responseText.substring(0, 200));
+      throw new Error('Resposta inválida do servidor (não é JSON)');
+    }
     
     if (result.success) {
       return result.data;
