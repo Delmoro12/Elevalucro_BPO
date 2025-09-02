@@ -9,10 +9,13 @@ import {
   FileText,
   Check,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Trash2,
+  AlertTriangle
 } from 'lucide-react';
 import { ModalSidebar } from '../../../shared/components';
 import { Building2 } from 'lucide-react';
+import { useDeleteUser } from '../hooks/useDeleteUser';
 
 interface OnboardingClient {
   company_id: string;
@@ -55,6 +58,9 @@ export const OnboardingModalContent: React.FC<OnboardingModalProps> = ({
   const [detailedClient, setDetailedClient] = useState<OnboardingClient | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const { deleteUser, isDeleting, deleteError } = useDeleteUser();
 
   // Carregar detalhes completos do cliente quando o modal abrir
   useEffect(() => {
@@ -171,6 +177,26 @@ export const OnboardingModalContent: React.FC<OnboardingModalProps> = ({
       ...prev,
       [key]: !prev[key]
     }));
+  };
+
+  // Handle user deletion
+  const handleDeleteUser = async () => {
+    if (deleteConfirmText !== 'DELETAR') {
+      alert('Digite DELETAR para confirmar');
+      return;
+    }
+
+    const result = await deleteUser(client.email);
+    
+    if (result) {
+      alert(`Usuário ${client.email} foi deletado permanentemente`);
+      setShowDeleteConfirm(false);
+      onClose();
+      // Reload the page to refresh the list
+      window.location.reload();
+    } else if (deleteError) {
+      alert(`Erro ao deletar: ${deleteError}`);
+    }
   };
 
   // Função para atualizar checklist item
@@ -1004,17 +1030,107 @@ export const OnboardingModalContent: React.FC<OnboardingModalProps> = ({
     </div>
   );
 
-  return (
-    <ModalSidebar
-      isOpen={isOpen}
-      onClose={onClose}
-      title={`Onboarding: ${client.nome_empresa}`}
-      subtitle={`${client.segmento} • ${client.email}`}
-      icon={Building2}
-      footer={modalFooter}
-      width="lg"
+  // Delete button component
+  const deleteButton = (
+    <button
+      onClick={() => setShowDeleteConfirm(true)}
+      className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors group"
+      title="Deletar usuário permanentemente"
     >
-      {modalContent}
-    </ModalSidebar>
+      <Trash2 className="h-4 w-4 text-slate-400 group-hover:text-red-600 transition-colors" />
+    </button>
+  );
+
+  return (
+    <>
+      <ModalSidebar
+        isOpen={isOpen}
+        onClose={onClose}
+        title={`Onboarding: ${client.nome_empresa}`}
+        subtitle={`${client.segmento} • ${client.email}`}
+        icon={Building2}
+        footer={modalFooter}
+        width="lg"
+        headerAction={deleteButton}
+      >
+        {modalContent}
+      </ModalSidebar>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50">
+          <div className="bg-white dark:bg-slate-900 rounded-lg p-6 max-w-md w-full mx-4 shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                  Confirmar Exclusão Permanente
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Esta ação não pode ser desfeita
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                <p className="text-sm text-red-700 dark:text-red-300 font-medium mb-2">
+                  Você está prestes a deletar permanentemente:
+                </p>
+                <ul className="text-sm text-red-600 dark:text-red-400 space-y-1">
+                  <li>• Empresa: <strong>{client.nome_empresa}</strong></li>
+                  <li>• Email: <strong>{client.email}</strong></li>
+                  <li>• Todos os dados relacionados</li>
+                </ul>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Digite <strong>DELETAR</strong> para confirmar:
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-red-500"
+                  placeholder="DELETAR"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setDeleteConfirmText('');
+                  }}
+                  className="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteUser}
+                  disabled={deleteConfirmText !== 'DELETAR' || isDeleting}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                >
+                  {isDeleting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Deletando...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="h-4 w-4" />
+                      Deletar Permanentemente
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };

@@ -12,6 +12,7 @@ interface ModalSidebarProps {
   children: ReactNode;
   footer?: ReactNode;
   width?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  headerAction?: ReactNode;
 }
 
 export const ModalSidebar: React.FC<ModalSidebarProps> = ({
@@ -22,7 +23,8 @@ export const ModalSidebar: React.FC<ModalSidebarProps> = ({
   icon: Icon,
   children,
   footer,
-  width = 'lg'
+  width = 'lg',
+  headerAction
 }) => {
   if (!isOpen) return null;
 
@@ -47,7 +49,7 @@ export const ModalSidebar: React.FC<ModalSidebarProps> = ({
         {/* Header */}
         <div className="border-b border-slate-200 dark:border-slate-700 px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1">
               <h2 className="text-xl font-semibold text-slate-900 dark:text-white flex items-center gap-2">
                 {Icon && <Icon className="h-5 w-5 text-emerald-600" />}
                 {title}
@@ -58,12 +60,15 @@ export const ModalSidebar: React.FC<ModalSidebarProps> = ({
                 </p>
               )}
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-            >
-              <X className="h-5 w-5 text-slate-500" />
-            </button>
+            <div className="flex items-center gap-2">
+              {headerAction && headerAction}
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5 text-slate-500" />
+              </button>
+            </div>
           </div>
         </div>
 
