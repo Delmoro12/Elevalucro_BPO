@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '@/src/lib/supabase';
 
 export const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -49,9 +50,23 @@ export const LoginForm: React.FC = () => {
         setError('Erro ao fazer login. Tente novamente.');
       }
     } else {
-      // Success - redirect will happen automatically via AuthContext
+      // Success - check user role and redirect accordingly
       console.log('Login successful');
-      router.push('/dashboard');
+      
+      // Get user data to check role
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user?.user_metadata?.role === 'bpo_side') {
+        // BPO user logged in app subdomain - redirect to tools
+        if (window.location.hostname.includes('localhost')) {
+          window.location.href = 'http://tools.localhost:4000/prospects';
+        } else {
+          window.location.href = 'https://tools.elevalucro.com.br/prospects';
+        }
+      } else {
+        // Client user - redirect to dashboard
+        router.push('/dashboard');
+      }
     }
   };
 
