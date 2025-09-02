@@ -6,6 +6,7 @@ import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { LayoutContext, useLayoutProvider } from '../shared/hooks/useLayout';
 import { ThemeProvider } from '../shared/components/ThemeProvider';
+import { AuthProvider } from '../auth/contexts/AuthContext';
 import { supabase } from '@/src/lib/supabase';
 
 // Importar páginas das features
@@ -148,9 +149,10 @@ export const MainPage: React.FC = () => {
   };
 
   return (
-    <ThemeProvider>
-      <LayoutContext.Provider value={layoutProviderValue}>
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <AuthProvider>
+      <ThemeProvider>
+        <LayoutContext.Provider value={layoutProviderValue}>
+          <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
         {/* Sidebar */}
         <Sidebar 
           collapsed={layoutProviderValue.sidebarCollapsed} 
@@ -239,8 +241,9 @@ export const MainPage: React.FC = () => {
             </div>
           </div>
         )}
-        </div>
-      </LayoutContext.Provider>
-    </ThemeProvider>
+          </div>
+        </LayoutContext.Provider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 };
