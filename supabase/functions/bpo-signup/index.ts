@@ -26,8 +26,17 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     
+    console.log('📊 Environment check:', { 
+      hasUrl: !!supabaseUrl, 
+      hasKey: !!serviceRoleKey,
+      url: supabaseUrl || 'NOT SET'
+    });
+    
     if (!supabaseUrl || !serviceRoleKey) {
-      return new Response(JSON.stringify({ error: 'Server configuration error' }), {
+      return new Response(JSON.stringify({ 
+        error: 'Server configuration error',
+        details: 'Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY'
+      }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });

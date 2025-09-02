@@ -1,5 +1,5 @@
-import { DashboardFinanceiro } from '@/src/frontend/elevalucro_bpo_app/dashboards/pages/DashboardFinanceiro'
+import { MainPage } from '@/src/frontend/elevalucro_bpo_app/layouts/MainPage'
 
 export default function DashboardPage() {
-  return <DashboardFinanceiro />
+  return <MainPage />
 }

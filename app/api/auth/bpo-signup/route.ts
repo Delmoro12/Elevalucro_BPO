@@ -30,39 +30,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Call the edge function with proper headers
-    const { data, error } = await supabase.functions.invoke('bpo-signup', {
-      body: {
+    // Call the edge function directly for local development
+    const isLocal = process.env.NODE_ENV === 'development';
+    const functionUrl = isLocal 
+      ? 'http://127.0.0.1:54321/functions/v1/bpo-signup'
+      : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/bpo-signup`;
+    
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    
+    console.log('📍 Calling edge function at:', functionUrl);
+    
+    const response = await fetch(functionUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${serviceKey}`,
+      },
+      body: JSON.stringify({
         full_name,
         email,
         phone,
         password
-      },
-      headers: {
-        'Authorization': `Bearer ${process.env.SUPABASE_LOCAL_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-        'apikey': process.env.SUPABASE_LOCAL_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
-      }
+      })
     });
 
-    if (error) {
-      console.error('❌ Edge function error:', error);
+    const data = await response.json();
+    
+    if (!response.ok) {
+      console.error('❌ Edge function error:', data);
       return NextResponse.json(
         { 
-          error: error.message || 'Failed to create BPO operator',
-          details: error.details || 'Unknown error'
+          error: data.error || 'Failed to create BPO operator',
+          details: data.details || 'Unknown error'
         },
-        { status: 500 }
-      );
-    }
-
-    if (!data?.success) {
-      console.error('❌ Edge function returned error:', data);
-      return NextResponse.json(
-        { 
-          error: data?.error || 'Failed to create BPO operator',
-          details: data?.details || 'Unknown error'
-        },
-        { status: data?.status || 500 }
+        { status: response.status }
       );
     }
 
