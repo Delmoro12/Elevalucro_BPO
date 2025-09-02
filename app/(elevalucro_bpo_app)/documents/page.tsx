@@ -1,5 +1,5 @@
-import DocumentsPage from '@/src/frontend/elevalucro_bpo_app/documents/pages/DocumentsPage'
+import { MainPage } from '@/src/frontend/elevalucro_bpo_app/layouts/MainPage'
 
 export default function DocumentsPageRoute() {
-  return <DocumentsPage />
+  return <MainPage />
 }

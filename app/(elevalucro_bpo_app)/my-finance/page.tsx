@@ -1,5 +1,5 @@
-import MyFinancePage from '@/src/frontend/elevalucro_bpo_app/my_finance/pages/MyFinancePage'
+import { MainPage } from '@/src/frontend/elevalucro_bpo_app/layouts/MainPage'
 
 export default function MyFinancePageRoute() {
-  return <MyFinancePage />
+  return <MainPage />
 }

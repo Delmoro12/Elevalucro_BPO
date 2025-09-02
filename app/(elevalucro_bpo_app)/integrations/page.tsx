@@ -1,5 +1,5 @@
-import IntegrationsPage from '@/src/frontend/elevalucro_bpo_app/integrations/pages/IntegrationsPage'
+import { MainPage } from '@/src/frontend/elevalucro_bpo_app/layouts/MainPage'
 
 export default function IntegrationsPageRoute() {
-  return <IntegrationsPage />
+  return <MainPage />
 }
