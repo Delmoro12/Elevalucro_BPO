@@ -6,8 +6,20 @@ export const useDocumentsService = () => {
   const { companyId } = useAuth();
   const client = supabase;
 
+  // Se não há companyId, retorna funções que mostram erro apenas quando chamadas
   if (!companyId) {
-    throw new Error('User must be authenticated with a valid company_id to use documents service');
+    return {
+      createDocument: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
+      getDocuments: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
+      getDocument: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
+      updateDocument: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
+      deleteDocument: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
+      getDocumentsByStatus: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
+      getDocumentsByCategory: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
+      getIncompleteDocuments: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
+      updateDocumentStatus: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
+      searchDocuments: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service'))
+    };
   }
 
   // Criar um novo documento
