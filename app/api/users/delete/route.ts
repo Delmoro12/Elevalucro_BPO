@@ -27,8 +27,12 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
+      console.error('Authentication error:', authError);
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { 
+          error: 'Unauthorized',
+          details: authError?.message || 'Invalid token'
+        },
         { status: 401 }
       );
     }
