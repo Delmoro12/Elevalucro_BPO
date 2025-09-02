@@ -195,8 +195,8 @@ Deno.serve(async (req) => {
       // Brevo API configuration
       const brevoApiKey = Deno.env.get('BREVO_API_KEY');
       const loginUrl = supabaseUrl.includes('localhost') 
-        ? 'http://localhost:4000/auth/login' 
-        : 'https://elevalucrobpo.com.br/auth/login';
+        ? 'http://app.localhost:4000/auth/login' 
+        : 'https://app.elevalucro.com.br/auth/login';
       
       if (!brevoApiKey) {
         console.log('⚠️ Brevo API key not configured, skipping email');
@@ -211,7 +211,7 @@ Deno.serve(async (req) => {
           body: JSON.stringify({
             sender: {
               name: 'ElevaLucro BPO',
-              email: 'delmoro123@gmail.com'
+              email: 'atendimento@elevalucro.com.br'
             },
             to: [{
               email: prospect.email_contato,
