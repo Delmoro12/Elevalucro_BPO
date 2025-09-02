@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { supabase } from '@/src/lib/supabase';
 
 interface DeleteUserResult {
   success: boolean;
@@ -20,10 +21,19 @@ export const useDeleteUser = () => {
     setDeleteError(null);
 
     try {
+      // Get the current session token
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        setDeleteError('Não autorizado');
+        return null;
+      }
+
       const response = await fetch('/api/users/delete', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ user_email: email }),
       });

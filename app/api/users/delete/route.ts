@@ -1,14 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { getSupabaseClient } from '../../../../src/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
-    // Initialize Supabase client
-    const supabase = createRouteHandlerClient({ cookies });
+    // Get authorization header
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader) {
+      return NextResponse.json(
+        { error: 'Missing authorization header' },
+        { status: 401 }
+      );
+    }
 
-    // Get the current user to verify permissions
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // Initialize Supabase client
+    const supabase = getSupabaseClient();
+
+    // Get the current user to verify permissions using the token
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
       return NextResponse.json(
