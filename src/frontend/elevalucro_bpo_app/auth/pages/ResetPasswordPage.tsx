@@ -87,7 +87,18 @@ export default function ResetPasswordPage() {
 
       if (error) {
         console.error('Error updating password:', error);
-        setError('Erro ao atualizar a senha. Tente novamente.');
+        
+        // Handle specific error types
+        if (error.message.includes('New password should be different')) {
+          setError('A nova senha deve ser diferente da senha atual.');
+        } else if (error.message.includes('Password should be at least')) {
+          setError('A senha deve ter pelo menos 8 caracteres.');
+        } else if (error.message.includes('expired') || error.message.includes('invalid')) {
+          setError('Link expirado ou já utilizado. Solicite uma nova recuperação de senha.');
+        } else {
+          setError(`Erro ao atualizar a senha: ${error.message}`);
+        }
+        
         setIsLoading(false);
         return;
       }
