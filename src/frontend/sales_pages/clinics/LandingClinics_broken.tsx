@@ -365,7 +365,7 @@ export default function LandingClinics() {
             <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/10">
               <div className="flex items-baseline justify-between">
                 <h3 className="text-xl font-semibold">Controle</h3>
-                <span className="text-emerald-300 font-semibold">R$ 950,00<span className="text-slate-400 text-sm"> / mês</span></span>
+                <span className="text-emerald-300 font-semibold">R$ 1.200,00<span className="text-slate-400 text-sm"> / mês</span></span>
               </div>
               <p className="mt-2 text-sm text-slate-300/90">Básico organizado. Tiramos a clínica do operacional.</p>
               <ul className="mt-4 space-y-2 text-sm text-slate-300/90">
@@ -382,7 +382,7 @@ export default function LandingClinics() {
             <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/10 ring-1 ring-emerald-300/30">
               <div className="flex items-baseline justify-between">
                 <h3 className="text-xl font-semibold">Gerencial</h3>
-                <span className="text-emerald-300 font-semibold">R$ 1.300,00<span className="text-slate-400 text-sm"> / mês</span></span>
+                <span className="text-emerald-300 font-semibold">R$ 1.500,00<span className="text-slate-400 text-sm"> / mês</span></span>
               </div>
               <p className="mt-2 text-sm text-slate-300/90">Tudo do Controle + visão de gestão e cobrança ativa.</p>
               <ul className="mt-4 space-y-2 text-sm text-slate-300/90">
@@ -399,7 +399,7 @@ export default function LandingClinics() {
             <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/10">
               <div className="flex items-baseline justify-between">
                 <h3 className="text-xl font-semibold">Avançado</h3>
-                <span className="text-emerald-300 font-semibold">R$ 1.700,00<span className="text-slate-400 text-sm"> / mês</span></span>
+                <span className="text-emerald-300 font-semibold">R$ 1.900,00<span className="text-slate-400 text-sm"> / mês</span></span>
               </div>
               <p className="mt-2 text-sm text-slate-300/90">Tudo do Gerencial + inteligência financeira para crescer.</p>
               <ul className="mt-4 space-y-2 text-sm text-slate-300/90">

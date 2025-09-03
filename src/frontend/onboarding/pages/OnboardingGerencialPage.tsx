@@ -15,7 +15,7 @@ export default function OnboardingGerencialPage() {
     <OnboardingPresentation 
       planName="Gerencial"
       planFeatures={planFeatures}
-      monthlyPrice="R$ 1.300,00"
+      monthlyPrice="R$ 1.500,00"
     />
   );
 }

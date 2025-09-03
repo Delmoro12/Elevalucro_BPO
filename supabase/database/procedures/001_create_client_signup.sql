@@ -20,8 +20,29 @@ DECLARE
   v_profile_id UUID;
   v_subscription_id UUID;
   v_result JSONB;
+  v_base_slug TEXT;
+  v_final_slug TEXT;
+  v_slug_counter INTEGER := 0;
+  v_slug_exists BOOLEAN;
 BEGIN
-  -- 1. Criar empresa baseada nos dados do prospect
+  -- 1. Gerar slug único para a empresa
+  v_base_slug := lower(replace(replace(p_prospect_data->>'nome_empresa', ' ', '-'), '.', ''));
+  v_final_slug := v_base_slug;
+  
+  -- Verificar se o slug já existe e gerar um único se necessário
+  LOOP
+    SELECT EXISTS(SELECT 1 FROM companies WHERE slug = v_final_slug) INTO v_slug_exists;
+    
+    IF NOT v_slug_exists THEN
+      EXIT; -- Slug é único, sair do loop
+    END IF;
+    
+    -- Incrementar contador e tentar novamente
+    v_slug_counter := v_slug_counter + 1;
+    v_final_slug := v_base_slug || '-' || v_slug_counter;
+  END LOOP;
+
+  -- 2. Criar empresa baseada nos dados do prospect
   INSERT INTO companies (
     name,
     slug,
@@ -33,7 +54,7 @@ BEGIN
     updated_at
   ) VALUES (
     p_prospect_data->>'nome_empresa',
-    lower(replace(replace(p_prospect_data->>'nome_empresa', ' ', '-'), '.', '')),
+    v_final_slug,
     p_prospect_data->>'email_contato',
     p_prospect_data->>'telefone_contato',
     p_prospect_data->>'cnpj',

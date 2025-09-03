@@ -32,6 +32,9 @@ CREATE TABLE IF NOT EXISTS companies_routines (
     last_completed_at TIMESTAMPTZ,
     last_completed_by UUID REFERENCES users(id),
     completion_count INTEGER DEFAULT 0,
+    next_execution_date DATE,
+    last_execution_date DATE,
+    notes TEXT,
     
     -- Status and control
     is_active BOOLEAN DEFAULT true,
@@ -58,6 +61,8 @@ CREATE INDEX IF NOT EXISTS idx_companies_routines_is_active ON companies_routine
 CREATE INDEX IF NOT EXISTS idx_companies_routines_is_paused ON companies_routines(is_paused);
 CREATE INDEX IF NOT EXISTS idx_companies_routines_start_date ON companies_routines(start_date);
 CREATE INDEX IF NOT EXISTS idx_companies_routines_last_completed_at ON companies_routines(last_completed_at);
+CREATE INDEX IF NOT EXISTS idx_companies_routines_next_execution_date ON companies_routines(next_execution_date);
+CREATE INDEX IF NOT EXISTS idx_companies_routines_last_execution_date ON companies_routines(last_execution_date);
 CREATE INDEX IF NOT EXISTS idx_companies_routines_created_at ON companies_routines(created_at);
 
 -- Comments
@@ -79,6 +84,9 @@ COMMENT ON COLUMN companies_routines.month_of_year IS 'For yearly routines (1-12
 COMMENT ON COLUMN companies_routines.last_completed_at IS 'Timestamp of last completion';
 COMMENT ON COLUMN companies_routines.last_completed_by IS 'User who last completed this routine';
 COMMENT ON COLUMN companies_routines.completion_count IS 'Total number of times completed';
+COMMENT ON COLUMN companies_routines.next_execution_date IS 'Next scheduled execution date';
+COMMENT ON COLUMN companies_routines.last_execution_date IS 'Last execution date';
+COMMENT ON COLUMN companies_routines.notes IS 'Additional notes for this routine';
 COMMENT ON COLUMN companies_routines.is_paused IS 'Temporarily pause this routine';
 COMMENT ON COLUMN companies_routines.notify_before_hours IS 'Hours before due date to send notification';
 COMMENT ON COLUMN companies_routines.notify_on_overdue IS 'Send notification when overdue';

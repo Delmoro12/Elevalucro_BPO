@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -26,6 +26,96 @@ export const MainPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState('dashboards');
   const [showClaimsModal, setShowClaimsModal] = useState(false);
   const [userClaims, setUserClaims] = useState(null);
+
+  // Function to refresh token and fetch claims
+  const refreshTokenAndFetchClaims = useCallback(async (forceRefresh = false) => {
+    try {
+      console.log(forceRefresh ? '🔄 Force refreshing token...' : '📦 Getting current session...');
+      
+      // Force refresh if requested
+      if (forceRefresh) {
+        const { data: { session }, error } = await supabase.auth.refreshSession();
+        if (error) {
+          console.error('❌ Error refreshing session:', error);
+          return;
+        }
+        console.log('✅ Token refreshed successfully');
+      }
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('📦 Current Session:', session);
+      
+      if (session?.user && session.access_token) {
+        // IMPORTANT: Decode JWT to get actual claims
+        let decodedToken: any = {};
+        try {
+          const token = session.access_token;
+          const parts = token.split('.');
+          
+          // Verificar se o token tem 3 partes
+          if (parts.length !== 3) {
+            console.warn('Token JWT inválido: não tem 3 partes');
+          } else {
+            let payload = parts[1];
+            
+            // Adicionar padding se necessário
+            const padding = payload.length % 4;
+            if (padding) {
+              payload += '='.repeat(4 - padding);
+            }
+            
+            // Substituir caracteres URL-safe para base64 padrão
+            payload = payload.replace(/-/g, '+').replace(/_/g, '/');
+            
+            decodedToken = JSON.parse(atob(payload));
+            console.log('🔓 Decoded JWT Token:', decodedToken);
+          }
+        } catch (err) {
+          console.error('Error decoding JWT:', err);
+          console.error('Token que falhou:', session?.access_token?.substring(0, 50) + '...');
+        }
+        
+        const user = session.user as any;
+        console.log('🔍 User from Session:', {
+          id: user.id,
+          email: user.email,
+          user_metadata: user.user_metadata,
+          app_metadata: user.app_metadata
+        });
+        
+        console.log('🎯 Claims from Decoded JWT:', {
+          user_metadata: decodedToken.user_metadata,
+          app_metadata: decodedToken.app_metadata,
+          role: decodedToken.role,
+          company_id: decodedToken.user_metadata?.company_id,
+          role_from_metadata: decodedToken.user_metadata?.role
+        });
+        
+        // Use decoded token metadata instead of session.user metadata
+        setUserClaims({
+          email: user.email,
+          user_metadata: decodedToken.user_metadata || user.user_metadata,
+          app_metadata: decodedToken.app_metadata || user.app_metadata,
+          id: user.id,
+          created_at: user.created_at,
+          jwt_decoded: decodedToken,
+          access_token: session.access_token
+        } as any);
+        setShowClaimsModal(true);
+        console.log('✅ Modal shown with decoded JWT claims!');
+        
+        // Auto-fechar após 5 segundos para dar tempo de ver os dados
+        setTimeout(() => {
+          setShowClaimsModal(false);
+          console.log('⏰ Modal closed after 5 seconds');
+        }, 5000);
+      } else {
+        console.log('❌ No user in session or no access token');
+      }
+    } catch (error) {
+      console.error('Error fetching claims:', error);
+    }
+  }, []);
 
   // Mapear pathname para página
   const getPageFromPathname = (pathname: string): string => {
@@ -73,39 +163,11 @@ export const MainPage: React.FC = () => {
       }
       
       console.log('✅ On dashboard, fetching claims...');
-      
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        console.log('📦 Session:', session);
-        
-        if (session?.user) {
-          const user = session.user as any; // Type assertion para acessar campos não tipados
-          console.log('🔍 User Claims from JWT:', user);
-          setUserClaims({
-            email: user.email,
-            user_metadata: user.user_metadata,
-            app_metadata: user.app_metadata,
-            id: user.id,
-            created_at: user.created_at
-          } as any);
-          setShowClaimsModal(true);
-          console.log('✅ Modal shown!');
-          
-          // Auto-fechar após 1 segundo
-          setTimeout(() => {
-            setShowClaimsModal(false);
-            console.log('⏰ Modal closed after 1 second');
-          }, 1000);
-        } else {
-          console.log('❌ No user in session');
-        }
-      } catch (error) {
-        console.error('Error fetching claims:', error);
-      }
+      await refreshTokenAndFetchClaims(false);
     };
 
     fetchUserClaims();
-  }, [currentPage]); // Trigger quando muda de página
+  }, [currentPage, refreshTokenAndFetchClaims]); // Trigger quando muda de página
 
   // Função para navegar entre páginas
   const handlePageChange = (page: string) => {
@@ -211,10 +273,30 @@ export const MainPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">User Metadata:</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">User Metadata (from JWT):</span>
                   <pre className="text-xs bg-gray-100 dark:bg-slate-900 p-2 rounded mt-1 overflow-x-auto">
                     {JSON.stringify((userClaims as any).user_metadata, null, 2)}
                   </pre>
+                  {(userClaims as any).user_metadata?.company_id && (
+                    <div className="mt-2 p-2 bg-green-100 dark:bg-green-900 rounded">
+                      <p className="text-xs text-green-800 dark:text-green-200">
+                        ✅ Company ID: {(userClaims as any).user_metadata.company_id}
+                      </p>
+                      <p className="text-xs text-green-800 dark:text-green-200">
+                        ✅ Role: {(userClaims as any).user_metadata.role || 'Not found'}
+                      </p>
+                    </div>
+                  )}
+                  {!(userClaims as any).user_metadata?.company_id && (
+                    <div className="mt-2 p-2 bg-red-100 dark:bg-red-900 rounded">
+                      <p className="text-xs text-red-800 dark:text-red-200">
+                        ❌ Company ID not found in JWT claims
+                      </p>
+                      <p className="text-xs text-red-800 dark:text-red-200">
+                        ❌ Role not found in JWT claims
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -232,10 +314,30 @@ export const MainPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Footer */}
-              <div className="px-4 py-3 bg-gray-50 dark:bg-slate-700 rounded-b-lg">
+              {/* Debug Actions */}
+              <div className="p-3 bg-gray-50 dark:bg-slate-700 rounded-b-lg space-y-2">
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => {
+                      setShowClaimsModal(false);
+                      console.log('🔄 Manual refresh token requested');
+                      setTimeout(async () => {
+                        await refreshTokenAndFetchClaims(true);
+                      }, 100);
+                    }}
+                    className="flex-1 px-3 py-2 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                  >
+                    🔄 Refresh Token & Check Claims
+                  </button>
+                  <button
+                    onClick={() => setShowClaimsModal(false)}
+                    className="px-3 py-2 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Modal aparece a cada navegação/refresh da página
+                  Hook version: {(userClaims as any).user_metadata?.jwt_hook_version || 'unknown'}
                 </p>
               </div>
             </div>

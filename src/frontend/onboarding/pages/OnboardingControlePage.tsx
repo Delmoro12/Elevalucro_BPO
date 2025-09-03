@@ -14,7 +14,7 @@ export default function OnboardingControlePage() {
     <OnboardingPresentation 
       planName="Controle"
       planFeatures={planFeatures}
-      monthlyPrice="R$ 950,00"
+      monthlyPrice="R$ 1.200,00"
     />
   );
 }

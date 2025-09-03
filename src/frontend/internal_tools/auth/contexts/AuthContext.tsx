@@ -42,7 +42,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const showJwtDebugPopup = (session: Session) => {
     try {
       const token = session.access_token;
-      const payload = token.split('.')[1];
+      const parts = token.split('.');
+      
+      // Verificar se o token tem 3 partes (header.payload.signature)
+      if (parts.length !== 3) {
+        console.warn('Token JWT inválido: não tem 3 partes');
+        return;
+      }
+      
+      let payload = parts[1];
+      
+      // Adicionar padding se necessário para base64
+      const padding = payload.length % 4;
+      if (padding) {
+        payload += '='.repeat(4 - padding);
+      }
+      
+      // Substituir caracteres URL-safe para base64 padrão
+      payload = payload.replace(/-/g, '+').replace(/_/g, '/');
+      
       const decoded = JSON.parse(atob(payload));
       
       const debugInfo = {
@@ -66,6 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
     } catch (error) {
       console.error('Erro ao decodificar JWT:', error);
+      console.error('Token que falhou:', session?.access_token?.substring(0, 50) + '...');
     }
   };
 

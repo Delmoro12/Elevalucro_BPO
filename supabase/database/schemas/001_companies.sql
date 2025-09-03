@@ -28,12 +28,17 @@ CREATE TABLE IF NOT EXISTS companies (
     email VARCHAR(255),
     website VARCHAR(255),
     
+    -- Segmento de negócio
+    segmento VARCHAR(100),
     
     -- Status e configurações
     is_active BOOLEAN DEFAULT true,
     subscription_plan VARCHAR(50) DEFAULT 'controle' CHECK (subscription_plan IN ('controle', 'gerencial', 'avancado')),
     subscription_status VARCHAR(20) DEFAULT 'active' CHECK (subscription_status IN ('active', 'suspended', 'cancelled')),
     lifecycle_stage VARCHAR(20) DEFAULT 'onboarding' CHECK (lifecycle_stage IN ('onboarding', 'production')),
+    
+    -- Progresso de onboarding
+    onboarding_progress INTEGER DEFAULT 0 CHECK (onboarding_progress >= 0 AND onboarding_progress <= 100),
     
     -- Limites por plano
     max_users INTEGER DEFAULT 3, -- Limite de usuários
@@ -55,4 +60,9 @@ CREATE INDEX IF NOT EXISTS idx_companies_slug ON companies(slug);
 CREATE INDEX IF NOT EXISTS idx_companies_cnpj_raw ON companies(cnpj_raw);
 CREATE INDEX IF NOT EXISTS idx_companies_is_active ON companies(is_active);
 CREATE INDEX IF NOT EXISTS idx_companies_subscription_plan ON companies(subscription_plan);
+CREATE INDEX IF NOT EXISTS idx_companies_onboarding_progress ON companies(onboarding_progress);
 CREATE INDEX IF NOT EXISTS idx_companies_created_at ON companies(created_at);
+
+-- Comentários para as novas colunas
+COMMENT ON COLUMN companies.segmento IS 'Business segment or industry of the company';
+COMMENT ON COLUMN companies.onboarding_progress IS 'Onboarding progress percentage (0-100)';

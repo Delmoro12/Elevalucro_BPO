@@ -1,3 +1,6 @@
+-- Update JWT Hook to be compatible with BPO users (who may not have profile/company)
+-- Version 3.1.0-bpo-compatible
+
 CREATE OR REPLACE FUNCTION public.custom_access_token_hook(event jsonb)
   RETURNS jsonb
   LANGUAGE plpgsql
@@ -96,10 +99,9 @@ CREATE OR REPLACE FUNCTION public.custom_access_token_hook(event jsonb)
   END;
   $$;
 
-  -- Grant necessary permissions
+  -- Ensure permissions are granted
   GRANT USAGE ON SCHEMA public TO supabase_auth_admin;
-  GRANT EXECUTE ON FUNCTION public.custom_access_token_hook TO
-  supabase_auth_admin;
+  GRANT EXECUTE ON FUNCTION public.custom_access_token_hook TO supabase_auth_admin;
   GRANT SELECT ON public.users TO supabase_auth_admin;
   GRANT SELECT ON public.profiles TO supabase_auth_admin;
   GRANT SELECT ON public.roles TO supabase_auth_admin;

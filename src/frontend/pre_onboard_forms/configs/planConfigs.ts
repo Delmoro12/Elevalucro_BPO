@@ -9,7 +9,7 @@ export interface PlanConfig {
 export const planConfigs: Record<string, PlanConfig> = {
   controle: {
     name: "CONTROLE",
-    value: 950,
+    value: 1200,
     displayName: "Controle", 
     enabledAreas: [
       "categorias_centros_custos",
@@ -24,7 +24,7 @@ export const planConfigs: Record<string, PlanConfig> = {
   
   gerencial: {
     name: "GERENCIAL",
-    value: 1300,
+    value: 1500,
     displayName: "Gerencial",
     enabledAreas: [
       // Todas do Controle
@@ -47,7 +47,7 @@ export const planConfigs: Record<string, PlanConfig> = {
   
   avancado: {
     name: "AVANÇADO", 
-    value: 1700,
+    value: 1900,
     displayName: "Avançado",
     enabledAreas: [
       // Todas do Gerencial

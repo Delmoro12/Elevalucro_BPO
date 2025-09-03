@@ -12,7 +12,7 @@ export default function PlanosGenericos({ onSelectPlan }: PlanosGenericosProps) 
         <div className="flex items-baseline justify-between">
           <h3 className="text-xl font-semibold">Controle</h3>
           <span className="text-emerald-300 font-semibold">
-            R$ 950,00<span className="text-slate-400 text-sm"> / mês</span>
+            R$ 1.200,00<span className="text-slate-400 text-sm"> / mês</span>
           </span>
         </div>
         <p className="mt-2 text-sm text-slate-300/90">
@@ -60,7 +60,7 @@ export default function PlanosGenericos({ onSelectPlan }: PlanosGenericosProps) 
         <div className="flex items-baseline justify-between">
           <h3 className="text-xl font-semibold">Gerencial</h3>
           <span className="text-emerald-300 font-semibold">
-            R$ 1.300,00<span className="text-slate-400 text-sm"> / mês</span>
+            R$ 1.500,00<span className="text-slate-400 text-sm"> / mês</span>
           </span>
         </div>
         <p className="mt-2 text-sm text-slate-300/90">
@@ -112,7 +112,7 @@ export default function PlanosGenericos({ onSelectPlan }: PlanosGenericosProps) 
         <div className="flex items-baseline justify-between">
           <h3 className="text-xl font-semibold">Avançado</h3>
           <span className="text-emerald-300 font-semibold">
-            R$ 1.700,00<span className="text-slate-400 text-sm"> / mês</span>
+            R$ 1.900,00<span className="text-slate-400 text-sm"> / mês</span>
           </span>
         </div>
         <p className="mt-2 text-sm text-slate-300/90">

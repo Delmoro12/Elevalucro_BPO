@@ -13,7 +13,7 @@ export default function OnboardingAvancadoPage() {
     <OnboardingPresentation 
       planName="Avançado"
       planFeatures={planFeatures}
-      monthlyPrice="R$ 1.700,00"
+      monthlyPrice="R$ 1.900,00"
     />
   );
 }

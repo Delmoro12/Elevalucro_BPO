@@ -40,22 +40,14 @@ export function middleware(request: NextRequest) {
     
     // ============================================
     // REDIRECTS DOS FORMULÁRIOS
-    // Redireciona URLs antigas para nova estrutura
+    // Não precisa mais de redirects - as rotas existem diretamente
     // ============================================
-    const formRedirects: Record<string, string> = {
-      '/pre-onboard-avancado': '/pre_onboarding/pre-onboard-avancado',
-      '/pre-onboard-controle': '/pre_onboarding/pre-onboard-controle',
-      '/pre-onboard-gerencial': '/pre_onboarding/pre-onboard-gerencial',
-      '/onboarding-avancado': '/onboarding/onboarding-avancado',
-      '/onboarding-controle': '/onboarding/onboarding-controle',
-      '/onboarding-gerencial': '/onboarding/onboarding-gerencial'
-    }
-    
-    // Verifica se precisa redirecionar formulários
-    if (formRedirects[pathname]) {
-      console.log(`🔄 Form redirect: ${pathname} → ${formRedirects[pathname]}`)
-      return NextResponse.redirect(new URL(formRedirects[pathname], request.url))
-    }
+    // Comentado: Os redirects não são mais necessários
+    // As rotas /pre-onboard-* e /onboarding-* existem diretamente em app/
+    // const formRedirects: Record<string, string> = {}
+    // if (formRedirects[pathname]) {
+    //   return NextResponse.redirect(new URL(formRedirects[pathname], request.url))
+    // }
     
     // Lista de rotas públicas permitidas no domínio principal
     const publicRoutes = [
@@ -64,8 +56,12 @@ export function middleware(request: NextRequest) {
       '/geral',
       '/hoteis',
       '/restaurantes',
-      '/pre_onboarding',     // Formulários de pré-onboarding
-      '/onboarding',         // Formulários de onboarding
+      '/pre-onboard-avancado',  // Formulário pré-onboarding avançado
+      '/pre-onboard-controle',  // Formulário pré-onboarding controle
+      '/pre-onboard-gerencial', // Formulário pré-onboarding gerencial
+      '/onboarding-avancado',   // Formulário onboarding avançado
+      '/onboarding-controle',   // Formulário onboarding controle
+      '/onboarding-gerencial',  // Formulário onboarding gerencial
       '/obrigado',           // Página de obrigado
       '/_next',              // Assets do Next.js
       '/images',             // Imagens públicas
@@ -142,8 +138,22 @@ export function middleware(request: NextRequest) {
       })
     }
     
-    // TODO: Adicionar verificação de autenticação para rotas protegidas
-    // TODO: Adicionar verificação de role (client_side)
+    // Se não é rota pública, verificar autenticação
+    if (!isPublicRoute) {
+      console.log(`🔒 App: Protected route '${pathname}' - checking authentication`)
+      
+      // Verificar se usuário está logado (cookie simples)
+      const accessToken = request.cookies.get('sb-access-token')?.value
+      
+      if (!accessToken) {
+        console.log(`🚫 App: No access token found → redirecting to login`)
+        const loginUrl = new URL('/auth/login', request.url)
+        loginUrl.searchParams.set('redirect', pathname)
+        return NextResponse.redirect(loginUrl)
+      }
+      
+      console.log(`✅ App: Access token found, allowing access`)
+    }
   }
   
   // ============================================

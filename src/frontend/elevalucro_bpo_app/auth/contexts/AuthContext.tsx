@@ -36,6 +36,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         console.error('Error getting session:', error);
       } else if (session?.user) {
         setUser(session.user as AuthUser);
+        
+        // Set cookie for middleware if session exists
+        if (session.access_token) {
+          document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=3600; SameSite=Lax`;
+          console.log('🍪 Auth context: Cookie set for existing session');
+        }
       }
       
       setLoading(false);
@@ -50,8 +56,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         
         if (session?.user) {
           setUser(session.user as AuthUser);
+          
+          // Set cookie for middleware on session changes
+          if (session.access_token) {
+            document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=3600; SameSite=Lax`;
+            console.log('🍪 Auth state change: Cookie set for session');
+          }
         } else {
           setUser(null);
+          
+          // Clear cookie on logout
+          document.cookie = 'sb-access-token=; path=/; max-age=0; SameSite=Lax';
+          console.log('🍪 Auth state change: Cookie cleared on logout');
         }
         
         setLoading(false);
