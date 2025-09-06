@@ -134,15 +134,37 @@ export const LoginForm: React.FC = () => {
                     console.log('🏷️ Role encontrada:', payload.user_metadata?.role || payload.app_metadata?.role);
                     console.log('📧 Email:', payload.email);
                     console.log('🆔 User ID:', payload.sub);
+                    // Salvar logs no localStorage para não perder
+                    const debugInfo = {
+                      hostname: window.location.hostname,
+                      protocol: window.location.protocol,
+                      cookies: document.cookie,
+                      jwtPayload: payload,
+                      role: payload.user_metadata?.role || payload.app_metadata?.role,
+                      timestamp: new Date().toISOString()
+                    };
+                    localStorage.setItem('auth-debug-info', JSON.stringify(debugInfo, null, 2));
+                    console.log('💾 Debug info salvo no localStorage como "auth-debug-info"');
+                    
                   } catch (e) {
                     console.error('❌ Erro ao decodificar JWT:', e);
                   }
                 } else {
                   console.error('❌ Cookie não foi encontrado após setar!');
                 }
+                
+                // Mostrar alerta com informações básicas para debug
+                if (isProduction) {
+                  alert(`DEBUG INFO:\nHostname: ${window.location.hostname}\nCookies: ${document.cookie.length > 0 ? 'Existem' : 'Nenhum'}\nToken setado: ${!!document.cookie.split('; ').find(row => row.startsWith('sb-access-token='))}`);
+                }
               }, 100);
               
-              window.location.href = '/prospects';
+              // Aguardar 3 segundos antes de redirecionar para dar tempo de ler os logs
+              console.log('⏳ Aguardando 3 segundos antes de redirecionar...');
+              setTimeout(() => {
+                console.log('🚀 Redirecionando para /prospects...');
+                window.location.href = '/prospects';
+              }, 3000);
             } else {
               console.log('❌ No session token found');
               setError('Erro interno: Não foi possível obter token de acesso.');
