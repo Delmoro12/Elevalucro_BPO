@@ -91,8 +91,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Função para mapear role ID para nome - Atualizada com IDs corretos
   const mapRoleIdToName = (roleId: string): string | null => {
     const roleMap: Record<string, string> = {
-      'c6c3bd3e-64f0-4a2e-aa7b-18c7cd2baf4e': 'bpo_side',
-      '55252fe8-6968-470e-87ec-f2ad79e49782': 'client_side',
+      'a3ac4409-99ab-4b01-936b-d3ef18be0a3f': 'bpo_side',      // Equipe interna (produção)
+      '55252fe8-6968-470e-87ec-f2ad79e49782': 'client_side',   // Clientes (produção)
       '1': 'bpo_side',
       '2': 'client_side', 
       '3': 'admin',
