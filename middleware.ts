@@ -294,7 +294,28 @@ export function middleware(request: NextRequest) {
     console.log(`🌐 Request hostname: ${hostname}`)
     console.log(`📍 Request URL: ${request.url}`)
     console.log(`🔒 Request protocol: ${request.nextUrl.protocol}`)
-    console.log(`🎫 sb-access-token cookie specifically:`, request.cookies.get('sb-access-token')?.value?.substring(0, 50) + '...')
+    
+    const sbAccessToken = request.cookies.get('sb-access-token')?.value;
+    console.log(`🎫 sb-access-token cookie exists:`, !!sbAccessToken)
+    if (sbAccessToken) {
+      console.log(`🎫 sb-access-token length:`, sbAccessToken.length)
+      console.log(`🎫 sb-access-token sample:`, sbAccessToken.substring(0, 50) + '...')
+      
+      // Testar decodificação no middleware também
+      try {
+        const parts = sbAccessToken.split('.');
+        console.log(`🔍 MW: Token parts:`, parts.length)
+        if (parts.length === 3) {
+          // Usar Buffer.from ao invés de atob para compatibilidade Node.js
+          const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf-8'));
+          console.log(`🎫 MW: JWT decoded successfully`)
+          console.log(`🏷️ MW: Role from user_metadata:`, payload.user_metadata?.role)
+          console.log(`🏷️ MW: Role from app_metadata:`, payload.app_metadata?.role)
+        }
+      } catch (e) {
+        console.error(`❌ MW: Failed to decode JWT:`, e)
+      }
+    }
     
     console.log(`🎫 Tools: Token found via ${tokenSource}`)
     
@@ -348,7 +369,8 @@ function extractRoleFromJWT(token: string): string | null {
       return null
     }
     
-    const decoded = JSON.parse(atob(payload))
+    // Usar Buffer.from ao invés de atob para compatibilidade Node.js
+    const decoded = JSON.parse(Buffer.from(payload, 'base64').toString('utf-8'))
     console.log(`🎫 JWT Payload - user_metadata:`, decoded.user_metadata)
     console.log(`🎫 JWT Payload - app_metadata:`, decoded.app_metadata)
     
