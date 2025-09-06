@@ -291,6 +291,10 @@ export function middleware(request: NextRequest) {
       allCookiesDebug.push(`${cookie.name}=${cookie.value.substring(0, 20)}...`)
     }
     console.log(`🍪 All cookies:`, allCookiesDebug)
+    console.log(`🌐 Request hostname: ${hostname}`)
+    console.log(`📍 Request URL: ${request.url}`)
+    console.log(`🔒 Request protocol: ${request.nextUrl.protocol}`)
+    console.log(`🎫 sb-access-token cookie specifically:`, request.cookies.get('sb-access-token')?.value?.substring(0, 50) + '...')
     
     console.log(`🎫 Tools: Token found via ${tokenSource}`)
     

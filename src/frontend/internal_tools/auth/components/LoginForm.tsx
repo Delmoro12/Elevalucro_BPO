@@ -109,6 +109,39 @@ export const LoginForm: React.FC = () => {
               console.log(`🍪 Domain: ${isProduction ? 'tools.elevalucro.com.br (no domain attr)' : 'localhost'}`);
               console.log(`🍪 Token (first 50 chars): ${session.access_token.substring(0, 50)}...`);
               
+              // === DIAGNÓSTICO COMPLETO ===
+              console.log('=== DIAGNÓSTICO DE COOKIES E JWT ===');
+              console.log('🌐 Hostname:', window.location.hostname);
+              console.log('🔒 Protocol:', window.location.protocol);
+              console.log('📍 Full URL:', window.location.href);
+              
+              // Aguardar um pouco para o cookie ser setado
+              setTimeout(() => {
+                console.log('🍪 Todos os cookies após setar:', document.cookie);
+                const cookieValue = document.cookie.split('; ').find(row => row.startsWith('sb-access-token='));
+                console.log('🎫 Cookie sb-access-token encontrado:', !!cookieValue);
+                
+                if (cookieValue) {
+                  const tokenValue = cookieValue.split('=')[1];
+                  console.log('🔍 Token value (50 chars):', tokenValue.substring(0, 50) + '...');
+                  
+                  // Testar decodificação do JWT
+                  try {
+                    const payload = JSON.parse(atob(tokenValue.split('.')[1]));
+                    console.log('🎫 JWT Payload completo:', payload);
+                    console.log('👤 user_metadata:', payload.user_metadata);
+                    console.log('⚙️ app_metadata:', payload.app_metadata);
+                    console.log('🏷️ Role encontrada:', payload.user_metadata?.role || payload.app_metadata?.role);
+                    console.log('📧 Email:', payload.email);
+                    console.log('🆔 User ID:', payload.sub);
+                  } catch (e) {
+                    console.error('❌ Erro ao decodificar JWT:', e);
+                  }
+                } else {
+                  console.error('❌ Cookie não foi encontrado após setar!');
+                }
+              }, 100);
+              
               window.location.href = '/prospects';
             } else {
               console.log('❌ No session token found');
