@@ -296,10 +296,16 @@ export function middleware(request: NextRequest) {
     
     // Verificar se tem role bpo_side
     try {
+      // Log do token para debug (primeiros 50 caracteres)
+      console.log(`🔍 Tools: Token to validate: ${accessToken.substring(0, 50)}...`)
+      
       const userRole = extractRoleFromJWT(accessToken)
+      
+      console.log(`🎯 Tools: Extracted role: '${userRole}'`)
       
       if (userRole !== 'bpo_side') {
         console.log(`🚫 Tools: Invalid role '${userRole}', required 'bpo_side' → login`)
+        console.log(`🚫 Tools: Role comparison failed: '${userRole}' !== 'bpo_side'`)
         const loginUrl = new URL('/tools-auth/login', request.url)
         loginUrl.searchParams.set('error', 'insufficient_permissions')
         return NextResponse.redirect(loginUrl)
@@ -345,8 +351,13 @@ function extractRoleFromJWT(token: string): string | null {
     // Tentar buscar role tanto do user_metadata quanto app_metadata
     const roleName = decoded.user_metadata?.role || decoded.app_metadata?.role
     
+    // Log detalhado para debug
+    console.log(`🔍 JWT: Looking for role in metadata`)
+    console.log(`🔍 JWT: user_metadata.role = '${decoded.user_metadata?.role}'`)
+    console.log(`🔍 JWT: app_metadata.role = '${decoded.app_metadata?.role}'`)
+    
     if (!roleName) {
-      console.log(`🚫 JWT: No role in user_metadata`)
+      console.log(`🚫 JWT: No role found in either user_metadata or app_metadata`)
       return null
     }
 
@@ -366,7 +377,7 @@ function extractRoleFromJWT(token: string): string | null {
  */
 function mapRoleIdToName(roleId: string): string | null {
   const roleMap: Record<string, string> = {
-    'c6c3bd3e-64f0-4a2e-aa7b-18c7cd2baf4e': 'bpo_side',      // Equipe interna (produção)
+    'a3ac4409-99ab-4b01-936b-d3ef18be0a3f': 'bpo_side',      // Equipe interna (produção)
     '55252fe8-6968-470e-87ec-f2ad79e49782': 'client_side',   // Clientes (produção)
     // Legacy mapping for development
     '1': 'bpo_side',
