@@ -194,6 +194,9 @@ Deno.serve(async (req) => {
     try {
       // Brevo API configuration
       const brevoApiKey = Deno.env.get('BREVO_API_KEY');
+      console.log('🔑 DEBUG - Brevo API Key check:', brevoApiKey ? `Found (${brevoApiKey.substring(0, 8)}...)` : 'NOT FOUND');
+      console.log('🔑 DEBUG - All env vars:', Object.keys(Deno.env.toObject()));
+      
       const loginUrl = supabaseUrl.includes('localhost') 
         ? 'http://app.localhost:4000/auth/login' 
         : 'https://app.elevalucro.com.br/auth/login';
@@ -277,12 +280,16 @@ Deno.serve(async (req) => {
           })
         });
         
+        console.log('📤 DEBUG - Brevo API response status:', emailResponse.status);
+        console.log('📤 DEBUG - Brevo API response headers:', Object.fromEntries(emailResponse.headers.entries()));
+        
         if (emailResponse.ok) {
-          console.log('✅ Welcome email sent via Brevo');
+          const responseData = await emailResponse.json();
+          console.log('✅ Welcome email sent via Brevo:', responseData);
           inviteSent = true;
         } else {
           const errorText = await emailResponse.text();
-          console.log('⚠️ Brevo email failed:', errorText);
+          console.log('⚠️ Brevo email failed - Status:', emailResponse.status, 'Response:', errorText);
         }
       }
     } catch (emailError) {

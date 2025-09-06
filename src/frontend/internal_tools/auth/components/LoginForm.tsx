@@ -106,7 +106,7 @@ export const LoginForm: React.FC = () => {
                 document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=3600; SameSite=Lax`;
               }
               console.log(`🍪 Cookie set manually for ${isProduction ? 'production' : 'localhost'}`);
-              console.log(`🍪 Domain: ${domain}`);
+              console.log(`🍪 Domain: ${isProduction ? 'tools.elevalucro.com.br (no domain attr)' : 'localhost'}`);
               console.log(`🍪 Token (first 50 chars): ${session.access_token.substring(0, 50)}...`);
               
               window.location.href = '/prospects';
