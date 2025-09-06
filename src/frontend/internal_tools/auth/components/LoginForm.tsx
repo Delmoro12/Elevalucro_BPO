@@ -50,16 +50,11 @@ export const LoginForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('🎯 Login form submitted:', { email, password: password ? '***' : 'empty' });
     setError('');
     
-    console.log('🔍 Calling signIn...');
     const { error: signInError } = await signIn(email, password);
-    console.log('📋 SignIn result:', signInError ? 'ERROR' : 'SUCCESS');
     
     if (signInError) {
-      console.error('Login error:', signInError);
-      
       // Handle different error types
       if (signInError.message.includes('Invalid login credentials')) {
         setError('Email ou senha incorretos. Verifique suas credenciais.');
@@ -69,167 +64,27 @@ export const LoginForm: React.FC = () => {
         setError('Erro ao fazer login. Tente novamente.');
       }
     } else {
-      // Success - check cookies before redirect
-      console.log('🎉 LOGIN SUCCESS - Checking cookies...');
-      
-      // Check if cookies are set
-      setTimeout(() => {
-        const cookies = document.cookie;
-        console.log('🍪 Cookies after login:', cookies);
-        
-        const accessToken = cookies.split('; ').find(row => row.startsWith('sb-access-token='));
-        console.log('🎫 Access token found:', !!accessToken);
-        
-        if (accessToken) {
-          console.log('✅ Cookie token exists, redirecting...');
+      // Success - redirect immediately
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.access_token) {
+          sessionStorage.setItem('supabase-auth-token', session.access_token);
+          setupAuthInterceptor();
+          
+          // Set cookie for middleware
+          const isProduction = window.location.hostname.includes('elevalucro.com.br');
+          
+          if (isProduction) {
+            document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=3600; SameSite=Lax; Secure`;
+          } else {
+            document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=3600; SameSite=Lax`;
+          }
+          
+          // Redirect immediately
           window.location.href = '/prospects';
         } else {
-          console.log('❌ No cookie token, checking session...');
-          
-          // Buscar token da sessão atual e armazenar no sessionStorage
-          supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session?.access_token) {
-              console.log('✅ Session token found, storing and redirecting...');
-              console.log('🔍 Session object keys:', Object.keys(session));
-              console.log('🔍 Access token type:', typeof session.access_token);
-              console.log('🔍 Access token length:', session.access_token?.length);
-              console.log('🔍 Access token sample:', session.access_token?.substring(0, 100) + '...');
-              
-              sessionStorage.setItem('supabase-auth-token', session.access_token);
-              setupAuthInterceptor(); // Setup interceptor para futuras requisições
-              
-              // Para resolver o problema do middleware, vamos forçar um cookie manual
-              // Em produção, precisamos setar o domínio corretamente
-              const isProduction = window.location.hostname.includes('elevalucro.com.br');
-              
-              // Setar cookie com domínio apropriado
-              if (isProduction) {
-                // Para produção, setar SEM domain para funcionar no subdomínio atual
-                document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=3600; SameSite=Lax; Secure`;
-              } else {
-                // Para localhost, não usar domain
-                document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=3600; SameSite=Lax`;
-              }
-              console.log(`🍪 Cookie set manually for ${isProduction ? 'production' : 'localhost'}`);
-              console.log(`🍪 Domain: ${isProduction ? 'tools.elevalucro.com.br (no domain attr)' : 'localhost'}`);
-              console.log(`🍪 Token (first 50 chars): ${session.access_token.substring(0, 50)}...`);
-              
-              // === DIAGNÓSTICO COMPLETO ===
-              console.log('=== DIAGNÓSTICO DE COOKIES E JWT ===');
-              console.log('🌐 Hostname:', window.location.hostname);
-              console.log('🔒 Protocol:', window.location.protocol);
-              console.log('📍 Full URL:', window.location.href);
-              
-              // Aguardar um pouco para o cookie ser setado
-              setTimeout(() => {
-                console.log('🍪 Todos os cookies após setar:', document.cookie);
-                const cookieValue = document.cookie.split('; ').find(row => row.startsWith('sb-access-token='));
-                console.log('🎫 Cookie sb-access-token encontrado:', !!cookieValue);
-                
-                if (cookieValue) {
-                  const tokenValue = cookieValue.split('=')[1];
-                  console.log('🔍 Token value (50 chars):', tokenValue.substring(0, 50) + '...');
-                  
-                  // Testar decodificação do JWT
-                  console.log('🔍 Analisando estrutura do token...');
-                  console.log('🔍 Token completo (100 chars):', tokenValue.substring(0, 100) + '...');
-                  console.log('🔍 Token length:', tokenValue.length);
-                  
-                  const tokenParts = tokenValue.split('.');
-                  console.log('🔍 Token parts count:', tokenParts.length);
-                  
-                  if (tokenParts.length >= 1) {
-                    console.log('🔍 Header (part 0):', tokenParts[0]?.substring(0, 50) + '...');
-                    console.log('🔍 Header length:', tokenParts[0]?.length);
-                  }
-                  if (tokenParts.length >= 2) {
-                    console.log('🔍 Payload (part 1):', tokenParts[1]?.substring(0, 50) + '...');
-                    console.log('🔍 Payload length:', tokenParts[1]?.length);
-                  }
-                  if (tokenParts.length >= 3) {
-                    console.log('🔍 Signature (part 2):', tokenParts[2]?.substring(0, 50) + '...');
-                    console.log('🔍 Signature length:', tokenParts[2]?.length);
-                  }
-                  
-                  // Verificar se parece com JWT
-                  const looksLikeJWT = tokenParts.length === 3 && 
-                                      tokenParts[0].length > 0 && 
-                                      tokenParts[1].length > 0 && 
-                                      tokenParts[2].length > 0;
-                  
-                  console.log('🔍 Looks like JWT:', looksLikeJWT);
-                  
-                  try {
-                    if (!looksLikeJWT) {
-                      throw new Error(`Token não parece ser JWT: ${tokenParts.length} partes encontradas`);
-                    }
-                    
-                    // Tentar decodificar apenas se parecer com JWT
-                    console.log('🔍 Tentando decodificar payload...');
-                    const payload = JSON.parse(atob(tokenParts[1]));
-                    console.log('🎫 JWT Payload completo:', payload);
-                    console.log('👤 user_metadata:', payload.user_metadata);
-                    console.log('⚙️ app_metadata:', payload.app_metadata);
-                    console.log('🏷️ Role encontrada:', payload.user_metadata?.role || payload.app_metadata?.role);
-                    console.log('📧 Email:', payload.email);
-                    console.log('🆔 User ID:', payload.sub);
-                    
-                    // Salvar logs no localStorage para não perder
-                    const debugInfo = {
-                      hostname: window.location.hostname,
-                      protocol: window.location.protocol,
-                      cookies: document.cookie,
-                      tokenParts: tokenParts.length,
-                      tokenValid: true,
-                      jwtPayload: payload,
-                      role: payload.user_metadata?.role || payload.app_metadata?.role,
-                      timestamp: new Date().toISOString()
-                    };
-                    localStorage.setItem('auth-debug-info', JSON.stringify(debugInfo, null, 2));
-                    console.log('💾 Debug info salvo no localStorage como "auth-debug-info"');
-                    
-                  } catch (e) {
-                    console.error('❌ Erro ao decodificar JWT:', e);
-                    const errorMessage = e instanceof Error ? e.message : String(e);
-                    console.error('❌ Erro detalhado:', errorMessage);
-                    
-                    // Salvar informações do erro também
-                    const debugInfo = {
-                      hostname: window.location.hostname,
-                      protocol: window.location.protocol,
-                      cookies: document.cookie,
-                      tokenParts: tokenParts.length,
-                      tokenValid: false,
-                      error: errorMessage,
-                      tokenSample: tokenValue.substring(0, 100) + '...',
-                      timestamp: new Date().toISOString()
-                    };
-                    localStorage.setItem('auth-debug-info', JSON.stringify(debugInfo, null, 2));
-                    console.log('💾 Debug info com erro salvo no localStorage');
-                  }
-                } else {
-                  console.error('❌ Cookie não foi encontrado após setar!');
-                }
-                
-                // Mostrar alerta com informações básicas para debug
-                if (isProduction) {
-                  alert(`DEBUG INFO:\nHostname: ${window.location.hostname}\nCookies: ${document.cookie.length > 0 ? 'Existem' : 'Nenhum'}\nToken setado: ${!!document.cookie.split('; ').find(row => row.startsWith('sb-access-token='))}`);
-                }
-              }, 100);
-              
-              // Aguardar 3 segundos antes de redirecionar para dar tempo de ler os logs
-              console.log('⏳ Aguardando 3 segundos antes de redirecionar...');
-              setTimeout(() => {
-                console.log('🚀 Redirecionando para /prospects...');
-                window.location.href = '/prospects';
-              }, 3000);
-            } else {
-              console.log('❌ No session token found');
-              setError('Erro interno: Não foi possível obter token de acesso.');
-            }
-          });
+          setError('Erro interno: Não foi possível obter token de acesso.');
         }
-      }, 200);
+      });
     }
   };
 
