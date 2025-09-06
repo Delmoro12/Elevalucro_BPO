@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Eye, EyeOff, Mail, Lock, AlertCircle, Trash2 } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, AlertCircle, Trash2, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '@/src/lib/supabase';
 import { setupAuthInterceptor } from '@/src/lib/auth-interceptor';
@@ -13,7 +13,7 @@ export const LoginForm: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string>('');
-  const { signIn, signing } = useAuth();
+  const { signIn, signing, signOut } = useAuth();
   const router = useRouter();
 
   const handleClearData = () => {
@@ -94,8 +94,20 @@ export const LoginForm: React.FC = () => {
               setupAuthInterceptor(); // Setup interceptor para futuras requisições
               
               // Para resolver o problema do middleware, vamos forçar um cookie manual
-              document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=3600; SameSite=Lax`;
-              console.log('🍪 Cookie set manually');
+              // Em produção, precisamos setar o domínio corretamente
+              const isProduction = window.location.hostname.includes('elevalucro.com.br');
+              
+              // Setar cookie com domínio apropriado
+              if (isProduction) {
+                // Para produção, setar SEM domain para funcionar no subdomínio atual
+                document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=3600; SameSite=Lax; Secure`;
+              } else {
+                // Para localhost, não usar domain
+                document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=3600; SameSite=Lax`;
+              }
+              console.log(`🍪 Cookie set manually for ${isProduction ? 'production' : 'localhost'}`);
+              console.log(`🍪 Domain: ${domain}`);
+              console.log(`🍪 Token (first 50 chars): ${session.access_token.substring(0, 50)}...`);
               
               window.location.href = '/prospects';
             } else {
@@ -242,6 +254,24 @@ export const LoginForm: React.FC = () => {
               >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Limpar Dados do Navegador
+              </button>
+              
+              {/* Botão Logout (se usuário já estiver logado) */}
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    console.log('🚪 Fazendo logout...');
+                    await signOut();
+                  } catch (error) {
+                    console.error('❌ Erro no logout:', error);
+                    window.location.href = '/tools-auth/login';
+                  }
+                }}
+                className="group relative w-full flex justify-center py-2 px-4 border border-slate-600 text-sm font-medium rounded-md text-slate-300 bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-colors"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Fazer Logout
               </button>
             </div>
           </form>
