@@ -1,88 +1,80 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/src/lib/supabase';
 
 export default function DebugAuthPage() {
-  const [debugInfo, setDebugInfo] = useState<any>({});
+  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   useEffect(() => {
-    const runDiagnostics = async () => {
-      const info: any = {
-        timestamp: new Date().toISOString(),
-        location: {
-          hostname: window.location.hostname,
-          protocol: window.location.protocol,
-          href: window.location.href,
-        },
-        cookies: {
-          all: document.cookie,
-          sbAccessToken: document.cookie.split('; ').find(row => row.startsWith('sb-access-token=')),
-        },
-        supabase: {},
-        jwt: {}
-      };
-
-      // Testar sessão do Supabase
+    const savedInfo = localStorage.getItem('auth-debug-info');
+    if (savedInfo) {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        info.supabase = {
-          hasSession: !!session,
-          error: error?.message,
-          user: session?.user ? {
-            id: session.user.id,
-            email: session.user.email,
-            user_metadata: session.user.user_metadata,
-            app_metadata: session.user.app_metadata,
-          } : null,
-          accessToken: session?.access_token ? session.access_token.substring(0, 50) + '...' : null,
-        };
-
-        // Decodificar JWT se existir
-        if (session?.access_token) {
-          try {
-            const payload = JSON.parse(atob(session.access_token.split('.')[1]));
-            info.jwt = {
-              payload,
-              role: payload.user_metadata?.role || payload.app_metadata?.role,
-              email: payload.email,
-              sub: payload.sub,
-            };
-          } catch (e) {
-            info.jwt.error = (e as Error).message;
-          }
-        }
+        setDebugInfo(JSON.parse(savedInfo));
       } catch (e) {
-        info.supabase.error = (e as Error).message;
+        console.error('Erro ao parsear debug info:', e);
       }
-
-      setDebugInfo(info);
-    };
-
-    runDiagnostics();
+    }
   }, []);
+
+  const clearDebugInfo = () => {
+    localStorage.removeItem('auth-debug-info');
+    setDebugInfo(null);
+  };
 
   return (
     <div className="min-h-screen bg-slate-900 text-white p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">🔍 Debug de Autenticação</h1>
+        <h1 className="text-3xl font-bold mb-6">🔍 Debug de Autenticação</h1>
         
-        <div className="bg-slate-800 rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Informações de Debug</h2>
-          <pre className="bg-slate-700 p-4 rounded text-sm overflow-auto">
-            {JSON.stringify(debugInfo, null, 2)}
-          </pre>
-        </div>
+        {debugInfo ? (
+          <div className="space-y-6">
+            <div className="bg-slate-800 p-6 rounded-lg">
+              <h2 className="text-xl font-semibold mb-4">📊 Informações Coletadas</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <strong>🌐 Hostname:</strong> {debugInfo.hostname}
+                </div>
+                <div>
+                  <strong>🔒 Protocol:</strong> {debugInfo.protocol}
+                </div>
+                <div>
+                  <strong>⏰ Timestamp:</strong> {debugInfo.timestamp}
+                </div>
+                <div>
+                  <strong>🏷️ Role:</strong> {debugInfo.role || 'Não encontrada'}
+                </div>
+              </div>
+            </div>
 
-        <div className="mt-6 bg-slate-800 rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">📋 Como usar</h2>
-          <ol className="list-decimal list-inside space-y-2">
-            <li>Faça login normalmente em /tools-auth/login</li>
-            <li>Volte para esta página</li>
-            <li>Copie as informações acima</li>
-            <li>Envie para o desenvolvedor</li>
-          </ol>
-        </div>
+            <div className="bg-slate-800 p-6 rounded-lg">
+              <h2 className="text-xl font-semibold mb-4">🍪 Cookies</h2>
+              <pre className="bg-slate-700 p-4 rounded text-sm overflow-x-auto">
+                {debugInfo.cookies}
+              </pre>
+            </div>
+
+            <div className="bg-slate-800 p-6 rounded-lg">
+              <h2 className="text-xl font-semibold mb-4">🎫 JWT Payload</h2>
+              <pre className="bg-slate-700 p-4 rounded text-sm overflow-x-auto">
+                {JSON.stringify(debugInfo.jwtPayload, null, 2)}
+              </pre>
+            </div>
+
+            <button
+              onClick={clearDebugInfo}
+              className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded"
+            >
+              🗑️ Limpar Debug Info
+            </button>
+          </div>
+        ) : (
+          <div className="bg-slate-800 p-6 rounded-lg text-center">
+            <p className="text-lg">❌ Nenhuma informação de debug encontrada</p>
+            <p className="text-slate-400 mt-2">
+              Faça login primeiro para gerar as informações de debug
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

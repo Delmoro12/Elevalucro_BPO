@@ -126,19 +126,33 @@ export const LoginForm: React.FC = () => {
                   console.log('🔍 Token value (50 chars):', tokenValue.substring(0, 50) + '...');
                   
                   // Testar decodificação do JWT
+                  console.log('🔍 Analisando estrutura do token...');
+                  const tokenParts = tokenValue.split('.');
+                  console.log('🔍 Token parts count:', tokenParts.length);
+                  console.log('🔍 Header (part 0):', tokenParts[0]?.substring(0, 50) + '...');
+                  console.log('🔍 Payload (part 1):', tokenParts[1]?.substring(0, 50) + '...');
+                  console.log('🔍 Signature (part 2):', tokenParts[2]?.substring(0, 50) + '...');
+                  
                   try {
-                    const payload = JSON.parse(atob(tokenValue.split('.')[1]));
+                    if (tokenParts.length !== 3) {
+                      throw new Error(`Token inválido: esperado 3 partes, encontrado ${tokenParts.length}`);
+                    }
+                    
+                    const payload = JSON.parse(atob(tokenParts[1]));
                     console.log('🎫 JWT Payload completo:', payload);
                     console.log('👤 user_metadata:', payload.user_metadata);
                     console.log('⚙️ app_metadata:', payload.app_metadata);
                     console.log('🏷️ Role encontrada:', payload.user_metadata?.role || payload.app_metadata?.role);
                     console.log('📧 Email:', payload.email);
                     console.log('🆔 User ID:', payload.sub);
+                    
                     // Salvar logs no localStorage para não perder
                     const debugInfo = {
                       hostname: window.location.hostname,
                       protocol: window.location.protocol,
                       cookies: document.cookie,
+                      tokenParts: tokenParts.length,
+                      tokenValid: true,
                       jwtPayload: payload,
                       role: payload.user_metadata?.role || payload.app_metadata?.role,
                       timestamp: new Date().toISOString()
@@ -148,6 +162,22 @@ export const LoginForm: React.FC = () => {
                     
                   } catch (e) {
                     console.error('❌ Erro ao decodificar JWT:', e);
+                    const errorMessage = e instanceof Error ? e.message : String(e);
+                    console.error('❌ Erro detalhado:', errorMessage);
+                    
+                    // Salvar informações do erro também
+                    const debugInfo = {
+                      hostname: window.location.hostname,
+                      protocol: window.location.protocol,
+                      cookies: document.cookie,
+                      tokenParts: tokenParts.length,
+                      tokenValid: false,
+                      error: errorMessage,
+                      tokenSample: tokenValue.substring(0, 100) + '...',
+                      timestamp: new Date().toISOString()
+                    };
+                    localStorage.setItem('auth-debug-info', JSON.stringify(debugInfo, null, 2));
+                    console.log('💾 Debug info com erro salvo no localStorage');
                   }
                 } else {
                   console.error('❌ Cookie não foi encontrado após setar!');
