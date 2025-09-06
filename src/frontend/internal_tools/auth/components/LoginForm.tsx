@@ -90,6 +90,11 @@ export const LoginForm: React.FC = () => {
           supabase.auth.getSession().then(({ data: { session } }) => {
             if (session?.access_token) {
               console.log('✅ Session token found, storing and redirecting...');
+              console.log('🔍 Session object keys:', Object.keys(session));
+              console.log('🔍 Access token type:', typeof session.access_token);
+              console.log('🔍 Access token length:', session.access_token?.length);
+              console.log('🔍 Access token sample:', session.access_token?.substring(0, 100) + '...');
+              
               sessionStorage.setItem('supabase-auth-token', session.access_token);
               setupAuthInterceptor(); // Setup interceptor para futuras requisições
               
@@ -127,17 +132,40 @@ export const LoginForm: React.FC = () => {
                   
                   // Testar decodificação do JWT
                   console.log('🔍 Analisando estrutura do token...');
+                  console.log('🔍 Token completo (100 chars):', tokenValue.substring(0, 100) + '...');
+                  console.log('🔍 Token length:', tokenValue.length);
+                  
                   const tokenParts = tokenValue.split('.');
                   console.log('🔍 Token parts count:', tokenParts.length);
-                  console.log('🔍 Header (part 0):', tokenParts[0]?.substring(0, 50) + '...');
-                  console.log('🔍 Payload (part 1):', tokenParts[1]?.substring(0, 50) + '...');
-                  console.log('🔍 Signature (part 2):', tokenParts[2]?.substring(0, 50) + '...');
+                  
+                  if (tokenParts.length >= 1) {
+                    console.log('🔍 Header (part 0):', tokenParts[0]?.substring(0, 50) + '...');
+                    console.log('🔍 Header length:', tokenParts[0]?.length);
+                  }
+                  if (tokenParts.length >= 2) {
+                    console.log('🔍 Payload (part 1):', tokenParts[1]?.substring(0, 50) + '...');
+                    console.log('🔍 Payload length:', tokenParts[1]?.length);
+                  }
+                  if (tokenParts.length >= 3) {
+                    console.log('🔍 Signature (part 2):', tokenParts[2]?.substring(0, 50) + '...');
+                    console.log('🔍 Signature length:', tokenParts[2]?.length);
+                  }
+                  
+                  // Verificar se parece com JWT
+                  const looksLikeJWT = tokenParts.length === 3 && 
+                                      tokenParts[0].length > 0 && 
+                                      tokenParts[1].length > 0 && 
+                                      tokenParts[2].length > 0;
+                  
+                  console.log('🔍 Looks like JWT:', looksLikeJWT);
                   
                   try {
-                    if (tokenParts.length !== 3) {
-                      throw new Error(`Token inválido: esperado 3 partes, encontrado ${tokenParts.length}`);
+                    if (!looksLikeJWT) {
+                      throw new Error(`Token não parece ser JWT: ${tokenParts.length} partes encontradas`);
                     }
                     
+                    // Tentar decodificar apenas se parecer com JWT
+                    console.log('🔍 Tentando decodificar payload...');
                     const payload = JSON.parse(atob(tokenParts[1]));
                     console.log('🎫 JWT Payload completo:', payload);
                     console.log('👤 user_metadata:', payload.user_metadata);
