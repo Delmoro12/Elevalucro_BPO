@@ -26,7 +26,7 @@ DECLARE
   v_slug_exists BOOLEAN;
 BEGIN
   -- 1. Gerar slug único para a empresa
-  v_base_slug := lower(replace(replace(p_prospect_data->>'nome_empresa', ' ', '-'), '.', ''));
+  v_base_slug := lower(replace(replace(p_prospect_data->>'company_name', ' ', '-'), '.', ''));
   v_final_slug := v_base_slug;
   
   -- Verificar se o slug já existe e gerar um único se necessário
@@ -53,10 +53,10 @@ BEGIN
     created_at,
     updated_at
   ) VALUES (
-    p_prospect_data->>'nome_empresa',
+    p_prospect_data->>'company_name',
     v_final_slug,
-    p_prospect_data->>'email_contato',
-    p_prospect_data->>'telefone_contato',
+    p_prospect_data->>'contact_email',
+    p_prospect_data->>'contact_phone',
     p_prospect_data->>'cnpj',
     true,
     NOW(),
@@ -99,6 +99,7 @@ BEGIN
     whatsapp,
     role_id,
     profile_id,
+    company_id,
     is_active,
     is_verified,
     verification_level,
@@ -108,14 +109,15 @@ BEGIN
     updated_at
   ) VALUES (
     p_user_id,
-    p_prospect_data->>'email_contato',
-    p_prospect_data->>'nome_contato',
-    split_part(p_prospect_data->>'nome_contato', ' ', 1),
-    trim(replace(p_prospect_data->>'nome_contato', split_part(p_prospect_data->>'nome_contato', ' ', 1), '')),
-    p_prospect_data->>'telefone_contato',
-    p_prospect_data->>'telefone_contato',
+    p_prospect_data->>'contact_email',
+    p_prospect_data->>'contact_name',
+    split_part(p_prospect_data->>'contact_name', ' ', 1),
+    trim(replace(p_prospect_data->>'contact_name', split_part(p_prospect_data->>'contact_name', ' ', 1), '')),
+    p_prospect_data->>'contact_phone',
+    p_prospect_data->>'contact_phone',
     v_client_role_id,
     v_profile_id,
+    v_company_id,
     true,
     true,
     'email',
@@ -134,7 +136,7 @@ BEGIN
     updated_at
   ) VALUES (
     v_company_id,
-    p_prospect_data->>'plano',
+    p_prospect_data->>'plan',
     'active',
     NOW(),
     NOW()
@@ -153,24 +155,11 @@ BEGIN
   FROM entities e
   WHERE e.name IN ('companies', 'users', 'prospects', 'subscriptions');
 
-  -- 7. Vincular usuário ao profile
-  INSERT INTO user_profiles (
-    user_id,
-    profile_id,
-    is_active,
-    created_at
-  ) VALUES (
-    p_user_id,
-    v_profile_id,
-    true,
-    NOW()
-  );
+  -- 7. Relacionamento user-profile já estabelecido via campo profile_id na tabela users
+  -- Não é mais necessário inserir em user_profiles (tabela removida)
 
   -- 8. Configurar checklist de onboarding para a nova empresa
-  PERFORM setup_company_onboarding_checklist(v_company_id, p_prospect_data->>'plano');
-
-  -- 9. Configurar rotinas baseadas no plano de assinatura
-  PERFORM setup_company_routines(v_company_id, p_prospect_data->>'plano');
+  PERFORM setup_company_onboarding_checklist(v_company_id, p_prospect_data->>'plan');
 
   -- Preparar resultado
   v_result := jsonb_build_object(
@@ -179,8 +168,8 @@ BEGIN
     'user_id', p_user_id,
     'profile_id', v_profile_id,
     'subscription_id', v_subscription_id,
-    'plan', p_prospect_data->>'plano',
-    'company_name', p_prospect_data->>'nome_empresa'
+    'plan', p_prospect_data->>'plan',
+    'company_name', p_prospect_data->>'company_name'
   );
 
   -- Log para debug
@@ -210,8 +199,7 @@ Fluxo:
 4. Cria users com role_id e profile_id
 5. Cria subscriptions baseado no plano
 6. Cria permissions básicas para o profile
-7. Vincula user_profiles
-8. Retorna resultado em JSONB';
+7. Retorna resultado em JSONB (relacionamento user-profile via campo direto)';
 
 -- Garante permissões corretas
 GRANT EXECUTE ON FUNCTION public.create_client_signup TO service_role;

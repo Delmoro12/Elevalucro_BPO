@@ -39,32 +39,32 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
   useEffect(() => {
     if (prospectData) {
       setFormData({
-        nome_contato: prospectData.nome_contato,
-        cpf_contato: prospectData.cpf_contato,
-        email_contato: prospectData.email_contato,
-        telefone_contato: prospectData.telefone_contato || '',
-        cargo_contato: prospectData.cargo_contato || '',
-        nome_empresa: prospectData.nome_empresa,
+        contact_name: prospectData.contact_name,
+        contact_cpf: prospectData.contact_cpf,
+        contact_email: prospectData.contact_email,
+        contact_phone: prospectData.contact_phone || '',
+        contact_role: prospectData.contact_role || '',
+        company_name: prospectData.company_name,
         cnpj: prospectData.cnpj,
-        endereco: prospectData.endereco || '',
-        numero: prospectData.numero || '',
-        bairro: prospectData.bairro || '',
-        cep: prospectData.cep || '',
-        cidade: prospectData.cidade || '',
-        estado: prospectData.estado || '',
-        segmento: prospectData.segmento || '',
+        address: prospectData.address || '',
+        number: prospectData.number || '',
+        neighborhood: prospectData.neighborhood || '',
+        zip_code: prospectData.zip_code || '',
+        city: prospectData.city || '',
+        state: prospectData.state || '',
+        segment: prospectData.segment || '',
         areas: prospectData.areas || [],
-        bancos: prospectData.bancos || [],
-        ferramentas: prospectData.ferramentas || [],
-        fornecedores: prospectData.fornecedores || [],
-        organizacao: prospectData.organizacao || [],
-        relatorios: prospectData.relatorios || [],
-        expectativas_sucesso: prospectData.expectativas_sucesso || '',
-        plano: prospectData.plano,
-        valor_mensal: prospectData.valor_mensal,
+        banks: prospectData.banks || [],
+        tools: prospectData.tools || [],
+        suppliers: prospectData.suppliers || [],
+        organization: prospectData.organization || [],
+        reports: prospectData.reports || [],
+        success_expectations: prospectData.success_expectations || '',
+        plan: prospectData.plan,
+        monthly_value: prospectData.monthly_value,
         status: prospectData.status,
-        origem: prospectData.origem || '',
-        observacoes: prospectData.observacoes || '',
+        source: prospectData.source || '',
+        notes: prospectData.notes || '',
       });
     }
   }, [prospectData]);
@@ -126,21 +126,21 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
 
   const handleInputChange = useCallback((field: keyof ProspectUpdatePayload, value: any) => {
     // Se está mudando o plano, atualizar automaticamente as áreas e valor
-    if (field === 'plano' && (value === 'controle' || value === 'gerencial' || value === 'avancado')) {
+    if (field === 'plan' && (value === 'controle' || value === 'gerencial' || value === 'avancado')) {
       const novasAreas = areasPorPlano[value as keyof typeof areasPorPlano];
       const novoValor = valoresPorPlano[value as keyof typeof valoresPorPlano];
       setFormData(prev => ({ 
         ...prev, 
         [field]: value,
         areas: novasAreas,
-        valor_mensal: novoValor
+        monthly_value: novoValor
       }));
     } else {
       setFormData(prev => ({ ...prev, [field]: value }));
     }
   }, []);
 
-  const handleCheckboxToggle = useCallback((field: 'bancos' | 'ferramentas' | 'organizacao', item: string) => {
+  const handleCheckboxToggle = useCallback((field: 'banks' | 'tools' | 'organization', item: string) => {
     setFormData(prev => {
       const currentArray = (prev[field] as string[]) || [];
       const newArray = currentArray.includes(item) 
@@ -150,7 +150,7 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
     });
   }, []);
 
-  const handleCheckboxClick = useCallback((e: React.MouseEvent, field: 'bancos' | 'ferramentas' | 'organizacao', item: string) => {
+  const handleCheckboxClick = useCallback((e: React.MouseEvent, field: 'banks' | 'tools' | 'organization', item: string) => {
     e.preventDefault();
     e.stopPropagation();
     handleCheckboxToggle(field, item);
@@ -213,7 +213,7 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                 Editar Prospect
               </h2>
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                {prospectData?.nome_contato} - {prospectData?.nome_empresa}
+                {prospectData?.contact_name} - {prospectData?.company_name}
               </p>
             </div>
             <button
@@ -274,8 +274,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                         </label>
                         <input
                           type="text"
-                          value={formData.nome_contato || ''}
-                          onChange={(e) => handleInputChange('nome_contato', e.target.value)}
+                          value={formData.contact_name || ''}
+                          onChange={(e) => handleInputChange('contact_name', e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                           required
                         />
@@ -286,8 +286,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                         </label>
                         <input
                           type="text"
-                          value={formData.cpf_contato || ''}
-                          onChange={(e) => handleInputChange('cpf_contato', e.target.value)}
+                          value={formData.contact_cpf || ''}
+                          onChange={(e) => handleInputChange('contact_cpf', e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                           required
                         />
@@ -298,8 +298,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                         </label>
                         <input
                           type="email"
-                          value={formData.email_contato || ''}
-                          onChange={(e) => handleInputChange('email_contato', e.target.value)}
+                          value={formData.contact_email || ''}
+                          onChange={(e) => handleInputChange('contact_email', e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                           required
                         />
@@ -310,8 +310,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                         </label>
                         <input
                           type="tel"
-                          value={formData.telefone_contato || ''}
-                          onChange={(e) => handleInputChange('telefone_contato', e.target.value)}
+                          value={formData.contact_phone || ''}
+                          onChange={(e) => handleInputChange('contact_phone', e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                         />
                       </div>
@@ -321,8 +321,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                         </label>
                         <input
                           type="text"
-                          value={formData.cargo_contato || ''}
-                          onChange={(e) => handleInputChange('cargo_contato', e.target.value)}
+                          value={formData.contact_role || ''}
+                          onChange={(e) => handleInputChange('contact_role', e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                         />
                       </div>
@@ -340,8 +340,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                         </label>
                         <input
                           type="text"
-                          value={formData.nome_empresa || ''}
-                          onChange={(e) => handleInputChange('nome_empresa', e.target.value)}
+                          value={formData.company_name || ''}
+                          onChange={(e) => handleInputChange('company_name', e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                           required
                         />
@@ -364,8 +364,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                         </label>
                         <input
                           type="text"
-                          value={formData.segmento || ''}
-                          onChange={(e) => handleInputChange('segmento', e.target.value)}
+                          value={formData.segment || ''}
+                          onChange={(e) => handleInputChange('segment', e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                         />
                       </div>
@@ -383,8 +383,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                         </label>
                         <input
                           type="text"
-                          value={formData.endereco || ''}
-                          onChange={(e) => handleInputChange('endereco', e.target.value)}
+                          value={formData.address || ''}
+                          onChange={(e) => handleInputChange('address', e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                         />
                       </div>
@@ -394,8 +394,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                         </label>
                         <input
                           type="text"
-                          value={formData.numero || ''}
-                          onChange={(e) => handleInputChange('numero', e.target.value)}
+                          value={formData.number || ''}
+                          onChange={(e) => handleInputChange('number', e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                         />
                       </div>
@@ -405,8 +405,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                         </label>
                         <input
                           type="text"
-                          value={formData.bairro || ''}
-                          onChange={(e) => handleInputChange('bairro', e.target.value)}
+                          value={formData.neighborhood || ''}
+                          onChange={(e) => handleInputChange('neighborhood', e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                         />
                       </div>
@@ -416,8 +416,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                         </label>
                         <input
                           type="text"
-                          value={formData.cep || ''}
-                          onChange={(e) => handleInputChange('cep', e.target.value)}
+                          value={formData.zip_code || ''}
+                          onChange={(e) => handleInputChange('zip_code', e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                         />
                       </div>
@@ -427,8 +427,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                         </label>
                         <input
                           type="text"
-                          value={formData.cidade || ''}
-                          onChange={(e) => handleInputChange('cidade', e.target.value)}
+                          value={formData.city || ''}
+                          onChange={(e) => handleInputChange('city', e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                         />
                       </div>
@@ -437,8 +437,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                           Estado
                         </label>
                         <select
-                          value={formData.estado || ''}
-                          onChange={(e) => handleInputChange('estado', e.target.value)}
+                          value={formData.state || ''}
+                          onChange={(e) => handleInputChange('state', e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                         >
                           <option value="">Selecione...</option>
@@ -519,11 +519,11 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                           "BTG Pactual", "Safra", "Outro"
                         ].map(banco => (
                           <div key={banco} 
-                            onClick={(e) => handleCheckboxClick(e, 'bancos', banco)}
+                            onClick={(e) => handleCheckboxClick(e, 'banks', banco)}
                             className="flex items-center p-3 bg-slate-50 dark:bg-slate-700/30 hover:bg-slate-100 dark:hover:bg-slate-600/30 rounded-lg cursor-pointer border border-slate-200 dark:border-slate-600 hover:border-emerald-500/30 transition-all duration-200"
                           >
                             <div className={`w-4 h-4 rounded border-2 mr-3 flex items-center justify-center transition-all duration-200 ${
-                              (formData.bancos || []).includes(banco)
+                              (formData.banks || []).includes(banco)
                                 ? 'border-emerald-400 bg-emerald-400' 
                                 : 'border-slate-400 dark:border-slate-500'
                             }`}>
@@ -548,11 +548,11 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                           "Bling", "Tiny", "NFCom", "EmiteAí", "Nenhum sistema"
                         ].map(ferramenta => (
                           <div key={ferramenta}
-                            onClick={(e) => handleCheckboxClick(e, 'ferramentas', ferramenta)}
+                            onClick={(e) => handleCheckboxClick(e, 'tools', ferramenta)}
                             className="flex items-center p-3 bg-slate-50 dark:bg-slate-700/30 hover:bg-slate-100 dark:hover:bg-slate-600/30 rounded-lg cursor-pointer border border-slate-200 dark:border-slate-600 hover:border-emerald-500/30 transition-all duration-200"
                           >
                             <div className={`w-4 h-4 rounded border-2 mr-3 flex items-center justify-center transition-all duration-200 ${
-                              (formData.ferramentas || []).includes(ferramenta)
+                              (formData.tools || []).includes(ferramenta)
                                 ? 'border-emerald-400 bg-emerald-400' 
                                 : 'border-slate-400 dark:border-slate-500'
                             }`}>
@@ -581,11 +581,11 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                           "Outro método"
                         ].map(org => (
                           <div key={org}
-                            onClick={(e) => handleCheckboxClick(e, 'organizacao', org)}
+                            onClick={(e) => handleCheckboxClick(e, 'organization', org)}
                             className="flex items-center p-3 bg-slate-50 dark:bg-slate-700/30 hover:bg-slate-100 dark:hover:bg-slate-600/30 rounded-lg cursor-pointer border border-slate-200 dark:border-slate-600 hover:border-emerald-500/30 transition-all duration-200"
                           >
                             <div className={`w-4 h-4 rounded border-2 mr-3 flex items-center justify-center transition-all duration-200 ${
-                              (formData.organizacao || []).includes(org)
+                              (formData.organization || []).includes(org)
                                 ? 'border-emerald-400 bg-emerald-400' 
                                 : 'border-slate-400 dark:border-slate-500'
                             }`}>
@@ -605,8 +605,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                         Expectativas de Sucesso
                       </label>
                       <textarea
-                        value={formData.expectativas_sucesso || ''}
-                        onChange={(e) => handleInputChange('expectativas_sucesso', e.target.value)}
+                        value={formData.success_expectations || ''}
+                        onChange={(e) => handleInputChange('success_expectations', e.target.value)}
                         rows={4}
                         className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                         placeholder="Descreva suas expectativas e objetivos..."
@@ -624,8 +624,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                           Plano *
                         </label>
                         <select
-                          value={formData.plano || ''}
-                          onChange={(e) => handleInputChange('plano', e.target.value as any)}
+                          value={formData.plan || ''}
+                          onChange={(e) => handleInputChange('plan', e.target.value as any)}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                           required
                         >
@@ -647,7 +647,7 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                           </span>
                           <input
                             type="text"
-                            value={formData.valor_mensal ? formData.valor_mensal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0,00'}
+                            value={formData.monthly_value ? formData.monthly_value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0,00'}
                             readOnly
                             className="w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700/50 text-slate-900 dark:text-white cursor-not-allowed"
                           />
@@ -676,8 +676,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                         </label>
                         <input
                           type="text"
-                          value={formData.origem || ''}
-                          onChange={(e) => handleInputChange('origem', e.target.value)}
+                          value={formData.source || ''}
+                          onChange={(e) => handleInputChange('source', e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                         />
                       </div>
@@ -686,8 +686,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                           Observações
                         </label>
                         <textarea
-                          value={formData.observacoes || ''}
-                          onChange={(e) => handleInputChange('observacoes', e.target.value)}
+                          value={formData.notes || ''}
+                          onChange={(e) => handleInputChange('notes', e.target.value)}
                           rows={4}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                         />

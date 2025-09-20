@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../auth/contexts/AuthContext';
+import { supabase } from '@/src/lib/supabase';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -13,7 +14,10 @@ import {
   LogOut,
   Building2,
   Target,
-  FileText
+  FileText,
+  Cog,
+  UserCheck,
+  RotateCcw
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -55,6 +59,33 @@ const menuItems: MenuItem[] = [
     ]
   },
   {
+    id: 'operacional',
+    label: 'Operacional',
+    icon: Cog,
+    children: [
+      {
+        id: 'onboarding',
+        label: 'Onboarding',
+        icon: UserCheck,
+      },
+      {
+        id: 'operational-clients',
+        label: 'Clientes',
+        icon: Users,
+      },
+      {
+        id: 'routines',
+        label: 'Rotinas',
+        icon: RotateCcw,
+      }
+    ]
+  },
+  {
+    id: 'users',
+    label: 'Usuários',
+    icon: Users,
+  },
+  {
     id: 'analytics',
     label: 'Analytics',
     icon: BarChart3,
@@ -75,17 +106,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const router = useRouter();
   const { signOut } = useAuth();
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set(['crm']));
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set(['crm', 'operacional']));
 
   const handleLogout = async () => {
     try {
       console.log('🚪 Iniciando logout...');
       await signOut();
       console.log('✅ Logout realizado com sucesso');
+      // Aguardar um momento para garantir que o logout seja processado
+      console.log('⏱️ Aguardando processamento...');
+      await new Promise(resolve => setTimeout(resolve, 500));
+      // Verificar se ainda está autenticado
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        console.log('⚠️ Usuário ainda autenticado, forçando logout direto no Supabase...');
+        await supabase.auth.signOut();
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+      console.log('🔄 Redirecionando para login...');
+      window.location.replace('/tools-auth/login');
     } catch (error) {
       console.error('❌ Erro no logout:', error);
       // Mesmo com erro, redirecionar para login
-      window.location.href = '/tools-auth/login';
+      console.log('🔄 Redirecionamento de emergência...');
+      window.location.replace('/tools-auth/login');
     }
   };
 
@@ -104,11 +148,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const renderMenuItem = (item: MenuItem, level: number = 0) => {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems.has(item.id);
-    // Para itens pai, ativar se a página atual corresponder
-    // Para submenus, ativar se o currentSubPage corresponder ao id do item
-    const active = level === 0 
-      ? currentPage === item.id 
-      : currentSubPage === item.id;
+    
+    // Lógica aprimorada para determinar se um item está ativo
+    let active = false;
+    
+    if (level === 0) {
+      // Para itens pai
+      if (hasChildren) {
+        // Se tem filhos, só fica ativo se a página corresponde E nenhum filho está selecionado
+        active = currentPage === item.id && !item.children?.some(child => child.id === currentSubPage);
+      } else {
+        // Se não tem filhos, fica ativo quando selecionado
+        active = currentPage === item.id;
+      }
+    } else {
+      // Para submenus, fica ativo quando selecionado
+      active = currentSubPage === item.id;
+    }
+    
     const Icon = item.icon;
 
     if (hasChildren) {

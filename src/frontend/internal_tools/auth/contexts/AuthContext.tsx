@@ -35,58 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [signing, setSigning] = useState(false);
-  const [showJwtDebug, setShowJwtDebug] = useState(false);
-  const [jwtDebugData, setJwtDebugData] = useState<any>(null);
 
-  // Função para mostrar debug JWT
-  const showJwtDebugPopup = (session: Session) => {
-    try {
-      const token = session.access_token;
-      const parts = token.split('.');
-      
-      // Verificar se o token tem 3 partes (header.payload.signature)
-      if (parts.length !== 3) {
-        console.warn('Token JWT inválido: não tem 3 partes');
-        return;
-      }
-      
-      let payload = parts[1];
-      
-      // Adicionar padding se necessário para base64
-      const padding = payload.length % 4;
-      if (padding) {
-        payload += '='.repeat(4 - padding);
-      }
-      
-      // Substituir caracteres URL-safe para base64 padrão
-      payload = payload.replace(/-/g, '+').replace(/_/g, '/');
-      
-      const decoded = JSON.parse(atob(payload));
-      
-      const debugInfo = {
-        email: session.user.email,
-        userId: session.user.id,
-        role: decoded.user_metadata?.role,
-        roleName: decoded.user_metadata?.role,
-        exp: new Date(decoded.exp * 1000).toLocaleString(),
-        iat: new Date(decoded.iat * 1000).toLocaleString(),
-        provider: decoded.app_metadata?.provider,
-        providers: decoded.app_metadata?.providers
-      };
-      
-      setJwtDebugData(debugInfo);
-      setShowJwtDebug(true);
-      
-      // Auto-fechar após 1 segundo
-      setTimeout(() => {
-        setShowJwtDebug(false);
-      }, 1000);
-      
-    } catch (error) {
-      console.error('Erro ao decodificar JWT:', error);
-      console.error('Token que falhou:', session?.access_token?.substring(0, 50) + '...');
-    }
-  };
 
   // Função para mapear role ID para nome - Atualizada com IDs corretos
   const mapRoleIdToName = (roleId: string): string | null => {
@@ -107,11 +56,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-      
-      // Show JWT debug popup for existing session
-      if (session) {
-        showJwtDebugPopup(session);
-      }
     };
 
     getSession();
@@ -123,11 +67,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
-        
-        // Show JWT debug popup when user signs in or session is restored
-        if (event === 'SIGNED_IN' && session) {
-          showJwtDebugPopup(session);
-        }
       }
     );
 
@@ -213,7 +152,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('✅ Logout concluído com sucesso');
       
       // Redirect to login page com reload forçado
-      window.location.href = '/tools-auth/login';
+      console.log('🔄 Redirecionando para login...');
+      window.location.replace('/tools-auth/login');
       
     } catch (error) {
       console.error('❌ Erro inesperado no logout:', error);
@@ -222,7 +162,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(null);
       localStorage.clear();
       sessionStorage.clear();
-      window.location.href = '/auth/login';
+      console.log('🔄 Redirecionando para login (fallback)...');
+      window.location.replace('/tools-auth/login');
     } finally {
       setLoading(false);
     }
@@ -240,57 +181,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <AuthContext.Provider value={value}>
       {children}
-      
-      {/* JWT Debug Popup */}
-      {showJwtDebug && jwtDebugData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black bg-opacity-50" />
-          <div className="relative bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                JWT Debug Info
-              </h3>
-              <div className="text-sm text-slate-500 dark:text-slate-400">
-                3s auto-close
-              </div>
-            </div>
-            
-            <div className="space-y-3 text-sm">
-              <div>
-                <span className="font-medium text-slate-700 dark:text-slate-300">Email:</span>
-                <span className="ml-2 text-slate-600 dark:text-slate-400">{jwtDebugData.email}</span>
-              </div>
-              
-              <div>
-                <span className="font-medium text-slate-700 dark:text-slate-300">User ID:</span>
-                <span className="ml-2 text-slate-600 dark:text-slate-400 font-mono text-xs">{jwtDebugData.userId}</span>
-              </div>
-              
-              <div>
-                <span className="font-medium text-slate-700 dark:text-slate-300">Role:</span>
-                <span className="ml-2 text-slate-600 dark:text-slate-400">{jwtDebugData.role}</span>
-              </div>
-              
-              <div>
-                <span className="font-medium text-slate-700 dark:text-slate-300">Expires:</span>
-                <span className="ml-2 text-slate-600 dark:text-slate-400">{jwtDebugData.exp}</span>
-              </div>
-              
-              <div>
-                <span className="font-medium text-slate-700 dark:text-slate-300">Issued:</span>
-                <span className="ml-2 text-slate-600 dark:text-slate-400">{jwtDebugData.iat}</span>
-              </div>
-              
-              {jwtDebugData.provider && (
-                <div>
-                  <span className="font-medium text-slate-700 dark:text-slate-300">Provider:</span>
-                  <span className="ml-2 text-slate-600 dark:text-slate-400">{jwtDebugData.provider}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </AuthContext.Provider>
   );
 };

@@ -20,7 +20,7 @@ export async function GET(request: NextRequest, { params }: Params) {
 
     // Get detailed onboarding information for specific company
     const { data: companyDetails, error } = await supabase
-      .from('onboarding_companies_unified')
+      .from('onboarding_companies_kanban')
       .select('*')
       .eq('company_id', companyId)
       .single();
@@ -73,20 +73,20 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       semana_onboarding // For moving between weeks
     } = body;
 
-    // If updating checklist item
+    // If updating checklist item - UPDATE existing record instead of UPSERT
     if (checklist_item_id !== undefined) {
+      console.log(`Updating checklist item: ${checklist_item_id} for company: ${companyId}`);
+      
       const { error: checklistError } = await supabase
         .from('companies_onboarding_checklist')
-        .upsert({
-          company_id: companyId,
-          checklist_item_id: checklist_item_id,
+        .update({
           is_checked: is_checked,
           notes: notes,
           checked_at: is_checked ? new Date().toISOString() : null,
           updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'company_id,checklist_item_id'
-        });
+        })
+        .eq('company_id', companyId)
+        .eq('checklist_item_id', checklist_item_id);
 
       if (checklistError) {
         console.error('Error updating checklist item:', checklistError);
@@ -133,7 +133,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
     // Return updated company details
     const { data: updatedCompany, error: fetchError } = await supabase
-      .from('onboarding_companies_unified')
+      .from('onboarding_companies_kanban')
       .select('*')
       .eq('company_id', companyId)
       .single();

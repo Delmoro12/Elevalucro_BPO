@@ -6,16 +6,16 @@
 CREATE OR REPLACE VIEW company_routines_details AS
 SELECT 
   c.id as company_id,
-  c.name as nome_empresa,
-  '' as email, -- Campo não existe na tabela companies
-  '' as telefone, -- Campo não existe na tabela companies  
-  '' as segmento, -- Campo não existe na tabela companies
-  c.subscription_plan as plano,
+  c.name as company_name,
+  c.email as email,
+  c.phone as phone,
+  c.segment as segment,
+  c.subscription_plan as plan,
   
-  -- Informações da rotina
+  -- Informações da rotina (template ou customizada)
   r.id as routine_id,
-  r.name as routine_title,
-  r.description as routine_description,
+  COALESCE(cr.custom_name, r.name) as routine_title,
+  COALESCE(cr.custom_description, r.description) as routine_description,
   -- r.category as routine_category, -- removed
   -- r.frequency as routine_frequency, -- removed  
   -- r.estimated_hours as routine_estimated_hours, -- removed
@@ -27,21 +27,25 @@ SELECT
   cr.next_execution_date as routine_next_execution,
   cr.last_execution_date as routine_last_execution,
   cr.assigned_to as routine_assigned_to,
-  cr.notes as routine_notes,
   cr.created_at as routine_added_at,
+  
+  -- Schedule settings
+  cr.day_of_week,
+  cr.day_of_month,
+  cr.month_of_year,
+  cr.start_date,
   
   -- Informações do usuário responsável
   u.full_name as assigned_to_name,
   u.email as assigned_to_email,
   
-  -- Histórico de execuções (últimas 10)
+  -- Histórico de execuções (últimas 10) - REMOVIDO time_spent_minutes
   (
     SELECT json_agg(
       json_build_object(
         'id', rh.id,
         'executed_at', rh.executed_at,
         'status', rh.status,
-        'duration_minutes', rh.time_spent_minutes,
         'executed_by_name', u_exec.full_name,
         'executed_by_email', u_exec.email,
         'observations', rh.notes,
@@ -55,13 +59,12 @@ SELECT
     LIMIT 10
   ) as execution_history,
   
-  -- Estatísticas de execução
+  -- Estatísticas de execução - REMOVIDO avg_duration_minutes
   (
     SELECT json_build_object(
       'total_executions', COUNT(rh.id),
       'successful_executions', COUNT(rh.id) FILTER (WHERE rh.status = 'completed'),
       'failed_executions', COUNT(rh.id) FILTER (WHERE rh.status = 'failed'),
-      'avg_duration_minutes', AVG(rh.time_spent_minutes),
       'last_30_days_executions', COUNT(rh.id) FILTER (WHERE rh.executed_at >= NOW() - INTERVAL '30 days'),
       'success_rate_30_days', 
         CASE 
@@ -99,9 +102,10 @@ SELECT
 
 FROM companies c
 JOIN companies_routines cr ON c.id = cr.company_id
-JOIN routines r ON cr.routine_id = r.id
+LEFT JOIN routines r ON cr.routine_id = r.id
 LEFT JOIN users u ON cr.assigned_to = u.id
 WHERE c.is_active = true
+  AND cr.is_active = true
 ORDER BY 
   c.name ASC,
   CASE cr.is_active WHEN true THEN 0 ELSE 1 END,
@@ -116,4 +120,5 @@ ORDER BY
 -- Comentário
 COMMENT ON VIEW company_routines_details IS 
 'View para detalhes completos das rotinas por empresa - inclui histórico de execução,
-estatísticas, informações do responsável e status detalhado para gestão operacional.';
+estatísticas, informações do responsável e status detalhado para gestão operacional.
+Suporta tanto rotinas baseadas em templates quanto rotinas customizadas (routine_id nulo).';

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Menu,
   Bell,
@@ -8,6 +8,7 @@ import {
   Search
 } from 'lucide-react';
 import { ThemeToggle } from '../../shared/components/ThemeToggle';
+import { supabase } from '@/src/lib/supabase';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -51,6 +52,58 @@ export const Header: React.FC<HeaderProps> = ({
   currentPage = 'crm' 
 }) => {
   const { title, subtitle } = getPageTitle(currentPage);
+  const [userName, setUserName] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Get user data from session
+    const getUserData = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          // Try to get name from user metadata first
+          const fullName = session.user.user_metadata?.full_name;
+          
+          if (fullName) {
+            // Get first name only
+            const firstName = fullName.split(' ')[0];
+            setUserName(firstName);
+          } else {
+            // Fallback to email
+            const emailName = session.user.email?.split('@')[0] || 'Usuário';
+            setUserName(emailName);
+          }
+        }
+      } catch (error) {
+        console.error('Error getting user data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getUserData();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          const fullName = session.user.user_metadata?.full_name;
+          if (fullName) {
+            const firstName = fullName.split(' ')[0];
+            setUserName(firstName);
+          } else {
+            const emailName = session.user.email?.split('@')[0] || 'Usuário';
+            setUserName(emailName);
+          }
+        } else {
+          setUserName('');
+        }
+      }
+    );
+
+    return () => subscription?.unsubscribe();
+  }, []);
 
   return (
     <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-4 py-3">
@@ -97,7 +150,11 @@ export const Header: React.FC<HeaderProps> = ({
             <button className="flex items-center p-2 rounded-md text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
               <User className="h-5 w-5" />
               <span className="ml-2 text-sm font-medium hidden md:block">
-                Admin
+                {loading ? (
+                  <span className="animate-pulse">...</span>
+                ) : (
+                  userName ? `Olá, ${userName}` : 'Usuário'
+                )}
               </span>
             </button>
           </div>

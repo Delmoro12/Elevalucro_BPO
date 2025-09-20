@@ -8,14 +8,14 @@ import { LayoutContext, useLayoutProvider } from '../shared/hooks/useLayout';
 
 // Importar páginas das features
 import { CrmMainPage } from '../crm/pages/CrmMainPage';
+import { OperationalMainPage } from '../operational/pages/OperationalMainPage';
+import { UsersMainPage } from '../users/pages/UsersMainPage';
 
 export const MainPage: React.FC = () => {
   const layoutProviderValue = useLayoutProvider();
   const router = useRouter();
   const pathname = usePathname();
-  const [currentPage, setCurrentPage] = useState('crm');
-  const [currentSubPage, setCurrentSubPage] = useState('prospects');
-
+  
   // Mapear pathname para página
   const getPageFromPathname = (pathname: string): { page: string; subPage?: string } => {
     const segments = pathname.split('/').filter(Boolean);
@@ -31,6 +31,14 @@ export const MainPage: React.FC = () => {
           return { page: 'crm', subPage: 'prospects' };
         case 'customer-success':
           return { page: 'crm', subPage: 'customer-success' };
+        case 'onboarding':
+          return { page: 'operacional', subPage: 'onboarding' };
+        case 'operational-clients':
+          return { page: 'operacional', subPage: 'operational-clients' };
+        case 'routines':
+          return { page: 'operacional', subPage: 'routines' };
+        case 'users':
+          return { page: 'users' };
         case 'analytics':
           return { page: 'analytics' };
         case 'settings':
@@ -42,39 +50,74 @@ export const MainPage: React.FC = () => {
     
     return { page: 'crm', subPage: 'prospects' };
   };
+  
+  // Inicializar estado com valores corretos baseados na URL atual
+  const initialPageData = getPageFromPathname(pathname);
+  const [currentPage, setCurrentPage] = useState(initialPageData.page);
+  const [currentSubPage, setCurrentSubPage] = useState(initialPageData.subPage || '');
 
-  // Sincronizar página atual com URL
+  // Sincronizar página atual com URL quando mudar
   useEffect(() => {
     const { page, subPage } = getPageFromPathname(pathname);
     setCurrentPage(page);
-    if (subPage) {
-      setCurrentSubPage(subPage);
-    }
+    setCurrentSubPage(subPage || '');
   }, [pathname]);
 
   // Função para navegar entre páginas
   const handlePageChange = (page: string) => {
-    // Se clicou em CRM no sidebar, vai para prospects
+    // Mapear página interna para URL (rotas diretas no tools subdomain)
+    const urlMap: { [key: string]: string } = {
+      'leads': '/leads',
+      'prospects': '/prospects', 
+      'customer-success': '/customer-success',
+      'onboarding': '/onboarding',
+      'operational-clients': '/operational-clients',
+      'routines': '/routines',
+      'users': '/users',
+      'analytics': '/analytics',
+      'settings': '/settings'
+    };
+    
+    // Verificar se é um submenu do CRM
+    if (['leads', 'prospects', 'customer-success'].includes(page)) {
+      setCurrentPage('crm');
+      setCurrentSubPage(page);
+      router.push(urlMap[page]);
+      return;
+    }
+    
+    // Verificar se é um submenu do Operacional
+    if (['onboarding', 'operational-clients', 'routines'].includes(page)) {
+      setCurrentPage('operacional');
+      setCurrentSubPage(page);
+      router.push(urlMap[page]);
+      return;
+    }
+    
+    // Se clicou em CRM no sidebar (menu pai), vai para prospects
     if (page === 'crm') {
       setCurrentPage('crm');
       setCurrentSubPage('prospects');
       router.push('/prospects');
       return;
     }
+    
+    // Se clicou em Operacional no sidebar (menu pai), vai para onboarding
+    if (page === 'operacional') {
+      setCurrentPage('operacional');
+      setCurrentSubPage('onboarding');
+      router.push('/onboarding');
+      return;
+    }
 
+    // Para outros menus sem submenu (users, analytics, settings)
     setCurrentPage(page);
+    setCurrentSubPage('');
     
-    // Mapear página interna para URL (rotas diretas no tools subdomain)
-    const urlMap: { [key: string]: string } = {
-      'leads': '/leads',
-      'prospects': '/prospects', 
-      'customer-success': '/customer-success',
-      'analytics': '/analytics',
-      'settings': '/settings'
-    };
-    
-    const url = urlMap[page] || '/prospects';
-    router.push(url);
+    const url = urlMap[page];
+    if (url) {
+      router.push(url);
+    }
   };
 
   // Função para navegar entre sub-páginas do CRM
@@ -92,6 +135,15 @@ export const MainPage: React.FC = () => {
             onSubPageChange={handleSubPageChange}
           />
         );
+      case 'operacional':
+        return (
+          <OperationalMainPage 
+            currentSubPage={currentSubPage}
+            onSubPageChange={handleSubPageChange}
+          />
+        );
+      case 'users':
+        return <UsersMainPage />;
       case 'analytics':
         return (
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-8 text-center">

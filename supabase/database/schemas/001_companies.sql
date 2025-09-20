@@ -29,7 +29,13 @@ CREATE TABLE IF NOT EXISTS companies (
     website VARCHAR(255),
     
     -- Segmento de negócio
-    segmento VARCHAR(100),
+    segment VARCHAR(100),
+    
+    -- Operador BPO responsável
+    bpo_operator_id UUID REFERENCES users(id),
+    
+    -- Analista BPO responsável
+    analyst_bpo_id UUID REFERENCES users(id),
     
     -- Status e configurações
     is_active BOOLEAN DEFAULT true,
@@ -58,11 +64,15 @@ CREATE TABLE IF NOT EXISTS companies (
 -- Índices para performance
 CREATE INDEX IF NOT EXISTS idx_companies_slug ON companies(slug);
 CREATE INDEX IF NOT EXISTS idx_companies_cnpj_raw ON companies(cnpj_raw);
+CREATE INDEX IF NOT EXISTS idx_companies_bpo_operator_id ON companies(bpo_operator_id);
+CREATE INDEX IF NOT EXISTS idx_companies_analyst_bpo_id ON companies(analyst_bpo_id);
 CREATE INDEX IF NOT EXISTS idx_companies_is_active ON companies(is_active);
 CREATE INDEX IF NOT EXISTS idx_companies_subscription_plan ON companies(subscription_plan);
 CREATE INDEX IF NOT EXISTS idx_companies_onboarding_progress ON companies(onboarding_progress);
 CREATE INDEX IF NOT EXISTS idx_companies_created_at ON companies(created_at);
 
 -- Comentários para as novas colunas
-COMMENT ON COLUMN companies.segmento IS 'Business segment or industry of the company';
+COMMENT ON COLUMN companies.segment IS 'Business segment or industry of the company';
+COMMENT ON COLUMN companies.bpo_operator_id IS 'ID do operador BPO responsável pela empresa';
+COMMENT ON COLUMN companies.analyst_bpo_id IS 'ID do analista BPO responsável pela empresa';
 COMMENT ON COLUMN companies.onboarding_progress IS 'Onboarding progress percentage (0-100)';

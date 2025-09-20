@@ -6,9 +6,9 @@ export async function getProspects(filters?: ProspectFilters): Promise<ProspectL
   try {
     const params = new URLSearchParams();
     
-    if (filters?.plano) params.append('plano', filters.plano);
-    if (filters?.origem) params.append('origem', filters.origem);
-    if (filters?.segmento) params.append('segmento', filters.segmento);
+    if (filters?.plan) params.append('plan', filters.plan);
+    if (filters?.source) params.append('source', filters.source);
+    if (filters?.segment) params.append('segment', filters.segment);
     if (filters?.search) params.append('search', filters.search);
     
     const queryString = params.toString();

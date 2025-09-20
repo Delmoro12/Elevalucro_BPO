@@ -6,10 +6,10 @@
 CREATE OR REPLACE VIEW operational_health_score AS
 SELECT 
   c.id as company_id,
-  c.name as nome_empresa,
-  '' as email, -- Campo não existe na tabela companies
-  '' as segmento, -- Campo não existe na tabela companies
-  c.subscription_plan as plano,
+  c.name as company_name,
+  c.email as email,
+  c.segment as segment,
+  c.subscription_plan as plan,
   c.lifecycle_stage,
   c.created_at,
   
@@ -41,7 +41,7 @@ SELECT
     ELSE NULL
   END as onboarding_metrics,
   
-  -- Métricas de Rotinas Operacionais
+  -- Métricas de Rotinas Operacionais - REMOVIDO avg_execution_time
   json_build_object(
     'total_routines', COALESCE(routine_stats.total_routines, 0),
     'active_routines', COALESCE(routine_stats.active_routines, 0),
@@ -52,8 +52,7 @@ SELECT
       CASE 
         WHEN COALESCE(routine_stats.executions_30d, 0) = 0 THEN 0
         ELSE (routine_stats.successful_30d::float / routine_stats.executions_30d * 100)
-      END,
-    'avg_execution_time', COALESCE(routine_stats.avg_duration, 0)
+      END
   ) as routine_metrics,
   
   -- Score Geral de Saúde (0-100)
@@ -169,7 +168,7 @@ LEFT JOIN (
   GROUP BY coc.company_id
 ) onb_stats ON c.id = onb_stats.company_id
 
--- Estatísticas de rotinas
+-- Estatísticas de rotinas - REMOVIDO avg_duration que usava time_spent_minutes
 LEFT JOIN (
   SELECT 
     cr.company_id,
@@ -177,8 +176,7 @@ LEFT JOIN (
     COUNT(cr.id) FILTER (WHERE cr.is_active = true) as active_routines,
     COUNT(cr.id) FILTER (WHERE cr.is_active = true AND cr.next_execution_date IS NOT NULL AND cr.next_execution_date < NOW()) as overdue_routines,
     COUNT(rh.id) FILTER (WHERE rh.executed_at >= NOW() - INTERVAL '30 days') as executions_30d,
-    COUNT(rh.id) FILTER (WHERE rh.executed_at >= NOW() - INTERVAL '30 days' AND rh.status IN ('completed', 'partially_completed')) as successful_30d,
-    AVG(rh.time_spent_minutes) FILTER (WHERE rh.executed_at >= NOW() - INTERVAL '30 days') as avg_duration
+    COUNT(rh.id) FILTER (WHERE rh.executed_at >= NOW() - INTERVAL '30 days' AND rh.status IN ('completed', 'partially_completed')) as successful_30d
   FROM companies_routines cr
   LEFT JOIN routine_executions rh ON cr.id = rh.company_routine_id
   GROUP BY cr.company_id

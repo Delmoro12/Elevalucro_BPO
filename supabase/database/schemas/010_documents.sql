@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS documents (
     -- Dados básicos do documento
     nome VARCHAR(255) NOT NULL,
     arquivo VARCHAR(500) NOT NULL, -- Caminho/URL do arquivo
-    tipo_documento VARCHAR(30) NOT NULL CHECK (tipo_documento IN ('nfe', 'cupom_fiscal', 'recibo', 'boleto', 'extrato', 'outro')),
+    tipo_documento VARCHAR(30) NOT NULL CHECK (tipo_documento IN ('fiscal', 'nao_fiscal')),
     categoria VARCHAR(20) NOT NULL CHECK (categoria IN ('entrada', 'saida')),
     
     -- Dados financeiros extraídos pela IA

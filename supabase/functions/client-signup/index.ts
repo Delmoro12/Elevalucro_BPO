@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    console.log('✅ Prospect found:', prospect.email_contato);
+    console.log('✅ Prospect found:', prospect.contact_email);
 
     // Generate temporary password
     const tempPassword = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -91,13 +91,13 @@ Deno.serve(async (req) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          email: prospect.email_contato,
+          email: prospect.contact_email,
           password: tempPassword,
           email_confirm: true,
           user_metadata: {
-            full_name: prospect.nome_contato,
-            phone: prospect.telefone_contato,
-            company_name: prospect.nome_empresa
+            full_name: prospect.contact_name,
+            phone: prospect.contact_phone,
+            company_name: prospect.company_name
           }
         })
       });
@@ -116,13 +116,13 @@ Deno.serve(async (req) => {
       
       // Fallback to SDK method
       const result = await serviceClient.auth.admin.createUser({
-        email: prospect.email_contato,
+        email: prospect.contact_email,
         password: tempPassword,
         email_confirm: true,
         user_metadata: {
-          full_name: prospect.nome_contato,
-          phone: prospect.telefone_contato,
-          company_name: prospect.nome_empresa
+          full_name: prospect.contact_name,
+          phone: prospect.contact_phone,
+          company_name: prospect.company_name
         }
       });
       
@@ -217,8 +217,8 @@ Deno.serve(async (req) => {
               email: 'atendimento@elevalucro.com.br'
             },
             to: [{
-              email: prospect.email_contato,
-              name: prospect.nome_contato
+              email: prospect.contact_email,
+              name: prospect.contact_name
             }],
             subject: 'Bem-vindo ao ElevaLucro BPO - Acesso à Plataforma',
             htmlContent: `
@@ -228,14 +228,14 @@ Deno.serve(async (req) => {
                 </div>
                 
                 <div style="padding: 30px; background: #f9fafb; border-radius: 0 0 10px 10px;">
-                  <p style="font-size: 16px; color: #374151;">Olá <strong>${prospect.nome_contato}</strong>,</p>
+                  <p style="font-size: 16px; color: #374151;">Olá <strong>${prospect.contact_name}</strong>,</p>
                   
                   <p style="font-size: 16px; color: #374151;">
                     Sua conta foi criada com sucesso! Abaixo estão suas credenciais de acesso:
                   </p>
                   
                   <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e5e7eb;">
-                    <p style="margin: 5px 0; color: #374151;"><strong>Email:</strong> ${prospect.email_contato}</p>
+                    <p style="margin: 5px 0; color: #374151;"><strong>Email:</strong> ${prospect.contact_email}</p>
                     <p style="margin: 5px 0; color: #374151;"><strong>Senha provisória:</strong> <code style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${tempPassword}</code></p>
                   </div>
                   
@@ -253,10 +253,10 @@ Deno.serve(async (req) => {
                   
                   <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
                     <p style="font-size: 14px; color: #6b7280; margin: 5px 0;">
-                      <strong>Empresa:</strong> ${prospect.nome_empresa}
+                      <strong>Empresa:</strong> ${prospect.company_name}
                     </p>
                     <p style="font-size: 14px; color: #6b7280; margin: 5px 0;">
-                      <strong>Plano:</strong> ${prospect.plano.charAt(0).toUpperCase() + prospect.plano.slice(1)}
+                      <strong>Plano:</strong> ${prospect.plan.charAt(0).toUpperCase() + prospect.plan.slice(1)}
                     </p>
                   </div>
                   
@@ -303,8 +303,8 @@ Deno.serve(async (req) => {
       message: 'Client created and invitation sent',
       data: {
         user_id: userId,
-        email: prospect.email_contato,
-        company: prospect.nome_empresa,
+        email: prospect.contact_email,
+        company: prospect.company_name,
         invitation_sent: inviteSent,
         temp_password: tempPassword // For debugging/manual access if needed
       }

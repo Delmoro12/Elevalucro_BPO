@@ -30,16 +30,15 @@ CREATE OR REPLACE FUNCTION public.custom_access_token_hook(event jsonb)
     -- Using LEFT JOINs to handle both BPO and client users
     BEGIN
       SELECT
-        p.company_id::text,
+        u.company_id::text,
         u.profile_id::text,
         r.name,
         COALESCE(s.plan_type, 'controle'),
         COALESCE(s.status, 'active')
       INTO v_company_id, v_profile_id, v_role, v_plan, v_status
       FROM public.users u
-      LEFT JOIN public.profiles p ON u.profile_id = p.id
       LEFT JOIN public.roles r ON u.role_id = r.id
-      LEFT JOIN public.subscriptions s ON p.company_id::uuid = s.company_id
+      LEFT JOIN public.subscriptions s ON u.company_id = s.company_id
         AND s.status = 'active'
       WHERE u.id = v_user_id
       LIMIT 1;

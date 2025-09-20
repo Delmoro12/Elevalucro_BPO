@@ -6,24 +6,12 @@ export const useDocumentsService = () => {
   const { companyId } = useAuth();
   const client = supabase;
 
-  // Se não há companyId, retorna funções que mostram erro apenas quando chamadas
-  if (!companyId) {
-    return {
-      createDocument: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
-      getDocuments: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
-      getDocument: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
-      updateDocument: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
-      deleteDocument: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
-      getDocumentsByStatus: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
-      getDocumentsByCategory: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
-      getIncompleteDocuments: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
-      updateDocumentStatus: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service')),
-      searchDocuments: () => Promise.reject(new Error('User must be authenticated with a valid company_id to use documents service'))
-    };
-  }
-
   // Criar um novo documento
   const createDocument = async (data: CreateDocumentRequest): Promise<Document> => {
+    if (!companyId) {
+      throw new Error('User must be authenticated with a valid company_id to use documents service');
+    }
+
     try {
       console.log('📄 Creating document:', data.nome);
       
@@ -65,6 +53,10 @@ export const useDocumentsService = () => {
 
   // Buscar documentos da empresa do usuario logado
   const getDocuments = async (): Promise<Document[]> => {
+    if (!companyId) {
+      throw new Error('User must be authenticated with a valid company_id to use documents service');
+    }
+
     try {
       console.log('📋 Fetching documents...');
       
@@ -89,6 +81,10 @@ export const useDocumentsService = () => {
 
   // Buscar documento por ID
   const getDocument = async (id: string): Promise<Document | null> => {
+    if (!companyId) {
+      throw new Error('User must be authenticated with a valid company_id to use documents service');
+    }
+
     try {
       console.log('📄 Fetching document:', id);
       
@@ -114,6 +110,10 @@ export const useDocumentsService = () => {
 
   // Atualizar documento
   const updateDocument = async (id: string, data: UpdateDocumentRequest): Promise<Document> => {
+    if (!companyId) {
+      throw new Error('User must be authenticated with a valid company_id to use documents service');
+    }
+
     try {
       console.log('📝 Updating document:', id);
       
@@ -159,18 +159,56 @@ export const useDocumentsService = () => {
 
   // Deletar documento
   const deleteDocument = async (id: string): Promise<void> => {
+    if (!companyId) {
+      throw new Error('User must be authenticated with a valid company_id to use documents service');
+    }
+
     try {
       console.log('🗑️ Deleting document:', id);
       
-      const { error } = await client
+      // 1. Primeiro buscar o documento para obter o path do arquivo
+      const { data: document, error: fetchError } = await client
+        .from('documents')
+        .select('arquivo')
+        .eq('id', id)
+        .eq('company_id', companyId)
+        .single();
+
+      if (fetchError) {
+        console.error('❌ Error fetching document for deletion:', fetchError);
+        throw new Error(`Failed to fetch document: ${fetchError.message}`);
+      }
+
+      // 2. Deletar o documento do banco de dados
+      const { error: deleteError } = await client
         .from('documents')
         .delete()
         .eq('id', id)
         .eq('company_id', companyId);
 
-      if (error) {
-        console.error('❌ Error deleting document:', error);
-        throw new Error(`Failed to delete document: ${error.message}`);
+      if (deleteError) {
+        console.error('❌ Error deleting document from database:', deleteError);
+        throw new Error(`Failed to delete document: ${deleteError.message}`);
+      }
+
+      // 3. Tentar deletar o arquivo do Storage (se existir)
+      if (document?.arquivo) {
+        try {
+          console.log('🗑️ Deleting file from storage:', document.arquivo);
+          const { error: storageError } = await client.storage
+            .from('documents')
+            .remove([document.arquivo]);
+
+          if (storageError) {
+            console.warn('⚠️ Warning: Failed to delete file from storage:', storageError);
+            // Não falha a operação se só o storage der erro
+          } else {
+            console.log('✅ File deleted from storage successfully');
+          }
+        } catch (storageError) {
+          console.warn('⚠️ Warning: Storage deletion failed:', storageError);
+          // Não falha a operação se só o storage der erro
+        }
       }
 
       console.log('✅ Document deleted successfully');
@@ -182,6 +220,10 @@ export const useDocumentsService = () => {
 
   // Buscar documentos por status
   const getDocumentsByStatus = async (status: 'pendente' | 'processado' | 'conciliado' | 'erro'): Promise<Document[]> => {
+    if (!companyId) {
+      throw new Error('User must be authenticated with a valid company_id to use documents service');
+    }
+
     try {
       console.log('📋 Fetching documents by status:', status);
       
@@ -207,6 +249,10 @@ export const useDocumentsService = () => {
 
   // Buscar documentos por categoria
   const getDocumentsByCategory = async (categoria: 'entrada' | 'saida'): Promise<Document[]> => {
+    if (!companyId) {
+      throw new Error('User must be authenticated with a valid company_id to use documents service');
+    }
+
     try {
       console.log('📋 Fetching documents by category:', categoria);
       
@@ -232,6 +278,10 @@ export const useDocumentsService = () => {
 
   // Buscar documentos com dados incompletos
   const getIncompleteDocuments = async (): Promise<Document[]> => {
+    if (!companyId) {
+      throw new Error('User must be authenticated with a valid company_id to use documents service');
+    }
+
     try {
       console.log('📋 Fetching incomplete documents...');
       
@@ -257,6 +307,10 @@ export const useDocumentsService = () => {
 
   // Atualizar status do documento
   const updateDocumentStatus = async (id: string, status: 'pendente' | 'processado' | 'conciliado' | 'erro'): Promise<void> => {
+    if (!companyId) {
+      throw new Error('User must be authenticated with a valid company_id to use documents service');
+    }
+
     try {
       console.log('📝 Updating document status:', id, status);
       
@@ -287,6 +341,10 @@ export const useDocumentsService = () => {
 
   // Buscar por texto (full-text search)
   const searchDocuments = async (query: string): Promise<Document[]> => {
+    if (!companyId) {
+      throw new Error('User must be authenticated with a valid company_id to use documents service');
+    }
+
     try {
       console.log('🔍 Searching documents:', query);
       

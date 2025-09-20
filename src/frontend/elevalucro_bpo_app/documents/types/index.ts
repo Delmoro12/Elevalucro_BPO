@@ -1,7 +1,7 @@
 // Tipos dos documentos baseados na estrutura do banco de dados
 import { convertBrazilianDateToISO } from '../../shared/utils';
 
-export type DocumentType = 'nfe' | 'cupom_fiscal' | 'recibo' | 'boleto' | 'extrato' | 'outro';
+export type DocumentType = 'fiscal' | 'nao_fiscal';
 export type DocumentCategory = 'entrada' | 'saida';
 export type DocumentStatus = 'pendente' | 'processado' | 'conciliado' | 'erro';
 
@@ -27,7 +27,6 @@ export interface Document {
   cnpj?: string;
   
   // Dados especificos do documento (extraidos pela IA)
-  numero_nota?: string;
   descricao?: string;
   
   // Dados complementares (preenchidos pelo usuario)
@@ -78,7 +77,6 @@ export interface CreateDocumentRequest {
   fornecedor?: string;
   cliente?: string;
   cnpj?: string;
-  numero_nota?: string;
   descricao?: string;
   
   // Dados do usuario
@@ -117,9 +115,7 @@ export interface DocumentData {
   fornecedor?: string;
   cliente?: string;
   cnpj?: string;
-  numeroNota?: string;
   formaPagamento?: string;
-  centroCusto?: string;
   descricao?: string;
   dadosCompletos: boolean;
   confianca: number; // 0-100%
@@ -163,7 +159,7 @@ export function documentDataToCreateRequest(
   return {
     nome: fileName,
     arquivo: fileName, // Sera atualizado com o caminho correto apos upload
-    tipo_documento: documentData.tipo,
+    tipo_documento: documentInfo.tipoFiscal as DocumentType, // Usar escolha do usuário ao invés da IA
     categoria: documentInfo.categoria as DocumentCategory,
     
     // Dados da IA - com conversao de data
@@ -172,12 +168,10 @@ export function documentDataToCreateRequest(
     fornecedor: documentData.fornecedor,
     cliente: documentData.cliente,
     cnpj: documentData.cnpj,
-    numero_nota: documentData.numeroNota,
     descricao: documentData.descricao,
     
     // Dados do usuario
     forma_pagamento: documentData.formaPagamento,
-    centro_custo: documentData.centroCusto,
     
     // Metadados
     tamanho: formatFileSize(fileSize),

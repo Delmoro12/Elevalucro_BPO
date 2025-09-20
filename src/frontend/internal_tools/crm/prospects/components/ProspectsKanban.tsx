@@ -79,7 +79,7 @@ export const ProspectsKanban: React.FC<ProspectsKanbanProps> = ({
       );
       acc.prospectsByStatus[column.id] = prospectsInColumn;
       acc.valuesByStatus[column.id] = prospectsInColumn.reduce((sum, prospect) => 
-        sum + prospect.valor_mensal, 0
+        sum + prospect.monthly_value, 0
       );
       return acc;
     }, {

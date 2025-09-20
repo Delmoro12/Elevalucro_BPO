@@ -13,9 +13,7 @@ export interface DocumentData {
   fornecedor?: string;
   cliente?: string;
   cnpj?: string;
-  numeroNota?: string;
   formaPagamento?: string;
-  centroCusto?: string;
   descricao?: string;
   dadosCompletos: boolean;
   camposFaltantes: string[];
@@ -42,15 +40,22 @@ REGRAS IMPORTANTES:
 
 DADOS OBRIGATÓRIOS:
 - Valor do documento
-- Data da transação
+- Data da transação/vencimento
 - Fornecedor/Cliente
-- Forma de pagamento
-- Centro de custo
+
+REGRAS PARA FORMA DE PAGAMENTO:
+- Se for boleto: extrair 'Boleto' e a data de vencimento
+- Se for NFe com forma de pagamento visível: extrair a forma (PIX, cartão, etc)
+- Se tiver código de barras de boleto: é 'Boleto'
+- Se tiver QR code PIX: é 'PIX'
+- Só perguntar se realmente não conseguir identificar
 
 CAMPOS OPCIONAIS:
 - CNPJ
 - Número da nota
-- Descrição adicional`;
+- Descrição adicional
+
+OBSERVAÇÃO: NÃO pergunte sobre categoria de conta ou centro de custo - isso é definido internamente.`;
 
   // Converte arquivo para base64
   private async fileToBase64(file: File): Promise<string> {
@@ -94,12 +99,19 @@ CAMPOS OPCIONAIS:
   "fornecedor": "nome completo do fornecedor/emissor",
   "cliente": "nome completo do cliente/destinatário",
   "cnpj": "CNPJ no formato XX.XXX.XXX/XXXX-XX",
-  "numeroNota": "número da nota/documento",
   "descricao": "descrição dos produtos/serviços",
+  "formaPagamento": "forma de pagamento SE VISÍVEL (Boleto, PIX, Cartão, etc)",
+  "dataVencimento": "data de vencimento SE for boleto",
   "confianca": "nível de confiança na extração (0-100)"
 }
 
-IMPORTANTE: Leia TODO o conteúdo do documento e extraia todas as informações visíveis. Seja muito preciso com valores e datas.`
+IMPORTANTE: 
+- Leia TODO o conteúdo do documento
+- Se for BOLETO, sempre extraia 'Boleto' como formaPagamento
+- Se tiver código de barras, é provavelmente um boleto
+- Extraia a data de vencimento em boletos
+- Seja muito preciso com valores e datas
+- NÃO tente extrair números de documento/nota - foque nos dados essenciais`
               },
               {
                 type: file.type === 'application/pdf' ? 'document' as any : 'image',
@@ -121,35 +133,48 @@ IMPORTANTE: Leia TODO o conteúdo do documento e extraia todas as informações 
       let extractedData;
       try {
         const jsonMatch = content.match(/\{[\s\S]*\}/);
-        extractedData = JSON.parse(jsonMatch?.[0] || '{}');
-      } catch {
+        const jsonString = jsonMatch?.[0] || '{}';
+        console.log('🔍 JSON extraído:', jsonString);
+        extractedData = JSON.parse(jsonString);
+        console.log('✅ Dados parseados:', extractedData);
+      } catch (parseError) {
+        console.error('❌ Erro ao parsear JSON:', parseError);
         extractedData = {};
       }
 
       // Identificar campos faltantes
       const camposFaltantes: string[] = [];
       if (!extractedData.valor) camposFaltantes.push('valor');
-      if (!extractedData.data) camposFaltantes.push('data');
+      if (!extractedData.data && !extractedData.dataVencimento) camposFaltantes.push('data');
       if (!extractedData.fornecedor && !extractedData.cliente) camposFaltantes.push('fornecedor_cliente');
       
-      // Sempre solicita forma de pagamento e centro de custo (não detectáveis)
-      camposFaltantes.push('forma_pagamento', 'centro_custo');
+      // Detectar forma de pagamento automaticamente para boletos
+      let formaPagamentoDetectada = extractedData.formaPagamento || '';
+      if (extractedData.tipo === 'boleto' && !formaPagamentoDetectada) {
+        formaPagamentoDetectada = 'Boleto';
+      }
+      
+      // Só solicita forma de pagamento se realmente não foi detectada
+      if (!formaPagamentoDetectada) {
+        camposFaltantes.push('forma_pagamento');
+      }
 
-      return {
+      const result = {
         tipo: extractedData.tipo || 'outro',
         valor: extractedData.valor || '',
-        data: extractedData.data || '',
+        data: extractedData.data || extractedData.dataVencimento || '',
         fornecedor: extractedData.fornecedor || '',
         cliente: extractedData.cliente || '',
         cnpj: extractedData.cnpj || '',
-        numeroNota: extractedData.numeroNota || '',
         descricao: extractedData.descricao || '',
-        formaPagamento: '',
-        centroCusto: '',
-        dadosCompletos: camposFaltantes.filter(c => !['forma_pagamento', 'centro_custo'].includes(c)).length === 0,
+        formaPagamento: formaPagamentoDetectada,
+        dadosCompletos: camposFaltantes.length === 0,
         camposFaltantes,
         confianca: extractedData.confianca || 0
       };
+      
+      console.log('📦 Resultado final do processamento:', result);
+      return result;
 
     } catch (error) {
       console.error('❌ Erro ao processar documento com Claude:', error);
@@ -197,7 +222,7 @@ IMPORTANTE: Esta conversa NÃO tem memória - trate cada mensagem como independe
 
   // Valida se documento está completo
   validateDocument(data: DocumentData): boolean {
-    const required = ['valor', 'data', 'formaPagamento', 'centroCusto'];
+    const required = ['valor', 'data'];
     const fornecedorOuCliente = data.fornecedor || data.cliente;
     
     return required.every(field => data[field as keyof DocumentData]) && !!fornecedorOuCliente;

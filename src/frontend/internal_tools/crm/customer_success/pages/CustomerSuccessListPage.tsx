@@ -6,10 +6,9 @@ import { useCustomerSuccess } from '../hooks/useCustomerSuccess';
 import { ClientsFilters } from '../components/ClientsFilters';
 import { TicketsFilters } from '../components/TicketsFilters';
 import { SupportChatPage } from './SupportChatPage';
-import { OnboardingKanban } from '../components/OnboardingKanban';
 
 export const CustomerSuccessListPage: React.FC = () => {
-  const [viewMode, setViewMode] = useState<'overview' | 'onboarding' | 'clients' | 'tickets' | 'support'>('overview');
+  const [viewMode, setViewMode] = useState<'overview' | 'clients' | 'tickets' | 'support'>('overview');
 
   // Configurações dinâmicas do cabeçalho
   const getHeaderConfig = () => {
@@ -19,12 +18,6 @@ export const CustomerSuccessListPage: React.FC = () => {
           title: 'Sucesso do Cliente',
           subtitle: 'Monitore a saúde dos clientes e gerencie tickets de suporte',
           icon: CheckCircle
-        };
-      case 'onboarding':
-        return {
-          title: 'Onboarding',
-          subtitle: 'Acompanhe o progresso do onboarding dos novos clientes',
-          icon: Users
         };
       case 'clients':
         return {
@@ -255,9 +248,6 @@ export const CustomerSuccessListPage: React.FC = () => {
     </div>
   );
 
-  const renderOnboarding = () => (
-    <OnboardingKanban />
-  );
 
   const renderSupport = () => (
     <SupportChatPage />
@@ -302,19 +292,6 @@ export const CustomerSuccessListPage: React.FC = () => {
           >
             <LayoutGrid className="h-4 w-4" />
             Visão Geral
-          </button>
-          <button
-            onClick={() => setViewMode('onboarding')}
-            className={`
-              flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors
-              ${viewMode === 'onboarding' 
-                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' 
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }
-            `}
-          >
-            <LayoutGrid className="h-4 w-4" />
-            Onboarding
           </button>
           <button
             onClick={() => setViewMode('clients')}
@@ -377,7 +354,6 @@ export const CustomerSuccessListPage: React.FC = () => {
       {/* Conteúdo principal */}
       <div className="flex-1 overflow-auto">
         {viewMode === 'overview' && renderOverview()}
-        {viewMode === 'onboarding' && renderOnboarding()}
         {viewMode === 'clients' && renderClients()}
         {viewMode === 'tickets' && renderTickets()}
         {viewMode === 'support' && renderSupport()}

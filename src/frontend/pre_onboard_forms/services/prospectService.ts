@@ -13,42 +13,42 @@ export function convertFormDataToProspect(formData: FormData, origem?: string): 
 
   return {
     // Dados pessoais do contato
-    nome_contato: formData.nomeContato,
-    cpf_contato: formData.cpfContato,
-    email_contato: formData.emailContato,
-    telefone_contato: formData.telefoneContato || undefined,
-    cargo_contato: formData.cargoContato || undefined,
+    contact_name: formData.nomeContato,
+    contact_cpf: formData.cpfContato,
+    contact_email: formData.emailContato,
+    contact_phone: formData.telefoneContato || undefined,
+    contact_role: formData.cargoContato || undefined,
     
     // Dados da empresa
-    nome_empresa: formData.nomeEmpresa,
+    company_name: formData.nomeEmpresa,
     cnpj: formData.cnpj,
-    endereco: formData.endereco || undefined,
-    numero: formData.numero || undefined,
-    bairro: formData.bairro || undefined,
-    cep: formData.cep || undefined,
-    cidade: formData.cidade || undefined,
-    estado: formData.estado || undefined,
+    address: formData.endereco || undefined,
+    number: formData.numero || undefined,
+    neighborhood: formData.bairro || undefined,
+    zip_code: formData.cep || undefined,
+    city: formData.cidade || undefined,
+    state: formData.estado || undefined,
     
     // Dados técnicos/operacionais
-    segmento: formData.segmento || undefined,
+    segment: formData.segmento || undefined,
     areas: formData.areas.length > 0 ? formData.areas : undefined,
-    bancos: formData.bancos.length > 0 ? formData.bancos : undefined,
-    bancos_outro: formData.bancosOutro || undefined,
-    ferramentas: formData.ferramentas.length > 0 ? formData.ferramentas : undefined,
-    ferramentas_outro: formData.ferramentasOutro || undefined,
-    fornecedores: formData.fornecedores.length > 0 ? formData.fornecedores : undefined,
-    organizacao: formData.organizacao.length > 0 ? formData.organizacao : undefined,
-    relatorios: formData.relatorios.length > 0 ? formData.relatorios : undefined,
+    banks: formData.bancos.length > 0 ? formData.bancos : undefined,
+    banks_other: formData.bancosOutro || undefined,
+    tools: formData.ferramentas.length > 0 ? formData.ferramentas : undefined,
+    tools_other: formData.ferramentasOutro || undefined,
+    suppliers: formData.fornecedores.length > 0 ? formData.fornecedores : undefined,
+    organization: formData.organizacao.length > 0 ? formData.organizacao : undefined,
+    reports: formData.relatorios.length > 0 ? formData.relatorios : undefined,
     
     // Expectativas e objetivos
-    expectativas_sucesso: formData.expectativasSucesso || undefined,
+    success_expectations: formData.expectativasSucesso || undefined,
     
     // Plano selecionado
-    plano: planoMap[formData.plano] || 'controle',
-    valor_mensal: formData.valorMensal,
+    plan: planoMap[formData.plano] || 'controle',
+    monthly_value: formData.valorMensal,
     
     // Metadados
-    origem: origem || 'site',
+    source: origem || 'site',
     observacoes: undefined
   };
 }

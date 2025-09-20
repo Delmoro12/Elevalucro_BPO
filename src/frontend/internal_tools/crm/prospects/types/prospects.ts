@@ -3,25 +3,25 @@ export type ProspectStatus = 'pending' | 'contacted' | 'contract_sent' | 'signed
 
 export interface ProspectListItem {
   id: string;
-  nome_contato: string;
-  email_contato: string;
-  telefone_contato?: string;
-  cargo_contato?: string;
-  nome_empresa: string;
+  contact_name: string;
+  contact_email: string;
+  contact_phone?: string;
+  contact_role?: string;
+  company_name: string;
   cnpj: string;
-  segmento?: string;
-  plano: 'controle' | 'gerencial' | 'avancado';
-  valor_mensal: number;
+  segment?: string;
+  plan: 'controle' | 'gerencial' | 'avancado';
+  monthly_value: number;
   status: ProspectStatus;
-  origem?: string;
+  source?: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface ProspectFilters {
-  plano?: 'controle' | 'gerencial' | 'avancado';
-  origem?: string;
-  segmento?: string;
+  plan?: 'controle' | 'gerencial' | 'avancado';
+  source?: string;
+  segment?: string;
   search?: string;
 }
 
@@ -36,68 +36,68 @@ export interface ProspectListResponse {
 export interface ProspectEditData {
   id: string;
   // Dados pessoais do contato
-  nome_contato: string;
-  cpf_contato: string;
-  email_contato: string;
-  telefone_contato?: string;
-  cargo_contato?: string;
+  contact_name: string;
+  contact_cpf: string;
+  contact_email: string;
+  contact_phone?: string;
+  contact_role?: string;
   
   // Dados da empresa
-  nome_empresa: string;
+  company_name: string;
   cnpj: string;
-  endereco?: string;
-  numero?: string;
-  bairro?: string;
-  cep?: string;
-  cidade?: string;
-  estado?: string;
+  address?: string;
+  number?: string;
+  neighborhood?: string;
+  zip_code?: string;
+  city?: string;
+  state?: string;
   
   // Dados técnicos/operacionais
-  segmento?: string;
+  segment?: string;
   areas?: string[];
-  bancos?: string[];
-  ferramentas?: string[];
-  fornecedores?: string[];
-  organizacao?: string[];
-  relatorios?: string[];
+  banks?: string[];
+  tools?: string[];
+  suppliers?: string[];
+  organization?: string[];
+  reports?: string[];
   
   // Expectativas e objetivos
-  expectativas_sucesso?: string;
+  success_expectations?: string;
   
   // Plano selecionado
-  plano: 'controle' | 'gerencial' | 'avancado';
-  valor_mensal: number;
+  plan: 'controle' | 'gerencial' | 'avancado';
+  monthly_value: number;
   
   // Status e metadados
   status: ProspectStatus;
-  origem?: string;
-  observacoes?: string;
+  source?: string;
+  notes?: string;
 }
 
 export interface ProspectUpdatePayload {
-  nome_contato?: string;
-  cpf_contato?: string;
-  email_contato?: string;
-  telefone_contato?: string;
-  cargo_contato?: string;
-  nome_empresa?: string;
+  contact_name?: string;
+  contact_cpf?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  contact_role?: string;
+  company_name?: string;
   cnpj?: string;
-  endereco?: string;
-  numero?: string;
-  bairro?: string;
-  cep?: string;
-  cidade?: string;
-  estado?: string;
-  segmento?: string;
+  address?: string;
+  number?: string;
+  neighborhood?: string;
+  zip_code?: string;
+  city?: string;
+  state?: string;
+  segment?: string;
   areas?: string[];
-  bancos?: string[];
-  ferramentas?: string[];
-  fornecedores?: string[];
-  organizacao?: string[];
-  relatorios?: string[];
-  expectativas_sucesso?: string;
-  plano?: 'controle' | 'gerencial' | 'avancado';
-  valor_mensal?: number;
+  banks?: string[];
+  tools?: string[];
+  suppliers?: string[];
+  organization?: string[];
+  reports?: string[];
+  success_expectations?: string;
+  plan?: 'controle' | 'gerencial' | 'avancado';
+  monthly_value?: number;
   status?: ProspectStatus;
   origem?: string;
   observacoes?: string;

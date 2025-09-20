@@ -17,15 +17,15 @@ export const ProspectsFilters: React.FC<ProspectsFiltersProps> = ({
     onFiltersChange({ ...filters, search });
   };
 
-  const handlePlanoChange = (plano: string) => {
+  const handlePlanChange = (plan: string) => {
     onFiltersChange({
       ...filters,
-      plano: plano as 'controle' | 'gerencial' | 'avancado' | undefined,
+      plan: plan as 'controle' | 'gerencial' | 'avancado' | undefined,
     });
   };
 
-  const handleOrigemChange = (origem: string) => {
-    onFiltersChange({ ...filters, origem: origem || undefined });
+  const handleSourceChange = (source: string) => {
+    onFiltersChange({ ...filters, source: source || undefined });
   };
 
   const clearFilters = () => {
@@ -53,8 +53,8 @@ export const ProspectsFilters: React.FC<ProspectsFiltersProps> = ({
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-slate-400" />
           <select
-            value={filters.plano || ''}
-            onChange={(e) => handlePlanoChange(e.target.value)}
+            value={filters.plan || ''}
+            onChange={(e) => handlePlanChange(e.target.value)}
             className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
             <option value="">Todos os planos</option>
@@ -67,8 +67,8 @@ export const ProspectsFilters: React.FC<ProspectsFiltersProps> = ({
         {/* Filtro por Origem */}
         <div className="flex items-center gap-2">
           <select
-            value={filters.origem || ''}
-            onChange={(e) => handleOrigemChange(e.target.value)}
+            value={filters.source || ''}
+            onChange={(e) => handleSourceChange(e.target.value)}
             className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
             <option value="">Todas as origens</option>

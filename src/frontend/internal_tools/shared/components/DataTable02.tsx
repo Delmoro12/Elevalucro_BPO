@@ -1,0 +1,704 @@
+'use client';
+
+import React, { ReactNode, useState, useRef, useEffect } from 'react';
+import { Search, RotateCcw, Plus, Calendar, ChevronDown, MoreVertical } from 'lucide-react';
+
+// Tipos genéricos para a tabela
+export interface DataTable02Column<T = any> {
+  key: string;
+  title: string;
+  width?: string;
+  className?: string;
+  render?: (value: any, record: T, index: number) => ReactNode;
+}
+
+export interface DataTable02Tab {
+  key: string;
+  label: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  count?: number;
+}
+
+export interface DataTable02Filter {
+  key: string;
+  label: string;
+  placeholder?: string;
+  type: 'select' | 'text' | 'date' | 'number';
+  options?: Array<{ value: string; label: string }>;
+  value?: any;
+  onChange?: (value: any) => void;
+}
+
+export interface DataTable02DateFilter {
+  type: 'month' | 'specific' | 'range';
+  month?: string;        // YYYY-MM
+  specificDate?: string; // YYYY-MM-DD
+  startDate?: string;    // YYYY-MM-DD
+  endDate?: string;      // YYYY-MM-DD
+}
+
+export interface DataTable02Action<T = any> {
+  key: string;
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  onClick: (record: T) => void;
+  color?: string;
+  show?: (record: T) => boolean;
+}
+
+export interface DataTable02Props<T = any> {
+  // Dados
+  data: T[];
+  columns: DataTable02Column<T>[];
+  loading?: boolean;
+
+  // Paginação
+  pagination?: {
+    pageSize?: number;          // Padrão: 30
+    showTotal?: boolean;        // Mostrar "Mostrando X de Y registros"
+    showSizeChanger?: boolean;  // Permitir mudar tamanho da página
+    pageSizeOptions?: number[]; // Opções (padrão: [10, 30, 50, 100])
+  };
+
+  // Header
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  searchPlaceholder?: string;
+
+  filters?: DataTable02Filter[];
+
+  // Filtro de data
+  dateFilter?: {
+    value: DataTable02DateFilter | null;
+    onChange: (filter: DataTable02DateFilter | null) => void;
+    dateField: string; // ex: 'due_date', 'created_at'
+    label?: string;
+  };
+
+  tabs?: DataTable02Tab[];
+  activeTab?: string;
+  onTabChange?: (key: string) => void;
+
+  onRefresh?: () => void;
+
+  createButton?: {
+    label: string;
+    icon?: React.ComponentType<{ className?: string }>;
+    onClick: () => void;
+  };
+
+  // Tabela
+  actions?: DataTable02Action<T>[];
+
+  // Estados vazios
+  emptyMessage?: string;
+  emptyDescription?: string;
+  emptyIcon?: React.ComponentType<{ className?: string }>;
+  emptyAction?: {
+    label: string;
+    onClick: () => void;
+  };
+
+  // Estilos
+  className?: string;
+  containerClassName?: string;
+  headerClassName?: string;
+  tableClassName?: string;
+
+  // Callbacks
+  onRowClick?: (record: T, index: number) => void;
+}
+
+export const DataTable02 = <T extends Record<string, any>>(props: DataTable02Props<T>): JSX.Element => {
+  const {
+    // Dados
+    data,
+    columns,
+    loading = false,
+
+    // Paginação
+    pagination = { pageSize: 30, showTotal: true, showSizeChanger: false },
+
+    // Header
+    searchValue = '',
+    onSearchChange,
+    searchPlaceholder = 'Buscar...',
+
+    filters = [],
+
+    // Filtro de data
+    dateFilter,
+
+    tabs = [],
+    activeTab,
+    onTabChange,
+
+    onRefresh,
+
+    createButton,
+
+    actions = [],
+
+    emptyMessage = 'Nenhum registro encontrado',
+    emptyDescription = 'Comece adicionando o primeiro registro.',
+    emptyIcon: EmptyIcon,
+    emptyAction,
+
+    className = '',
+    containerClassName = '',
+    headerClassName = '',
+    tableClassName = '',
+
+    onRowClick,
+  } = props;
+
+  const DefaultIcon = createButton?.icon || Plus;
+
+  // Estados de paginação
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(pagination?.pageSize || 30);
+
+  // Estados de filtros
+  const [dateFilterOpen, setDateFilterOpen] = useState(false);
+  const [dateFilterType, setDateFilterType] = useState<'month' | 'specific' | 'range'>('month');
+  const [tempDateFilter, setTempDateFilter] = useState<DataTable02DateFilter | null>(null);
+  const dateFilterRef = useRef<HTMLDivElement>(null);
+  const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null);
+  const menuRefs = useRef<Record<number, HTMLDivElement | null>>({});
+
+  // Lógica de paginação
+  const totalItems = data.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedData = data.slice(startIndex, endIndex);
+
+  // Reset página ao mudar dados/tamanho
+  useEffect(() => {
+    setCurrentPage(1);
+    setPageSize(pagination?.pageSize || 30);
+  }, [data.length, pagination?.pageSize]);
+
+  // Fechar dropdowns ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dateFilterRef.current && !dateFilterRef.current.contains(event.target as Node)) {
+        setDateFilterOpen(false);
+      }
+      if (openMenuIndex !== null) {
+        const currentMenuRef = menuRefs.current[openMenuIndex];
+        if (currentMenuRef && !currentMenuRef.contains(event.target as Node)) {
+          setOpenMenuIndex(null);
+        }
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [openMenuIndex]);
+
+  // Helpers - Filtro de data
+  const getDateFilterLabel = () => {
+    if (!dateFilter?.value) return dateFilter?.label || 'Filtrar por data';
+    const { type, month, specificDate, startDate, endDate } = dateFilter.value;
+
+    if (type === 'month' && month) {
+      const [year, monthNum] = month.split('-');
+      const monthName = new Date(parseInt(year), parseInt(monthNum) - 1).toLocaleDateString('pt-BR', {
+        month: 'long',
+        year: 'numeric',
+      });
+      return `Mês: ${monthName}`;
+    }
+    if (type === 'specific' && specificDate) {
+      return `Data: ${new Date(specificDate).toLocaleDateString('pt-BR')}`;
+    }
+    if (type === 'range' && startDate && endDate) {
+      return `${new Date(startDate).toLocaleDateString('pt-BR')} - ${new Date(endDate).toLocaleDateString('pt-BR')}`;
+    }
+    return dateFilter?.label || 'Filtrar por data';
+  };
+
+  const applyDateFilter = () => {
+    if (tempDateFilter) dateFilter?.onChange(tempDateFilter);
+    setDateFilterOpen(false);
+  };
+
+  const clearDateFilter = () => {
+    setTempDateFilter(null);
+    dateFilter?.onChange(null);
+    setDateFilterOpen(false);
+  };
+
+  const handleModalOpen = () => {
+    setTempDateFilter(dateFilter?.value || null);
+    setDateFilterOpen(true);
+  };
+
+  const getCurrentMonth = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  };
+
+  // Render de célula
+  const renderCellValue = (column: DataTable02Column<T>, record: T, index: number) => {
+    const value = record[column.key];
+    if (column.render) return column.render(value, record, index);
+    if (value === null || value === undefined) return '-';
+    return String(value);
+  };
+
+  // Render de ações (menu)
+  const renderActions = (record: T, index: number) => {
+    const visibleActions = actions.filter((a) => !a.show || a.show(record));
+    if (visibleActions.length === 0) return null;
+
+    return (
+      <div className="flex items-center justify-start">
+        <div className="relative" ref={(el) => { menuRefs.current[index] = el; }}>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenMenuIndex(openMenuIndex === index ? null : index);
+            }}
+            className="p-2 rounded-lg transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+            title="Ações"
+          >
+            <MoreVertical className="h-4 w-4" />
+          </button>
+
+          {openMenuIndex === index && (
+            <div
+              className="fixed w-48 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg shadow-xl py-1"
+              style={{
+                zIndex: 9999,
+                top: (menuRefs.current[index]?.getBoundingClientRect().bottom || 0) + 4,
+                left: (menuRefs.current[index]?.getBoundingClientRect().left || 0),
+              }}
+            >
+              {visibleActions.map((action) => {
+                const Icon = action.icon;
+                const isDanger = action.color === 'text-red-600 hover:text-red-900';
+                return (
+                  <button
+                    key={action.key}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      action.onClick(record);
+                      setOpenMenuIndex(null);
+                    }}
+                    className={`w-full px-4 py-2 text-left flex items-center gap-3 transition-colors hover:bg-slate-100 dark:hover:bg-slate-600 ${
+                      isDanger ? 'text-red-600 hover:text-red-700 dark:text-red-400' : 'text-slate-700 dark:text-slate-300'
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span className="text-sm">{action.title}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className={`space-y-4 ${containerClassName}`}>
+      {/* Card Integrado */}
+      <div
+        className={`bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 flex flex-col ${className}`}
+        style={{ minHeight: 'calc(100vh - 12rem)', overflow: 'visible' }}
+      >
+        {/* Header com Filtros */}
+        {(onSearchChange || filters.length > 0 || dateFilter || tabs.length > 0 || createButton || onRefresh) && (
+          <div className={`p-4 border-b border-slate-200 dark:border-slate-700 ${headerClassName}`}>
+            <div className="flex items-center justify-between gap-4">
+              {/* Esquerda: busca e filtros */}
+              <div className="flex items-center gap-3 flex-1">
+                {/* Busca */}
+                {onSearchChange && (
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <input
+                      type="text"
+                      value={searchValue}
+                      onChange={(e) => onSearchChange(e.target.value)}
+                      placeholder={searchPlaceholder}
+                      className="pl-10 pr-4 py-2 w-64 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    />
+                  </div>
+                )}
+
+                {/* Filtros custom */}
+                {filters.map((filter) =>
+                  filter.type === 'select' ? (
+                    <select
+                      key={filter.key}
+                      value={filter.value || ''}
+                      onChange={(e) => filter.onChange?.(e.target.value)}
+                      className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    >
+                      <option value="">{filter.placeholder || filter.label}</option>
+                      {filter.options?.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      key={filter.key}
+                      type={filter.type}
+                      value={filter.value || ''}
+                      onChange={(e) => filter.onChange?.(e.target.value)}
+                      placeholder={filter.placeholder || filter.label}
+                      className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    />
+                  )
+                )}
+
+                {/* Filtro de Data */}
+                {dateFilter && (
+                  <div className="relative" ref={dateFilterRef}>
+                    <button
+                      onClick={handleModalOpen}
+                      className="flex items-center gap-2 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-600 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                    >
+                      <Calendar className="h-4 w-4" />
+                      <span className="text-sm">{getDateFilterLabel()}</span>
+                      <ChevronDown className={`h-4 w-4 transition-transform ${dateFilterOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {dateFilterOpen && (
+                      <div className="absolute z-50 top-full left-0 mt-1 w-80 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg shadow-lg p-4">
+                        {/* Tipo */}
+                        <div className="mb-4">
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Tipo de Filtro</label>
+                          <div className="flex gap-2">
+                            {[
+                              { key: 'month', label: 'Mês' },
+                              { key: 'specific', label: 'Data específica' },
+                              { key: 'range', label: 'Período' },
+                            ].map((type) => (
+                              <button
+                                key={type.key}
+                                onClick={() => setDateFilterType(type.key as any)}
+                                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                                  dateFilterType === type.key
+                                    ? 'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300'
+                                    : 'bg-slate-100 dark:bg-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-500'
+                                }`}
+                              >
+                                {type.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Campos */}
+                        {dateFilterType === 'month' && (
+                          <div className="mb-4">
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Mês</label>
+                            <input
+                              type="month"
+                              value={tempDateFilter?.month || getCurrentMonth()}
+                              onChange={(e) => setTempDateFilter({ type: 'month', month: e.target.value })}
+                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            />
+                          </div>
+                        )}
+
+                        {dateFilterType === 'specific' && (
+                          <div className="mb-4">
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Data</label>
+                            <input
+                              type="date"
+                              value={tempDateFilter?.specificDate || ''}
+                              onChange={(e) => setTempDateFilter({ type: 'specific', specificDate: e.target.value })}
+                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            />
+                          </div>
+                        )}
+
+                        {dateFilterType === 'range' && (
+                          <div className="mb-4 space-y-3">
+                            <div>
+                              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Data inicial</label>
+                              <input
+                                type="date"
+                                value={tempDateFilter?.startDate || ''}
+                                onChange={(e) => setTempDateFilter({ ...(tempDateFilter || { type: 'range' }), type: 'range', startDate: e.target.value })}
+                                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Data final</label>
+                              <input
+                                type="date"
+                                value={tempDateFilter?.endDate || ''}
+                                onChange={(e) => setTempDateFilter({ ...(tempDateFilter || { type: 'range' }), type: 'range', endDate: e.target.value })}
+                                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Ações */}
+                        <div className="flex gap-2 pt-2 border-t border-slate-200 dark:border-slate-600">
+                          <button
+                            onClick={clearDateFilter}
+                            className="flex-1 px-3 py-1.5 text-sm border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
+                          >
+                            Limpar
+                          </button>
+                          <button
+                            onClick={applyDateFilter}
+                            className="flex-1 px-3 py-1.5 text-sm bg-emerald-600 text-white rounded hover:bg-emerald-700 transition-colors"
+                          >
+                            Filtrar
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Refresh */}
+                {onRefresh && (
+                  <button
+                    onClick={onRefresh}
+                    className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                    title="Atualizar"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Direita: Tabs e Criar */}
+              <div className="flex items-center gap-3">
+                {tabs.length > 0 && (
+                  <div className="flex items-center bg-slate-100 dark:bg-slate-700 rounded-lg p-1">
+                    {tabs.map((tab) => {
+                      const Icon = tab.icon;
+                      const active = activeTab === tab.key;
+                      return (
+                        <button
+                          key={tab.key}
+                          onClick={() => onTabChange?.(tab.key)}
+                          className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                            active ? 'bg-white dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                          }`}
+                        >
+                          {Icon && <Icon className="h-4 w-4" />}
+                          {tab.label}
+                          {tab.count !== undefined && <span className="ml-1 text-xs">({tab.count})</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {createButton && (
+                  <button
+                    onClick={createButton.onClick}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors bg-emerald-600 text-white hover:bg-emerald-700"
+                  >
+                    <DefaultIcon className="h-4 w-4" />
+                    {createButton.label}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Área de Conteúdo */}
+        <div className={`flex-1 ${tableClassName}`} style={{ overflow: 'visible' }}>
+          {loading ? (
+            <div className="flex-1 flex items-center justify-center p-8">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
+                <p className="mt-4 text-slate-600 dark:text-slate-400">Carregando...</p>
+              </div>
+            </div>
+          ) : data.length === 0 ? (
+            <div className="flex-1 flex items-center justify-center p-8">
+              <div className="text-center">
+                {EmptyIcon && <EmptyIcon className="mx-auto h-12 w-12 text-slate-400" />}
+                <h3 className="mt-4 text-lg font-medium text-slate-900 dark:text-white">{emptyMessage}</h3>
+                <p className="mt-2 text-slate-600 dark:text-slate-400">{emptyDescription}</p>
+                {emptyAction && (
+                  <button
+                    onClick={emptyAction.onClick}
+                    className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                  >
+                    <Plus className="h-4 w-4" />
+                    {emptyAction.label}
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="overflow-x-auto" style={{ overflowY: 'visible' }}>
+                <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+                  <thead className="bg-slate-50 dark:bg-slate-900/50">
+                    <tr>
+                      {actions.length > 0 && (
+                        <th className="px-3 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider w-16">
+                          Ações
+                        </th>
+                      )}
+                      {columns.map((column) => (
+                        <th
+                          key={column.key}
+                          className={`px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider ${column.className || ''}`}
+                          style={{ width: column.width }}
+                        >
+                          {column.title}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
+                    {paginatedData.map((record, index) => (
+                      <tr
+                        key={index}
+                        onClick={() => onRowClick?.(record, index)}
+                        className={`hover:bg-slate-50 dark:hover:bg-slate-700/50 ${onRowClick ? 'cursor-pointer' : ''}`}
+                      >
+                        {actions.length > 0 && (
+                          <td className="px-3 py-4 whitespace-nowrap text-left text-sm">{renderActions(record, index)}</td>
+                        )}
+                        {columns.map((column) => (
+                          <td
+                            key={column.key}
+                            className={`px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100 ${column.className || ''}`}
+                          >
+                            {renderCellValue(column, record, index)}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Paginação */}
+              {totalItems > 0 && (
+                <div className="bg-white dark:bg-slate-800 px-4 py-3 flex items-center justify-between border-t border-slate-200 dark:border-slate-700 sm:px-6">
+                  <div className="flex-1 flex justify-between sm:hidden">
+                    <button
+                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                      disabled={currentPage === 1}
+                      className="relative inline-flex items-center px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-md text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Anterior
+                    </button>
+                    <button
+                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                      disabled={currentPage === totalPages}
+                      className="ml-3 relative inline-flex items-center px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-md text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Próximo
+                    </button>
+                  </div>
+
+                  <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                      {pagination?.showTotal && (
+                        <p className="text-sm text-slate-700 dark:text-slate-300">
+                          Mostrando <span className="font-medium">{startIndex + 1}</span> a{' '}
+                          <span className="font-medium">{Math.min(endIndex, totalItems)}</span> de{' '}
+                          <span className="font-medium">{totalItems}</span> registros
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      {/* Alterar pageSize */}
+                      {pagination?.showSizeChanger && (
+                        <select
+                          value={pageSize}
+                          onChange={(e) => setPageSize(Number(e.target.value))}
+                          className="px-2 py-1 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-sm text-slate-700 dark:text-slate-300"
+                        >
+                          {(pagination.pageSizeOptions || [10, 30, 50, 100]).map((opt) => (
+                            <option key={opt} value={opt}>
+                              {opt}/página
+                            </option>
+                          ))}
+                        </select>
+                      )}
+
+                      <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        <button
+                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                          disabled={currentPage === 1}
+                          className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <span className="sr-only">Anterior</span>
+                          <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path
+                              fillRule="evenodd"
+                              d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+
+                        {/* Números das páginas */}
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                          let pageNumber: number;
+                          if (totalPages <= 5) {
+                            pageNumber = i + 1;
+                          } else if (currentPage <= 3) {
+                            pageNumber = i + 1;
+                          } else if (currentPage >= totalPages - 2) {
+                            pageNumber = totalPages - 4 + i;
+                          } else {
+                            pageNumber = currentPage - 2 + i;
+                          }
+
+                          return (
+                            <button
+                              key={pageNumber}
+                              onClick={() => setCurrentPage(pageNumber)}
+                              className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                                currentPage === pageNumber
+                                  ? 'z-10 bg-blue-50 dark:bg-blue-900/50 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-300'
+                                  : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'
+                              }`}
+                            >
+                              {pageNumber}
+                            </button>
+                          );
+                        })}
+
+                        <button
+                          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                          disabled={currentPage === totalPages}
+                          className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <span className="sr-only">Próximo</span>
+                          <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path
+                              fillRule="evenodd"
+                              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </nav>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};

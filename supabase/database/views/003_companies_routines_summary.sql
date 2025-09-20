@@ -6,11 +6,11 @@
 CREATE OR REPLACE VIEW companies_routines_summary AS
 SELECT 
   c.id as company_id,
-  c.name as nome_empresa,
-  '' as email, -- Campo não existe na tabela companies
-  '' as telefone, -- Campo não existe na tabela companies  
-  '' as segmento, -- Campo não existe na tabela companies
-  c.subscription_plan as plano,
+  c.name as company_name,
+  c.email as email,
+  c.phone as phone,
+  c.segment as segment,
+  c.subscription_plan as plan,
   c.lifecycle_stage,
   c.created_at,
   
@@ -99,7 +99,7 @@ LEFT JOIN routines r ON cr.routine_id = r.id
 LEFT JOIN routine_executions rh ON cr.id = rh.company_routine_id
 WHERE c.is_active = true
 GROUP BY 
-  c.id, c.name, c.subscription_plan, 
+  c.id, c.name, c.email, c.phone, c.segment, c.subscription_plan, 
   c.lifecycle_stage, c.created_at
 ORDER BY health_score DESC, c.name ASC;
 

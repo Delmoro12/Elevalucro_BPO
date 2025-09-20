@@ -8,14 +8,16 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Home,
-  CheckSquare,
   FileText,
   MessageSquare,
   Zap,
   LogOut,
-  TrendingUp,
   DollarSign,
-  Workflow
+  ClipboardList,
+  Settings,
+  Users,
+  Key,
+  CalendarCheck
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -44,19 +46,24 @@ const menuItems: MenuItem[] = [
     icon: DollarSign,
   },
   {
-    id: 'actions',
-    label: 'Ações',
-    icon: Workflow,
+    id: 'financial_registers',
+    label: 'Registros Financeiros',
+    icon: ClipboardList,
   },
   {
-    id: 'approvals',
-    label: 'Aprovações',
-    icon: CheckSquare,
+    id: 'supplier_and_customer_registration',
+    label: 'Cadastros',
+    icon: Users,
   },
   {
-    id: 'documents',
-    label: 'Documentos',
-    icon: FileText,
+    id: 'accesses',
+    label: 'Acessos',
+    icon: Key,
+  },
+  {
+    id: 'routines',
+    label: 'Rotinas',
+    icon: CalendarCheck,
   },
   {
     id: 'tickets',
@@ -67,6 +74,11 @@ const menuItems: MenuItem[] = [
     id: 'integrations',
     label: 'Integrações',
     icon: Zap,
+  },
+  {
+    id: 'config',
+    label: 'Configurações',
+    icon: Settings,
   }
 ];
 

@@ -37,43 +37,43 @@ export interface FormData {
 
 export interface ProspectData {
   // Dados pessoais do contato
-  nome_contato: string;
-  cpf_contato: string;
-  email_contato: string;
-  telefone_contato?: string;
-  cargo_contato?: string;
+  contact_name: string;
+  contact_cpf: string;
+  contact_email: string;
+  contact_phone?: string;
+  contact_role?: string;
   
   // Dados da empresa
-  nome_empresa: string;
+  company_name: string;
   cnpj: string;
-  endereco?: string;
-  numero?: string;
-  bairro?: string;
-  cep?: string;
-  cidade?: string;
-  estado?: string;
+  address?: string;
+  number?: string;
+  neighborhood?: string;
+  zip_code?: string;
+  city?: string;
+  state?: string;
   
   // Dados técnicos/operacionais
-  segmento?: string;
+  segment?: string;
   areas?: string[];
-  bancos?: string[];
-  bancos_outro?: string;
-  ferramentas?: string[];
-  ferramentas_outro?: string;
-  fornecedores?: string[];
-  organizacao?: string[];
-  relatorios?: string[];
+  banks?: string[];
+  banks_other?: string;
+  tools?: string[];
+  tools_other?: string;
+  suppliers?: string[];
+  organization?: string[];
+  reports?: string[];
   
   // Expectativas e objetivos
-  expectativas_sucesso?: string;
+  success_expectations?: string;
   
   // Plano selecionado
-  plano: 'controle' | 'gerencial' | 'avancado';
-  valor_mensal: number;
+  plan: 'controle' | 'gerencial' | 'avancado';
+  monthly_value: number;
   
   // Metadados
-  origem?: string;
-  observacoes?: string;
+  source?: string;
+  notes?: string;
 }
 
 export interface PlanConfig {

@@ -5,11 +5,14 @@ import { X, Upload, FileText, Bot, Send, AlertCircle, CheckSquare, ArrowLeft } f
 import { AIChat } from './AIChat';
 import { claudeService, DocumentData } from '../services/claudeService';
 import { useDocumentsService } from '../services/documentsService';
+import { useStorageService } from '../services/storageService';
 import { documentDataToCreateRequest } from '../types';
+import { useAuth } from '../../auth/contexts/AuthContext';
 
 interface DocumentUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 interface DocumentInfo {
@@ -26,7 +29,7 @@ interface ChatMessage {
   timestamp: Date;
 }
 
-export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({ isOpen, onClose }) => {
+export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const [documentInfo, setDocumentInfo] = useState<DocumentInfo>({
     file: null,
     categoria: '',
@@ -44,6 +47,8 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({ isOpen
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const documentsService = useDocumentsService();
+  const storageService = useStorageService();
+  const { companyId } = useAuth();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -114,7 +119,6 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({ isOpen
               case 'data': return '• Data da transação';
               case 'fornecedor_cliente': return '• Nome do fornecedor/cliente';
               case 'forma_pagamento': return '• Forma de pagamento (PIX, cartão, etc.)';
-              case 'centro_custo': return '• Centro de custo (Administrativo, Operacional, etc.)';
               default: return `• ${campo}`;
             }
           })
@@ -143,8 +147,36 @@ Por favor, me informe esses dados para que eu possa finalizar o processamento do
           }
         ]);
       } else {
-        // Se dados completos, salva diretamente
-        handleSaveDocument();
+        // Se dados completos, mostra mensagem de sucesso e salva automaticamente
+        console.log('✅ Documento processado com todos os dados!');
+        setFinalData(ocrResult);
+        setIsDataComplete(true);
+        
+        // Mostra mensagem de sucesso no chat
+        setShowChat(true);
+        setChatMessages([
+          {
+            id: '1',
+            type: 'system',
+            message: `🎉 Documento processado com sucesso!
+            
+✅ **Todos os dados foram extraídos automaticamente:**
+• Valor: ${ocrResult.valor || 'N/A'}
+• Data: ${ocrResult.data || 'N/A'}
+• ${ocrResult.fornecedor ? `Fornecedor: ${ocrResult.fornecedor}` : ocrResult.cliente ? `Cliente: ${ocrResult.cliente}` : 'N/A'}
+• Forma de pagamento: ${ocrResult.formaPagamento || 'N/A'}
+
+O documento será salvo automaticamente em instantes...`,
+            timestamp: new Date()
+          }
+        ]);
+        
+        // Aguarda 5 segundos para mostrar a mensagem e então salva
+        console.log('🔄 Iniciando processo de auto-save em 5 segundos...');
+        setTimeout(async () => {
+          console.log('🚀 Executando auto-save do documento processado...');
+          await handleSaveDocumentWithData(ocrResult);
+        }, 5000);
       }
 
     } catch (error: any) {
@@ -166,32 +198,97 @@ Por favor, me informe esses dados para que eu possa finalizar o processamento do
     setShowSaveButton(true);
   };
 
-  const handleSaveDocument = async () => {
-    if (!finalData || !documentInfo.file) {
-      setError('Dados do documento não encontrados.');
+  const handleSaveDocumentWithData = async (documentData: DocumentData) => {
+    console.log('🔍 handleSaveDocumentWithData chamado com:', {
+      hasFile: !!documentInfo.file,
+      fileName: documentInfo.file?.name,
+      companyId: companyId,
+      documentData: documentData
+    });
+
+    if (!documentInfo.file || !companyId) {
+      console.error('❌ Dados faltando:', { hasFile: !!documentInfo.file, companyId });
+      setError('Arquivo do documento ou dados de autenticação não encontrados.');
       return;
     }
 
     setIsProcessing(true);
     
     try {
-      console.log('💾 Salvando documento no banco:', documentInfo.file.name);
+      console.log('📤 Fazendo upload do arquivo para Storage:', documentInfo.file.name);
       
-      // Converte DocumentData para CreateDocumentRequest
+      // 1. Primeiro, fazer upload do arquivo para o Storage
+      const uploadResult = await storageService.uploadFile(documentInfo.file, companyId);
+      
+      if (!uploadResult.success || !uploadResult.filePath) {
+        setError(uploadResult.error || 'Erro ao fazer upload do arquivo');
+        return;
+      }
+      
+      console.log('✅ Arquivo enviado para Storage:', uploadResult.filePath);
+      
+      // 2. Converte DocumentData para CreateDocumentRequest (incluindo path do arquivo)
+      const createRequest = documentDataToCreateRequest(
+        documentData,
+        documentInfo,
+        uploadResult.filePath, // Usar o path do storage em vez do nome original
+        documentInfo.file.size
+      );
+
+      // 3. Cria documento no banco com referência ao arquivo no storage
+      await documentsService.createDocument(createRequest);
+      
+      console.log('✅ Documento salvo com sucesso no banco!');
+      
+      // Chama callback de sucesso se fornecido
+      if (onSuccess) {
+        onSuccess();
+      }
+      
+      // Fecha modal
+      onClose();
+      
+    } catch (error: any) {
+      console.error('❌ Erro ao salvar documento:', error);
+      setError(error.message || 'Erro ao salvar documento.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleSaveDocument = async () => {
+    if (!finalData || !documentInfo.file || !companyId) {
+      setError('Dados do documento ou autenticação não encontrados.');
+      return;
+    }
+
+    setIsProcessing(true);
+    
+    try {
+      console.log('📤 Fazendo upload do arquivo para Storage:', documentInfo.file.name);
+      
+      // 1. Primeiro, fazer upload do arquivo para o Storage
+      const uploadResult = await storageService.uploadFile(documentInfo.file, companyId);
+      
+      if (!uploadResult.success || !uploadResult.filePath) {
+        setError(uploadResult.error || 'Erro ao fazer upload do arquivo');
+        return;
+      }
+      
+      console.log('✅ Arquivo enviado para Storage:', uploadResult.filePath);
+      
+      // 2. Converte DocumentData para CreateDocumentRequest (incluindo path do arquivo)
       const createRequest = documentDataToCreateRequest(
         finalData,
         documentInfo,
-        documentInfo.file.name,
+        uploadResult.filePath, // Usar o path do storage em vez do nome original
         documentInfo.file.size
       );
       
-      // Salva no banco de dados
+      // 3. Salva no banco de dados com referência ao arquivo no storage
       const savedDocument = await documentsService.createDocument(createRequest);
       
       console.log('✅ Documento salvo com sucesso:', savedDocument.id);
-      
-      // Mensagem de sucesso
-      // Removido alert de debug
       console.log(`Documento "${savedDocument.nome}" salvo com sucesso! ✅`);
       
       // Reset form
@@ -205,7 +302,13 @@ Por favor, me informe esses dados para que eu possa finalizar o processamento do
       setShowChat(false);
       setChatMessages([]);
       setIsDataComplete(false);
+      setShowSaveButton(false);
       setError('');
+      
+      // Chama callback de sucesso se fornecido
+      if (onSuccess) {
+        onSuccess();
+      }
       
       // Fecha modal
       onClose();

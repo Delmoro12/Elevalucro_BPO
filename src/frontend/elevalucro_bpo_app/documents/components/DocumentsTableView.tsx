@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   FileText,
   FileSpreadsheet,
@@ -10,161 +10,58 @@ import {
   AlertCircle,
   Clock,
   CheckCircle,
-  Trash2
+  Trash2,
+  Loader2
 } from 'lucide-react';
 import { DataTable, Column, FilterOption, ActionButton, BulkAction } from '../../shared/components/DataTable';
 import { DocumentViewModal } from './DocumentViewModal';
+import { useDocuments, DocumentFilters } from '../hooks/useDocuments';
+import { Document } from '../types';
 
-type FilterStatus = 'todos' | 'processados' | 'pendentes' | 'erro';
+type FilterStatus = 'todos' | 'processado' | 'pendente' | 'conciliado' | 'erro';
 type TabType = 'pdfs_fotos' | 'excel';
-
-interface Document {
-  id: string;
-  nome: string;
-  tipo: 'fiscal' | 'nao_fiscal';
-  categoria: 'entrada' | 'saida';
-  valor?: string;
-  data: string;
-  empresaPessoa?: string;
-  status: 'processado' | 'pendente' | 'erro';
-  arquivo: string;
-  tamanho?: string;
-  dataUpload?: string;
-}
-
-interface ExcelFile {
-  id: string;
-  nome: string;
-  status: 'processando' | 'processado' | 'erro' | 'aguardando_validacao';
-  dataUpload: string;
-  tamanho: string;
-  linhasProcessadas?: number;
-  linhasTotal?: number;
-  erros?: string[];
-}
 
 interface DocumentsTableViewProps {
   onOpenDocumentModal: () => void;
   onOpenExcelModal: () => void;
 }
 
-const mockDocuments: Document[] = [
-  {
-    id: '1',
-    nome: 'Nota Fiscal 123456',
-    tipo: 'fiscal',
-    categoria: 'entrada',
-    valor: 'R$ 2.500,00',
-    data: '15/01/2025',
-    empresaPessoa: 'Tech Solutions Ltda',
-    status: 'processado',
-    arquivo: 'nf_123456.pdf',
-    tamanho: '1.2 MB',
-    dataUpload: '15/01/2025 14:30'
-  },
-  {
-    id: '2',
-    nome: 'Cupom Fiscal Loja ABC',
-    tipo: 'fiscal',
-    categoria: 'saida',
-    valor: 'R$ 450,00',
-    data: '14/01/2025',
-    empresaPessoa: 'Loja ABC Material',
-    status: 'processado',
-    arquivo: 'cupom_abc.jpg',
-    tamanho: '850 KB',
-    dataUpload: '14/01/2025 10:15'
-  },
-  {
-    id: '3',
-    nome: 'Recibo Pagamento',
-    tipo: 'nao_fiscal',
-    categoria: 'saida',
-    valor: 'R$ 1.200,00',
-    data: '13/01/2025',
-    empresaPessoa: 'João Silva Serviços',
-    status: 'processado',
-    arquivo: 'recibo_joao.pdf',
-    tamanho: '320 KB',
-    dataUpload: '13/01/2025 16:45'
-  },
-  {
-    id: '4',
-    nome: 'Extrato Bancário',
-    tipo: 'nao_fiscal',
-    categoria: 'entrada',
-    data: '12/01/2025',
-    empresaPessoa: 'Banco do Brasil',
-    status: 'pendente',
-    arquivo: 'extrato_jan.pdf',
-    tamanho: '2.1 MB',
-    dataUpload: '12/01/2025 09:00'
-  },
-  {
-    id: '5',
-    nome: 'NFe Venda Online',
-    tipo: 'fiscal',
-    categoria: 'entrada',
-    valor: 'R$ 890,00',
-    data: '11/01/2025',
-    empresaPessoa: 'Maria Santos',
-    status: 'processado',
-    arquivo: 'nfe_venda.xml',
-    tamanho: '45 KB',
-    dataUpload: '11/01/2025 11:30'
-  },
-  {
-    id: '6',
-    nome: 'Conta de Luz',
-    tipo: 'nao_fiscal',
-    categoria: 'saida',
-    valor: 'R$ 342,15',
-    data: '10/01/2025',
-    empresaPessoa: 'CEMIG',
-    status: 'erro',
-    arquivo: 'conta_luz_jan.pdf',
-    tamanho: '180 KB',
-    dataUpload: '10/01/2025 15:20'
+// Função helper para formatar data
+const formatDate = (dateString: string) => {
+  if (!dateString) return '-';
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR');
+  } catch {
+    return dateString;
   }
-];
+};
 
-const mockExcelFiles: ExcelFile[] = [
-  {
-    id: '1',
-    nome: 'Vendas_Janeiro_2025.xlsx',
-    status: 'processado',
-    dataUpload: '15/01/2025 14:00',
-    tamanho: '3.5 MB',
-    linhasProcessadas: 1250,
-    linhasTotal: 1250
-  },
-  {
-    id: '2',
-    nome: 'Relatorio_Despesas_Q1.csv',
-    status: 'aguardando_validacao',
-    dataUpload: '14/01/2025 16:30',
-    tamanho: '1.8 MB',
-    linhasProcessadas: 450,
-    linhasTotal: 450
-  },
-  {
-    id: '3',
-    nome: 'Planilha_Fornecedores.xls',
-    status: 'processando',
-    dataUpload: '15/01/2025 17:45',
-    tamanho: '2.2 MB',
-    linhasProcessadas: 120,
-    linhasTotal: 300
-  },
-  {
-    id: '4',
-    nome: 'Dados_Incorretos.xlsx',
-    status: 'erro',
-    dataUpload: '13/01/2025 10:00',
-    tamanho: '500 KB',
-    erros: ['Formato de data inválido na linha 45', 'Valores não numéricos na coluna G']
+// Função helper para formatar data e hora
+const formatDateTime = (dateString: string) => {
+  if (!dateString) return '-';
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch {
+    return dateString;
   }
-];
+};
+
+// Função helper para formatar tamanho de arquivo
+const formatFileSize = (bytes?: number) => {
+  if (!bytes) return '-';
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  if (bytes === 0) return '0 Bytes';
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+};
 
 export const DocumentsTableView: React.FC<DocumentsTableViewProps> = ({ 
   onOpenDocumentModal, 
@@ -172,80 +69,88 @@ export const DocumentsTableView: React.FC<DocumentsTableViewProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('pdfs_fotos');
   const [statusFilter, setStatusFilter] = useState<FilterStatus>('todos');
+  const [tipoFilter, setTipoFilter] = useState<'todos' | 'fiscal' | 'nao_fiscal'>('todos');
+  const [categoriaFilter, setCategoriaFilter] = useState<'todos' | 'entrada' | 'saida'>('todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDocuments, setSelectedDocuments] = useState<Set<string>>(new Set());
-  const [selectedExcelFiles, setSelectedExcelFiles] = useState<Set<string>>(new Set());
   
   // Modal states
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
-  const [selectedExcelFile, setSelectedExcelFile] = useState<ExcelFile | null>(null);
-  const [modalType, setModalType] = useState<'document' | 'excel'>('document');
-
-  const getFilteredDocuments = () => {
-    let filtered = mockDocuments;
+  
+  // Hook para buscar documentos reais
+  const {
+    documents,
+    loading,
+    error,
+    updateFilters,
+    deleteDocument,
+    updateStatus,
+    refreshDocuments
+  } = useDocuments();
+  
+  // Atualizar filtros de seleção (dropdowns) imediatamente
+  useEffect(() => {
+    const filters: DocumentFilters = {};
     
     if (statusFilter !== 'todos') {
-      const statusMap = {
-        'processados': 'processado',
-        'pendentes': 'pendente',
-        'erro': 'erro'
-      };
-      filtered = filtered.filter(doc => doc.status === statusMap[statusFilter as keyof typeof statusMap]);
+      filters.status = statusFilter as 'pendente' | 'processado' | 'conciliado' | 'erro';
     }
     
-    if (searchTerm) {
-      filtered = filtered.filter(doc => 
-        doc.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.empresaPessoa?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.arquivo.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+    if (tipoFilter !== 'todos') {
+      filters.tipo_documento = tipoFilter as 'fiscal' | 'nao_fiscal';
     }
     
-    return filtered;
-  };
+    if (categoriaFilter !== 'todos') {
+      filters.categoria = categoriaFilter as 'entrada' | 'saida';
+    }
+    
+    console.log('🔍 Aplicando filtros (dropdowns):', filters);
+    updateFilters(filters);
+  }, [statusFilter, tipoFilter, categoriaFilter]);
 
-  const getFilteredExcelFiles = () => {
-    let filtered = mockExcelFiles;
-    
-    if (statusFilter !== 'todos') {
-      const statusMap = {
-        'processados': 'processado',
-        'pendentes': 'aguardando_validacao',
-        'erro': 'erro'
-      };
-      const mappedStatus = statusMap[statusFilter as keyof typeof statusMap];
-      if (mappedStatus) {
-        filtered = filtered.filter(file => 
-          file.status === mappedStatus || 
-          (statusFilter === 'pendentes' && file.status === 'processando')
-        );
+  // Debounce para busca de texto
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const filters: DocumentFilters = {};
+      
+      if (statusFilter !== 'todos') {
+        filters.status = statusFilter as 'pendente' | 'processado' | 'conciliado' | 'erro';
       }
-    }
+      
+      if (tipoFilter !== 'todos') {
+        filters.tipo_documento = tipoFilter as 'fiscal' | 'nao_fiscal';
+      }
+      
+      if (categoriaFilter !== 'todos') {
+        filters.categoria = categoriaFilter as 'entrada' | 'saida';
+      }
+      
+      if (searchTerm) {
+        filters.searchTerm = searchTerm;
+      }
+      
+      console.log('🔍 Aplicando filtros com busca:', filters);
+      updateFilters(filters);
+    }, 300); // 300ms de debounce
     
-    if (searchTerm) {
-      filtered = filtered.filter(file => 
-        file.nome.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    return filtered;
+    return () => clearTimeout(timer);
+  }, [searchTerm, statusFilter, tipoFilter, categoriaFilter]);
+
+  // Callback estável para search
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchTerm(value);
+  }, []);
+
+  // Função para obter o tipo de documento formatado
+  const getDocumentTypeLabel = (tipo?: string) => {
+    const typeMap: Record<string, string> = {
+      'fiscal': 'Fiscal',
+      'nao_fiscal': 'Não Fiscal'
+    };
+    return typeMap[tipo || ''] || tipo || 'N/A';
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'processado':
-        return <CheckCircle className="h-4 w-4 text-emerald-500" />;
-      case 'pendente':
-      case 'processando':
-      case 'aguardando_validacao':
-        return <Clock className="h-4 w-4 text-yellow-500" />;
-      case 'erro':
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
-      default:
-        return null;
-    }
-  };
 
   const getStatusText = (status: string) => {
     switch (status) {
@@ -253,10 +158,8 @@ export const DocumentsTableView: React.FC<DocumentsTableViewProps> = ({
         return 'Processado';
       case 'pendente':
         return 'Pendente';
-      case 'processando':
-        return 'Processando';
-      case 'aguardando_validacao':
-        return 'Aguardando Validação';
+      case 'conciliado':
+        return 'Conciliado';
       case 'erro':
         return 'Erro';
       default:
@@ -266,12 +169,12 @@ export const DocumentsTableView: React.FC<DocumentsTableViewProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'processado':
-        return 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400';
       case 'pendente':
-      case 'processando':
-      case 'aguardando_validacao':
+        return 'bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400';
+      case 'processado':
         return 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-600 dark:text-yellow-400';
+      case 'conciliado':
+        return 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400';
       case 'erro':
         return 'bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400';
       default:
@@ -282,15 +185,6 @@ export const DocumentsTableView: React.FC<DocumentsTableViewProps> = ({
   // Handlers para modal
   const handleViewDocument = (document: Document) => {
     setSelectedDocument(document);
-    setSelectedExcelFile(null);
-    setModalType('document');
-    setIsViewModalOpen(true);
-  };
-
-  const handleViewExcelFile = (excelFile: ExcelFile) => {
-    setSelectedExcelFile(excelFile);
-    setSelectedDocument(null);
-    setModalType('excel');
     setIsViewModalOpen(true);
   };
 
@@ -298,6 +192,46 @@ export const DocumentsTableView: React.FC<DocumentsTableViewProps> = ({
     setIsViewModalOpen(false);
     setSelectedDocument(null);
     setSelectedExcelFile(null);
+  };
+
+  const handleBulkDelete = async (items: Document[]) => {
+    if (!items || items.length === 0) return;
+    
+    const confirmed = window.confirm(
+      `Tem certeza que deseja excluir ${items.length} documento${items.length > 1 ? 's' : ''}?`
+    );
+    
+    if (!confirmed) return;
+    
+    console.log('🗑️ Table: Starting bulk delete for documents:', items.map(d => d.id));
+    
+    try {
+      // Delete cada documento individualmente e aguarda resultado
+      const results = [];
+      for (const document of items) {
+        const id = document.id;
+        console.log(`🗑️ Table: Deleting document ${id}...`);
+        const result = await deleteDocument(id);
+        results.push(result);
+        console.log(`${result ? '✅' : '❌'} Table: Document ${id} deletion result:`, result);
+      }
+      
+      // Verificar se todos foram deletados com sucesso
+      const allDeleted = results.every(result => result);
+      
+      if (allDeleted) {
+        // Limpa seleção após exclusão bem-sucedida
+        setSelectedDocuments(new Set());
+        console.log('✅ Table: All documents deleted successfully');
+      } else {
+        console.warn('⚠️ Table: Some documents failed to delete');
+        alert('Alguns documentos não puderam ser excluídos. Verifique o console para detalhes.');
+      }
+      
+    } catch (error) {
+      console.error('❌ Table: Error in bulk delete:', error);
+      alert('Erro ao excluir documentos. Tente novamente.');
+    }
   };
 
   // Colunas para a tabela de PDFs e Fotos
@@ -311,21 +245,21 @@ export const DocumentsTableView: React.FC<DocumentsTableViewProps> = ({
             {row.nome}
           </div>
           <div className="text-xs text-slate-500 dark:text-slate-400">
-            {row.arquivo} • {row.tamanho}
+            {row.cliente || 'Cliente não informado'} • {row.tamanho}
           </div>
         </div>
       )
     },
     {
-      key: 'tipo',
+      key: 'tipo_documento',
       label: 'Tipo',
       render: (value, row) => (
         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-          row.tipo === 'fiscal'
+          row.tipo_documento === 'fiscal'
             ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400'
             : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
         }`}>
-          {row.tipo === 'fiscal' ? 'Fiscal' : 'Não Fiscal'}
+          {row.tipo_documento === 'fiscal' ? 'Fiscal' : 'Não Fiscal'}
         </span>
       )
     },
@@ -343,15 +277,6 @@ export const DocumentsTableView: React.FC<DocumentsTableViewProps> = ({
       )
     },
     {
-      key: 'empresaPessoa',
-      label: 'Empresa/Pessoa',
-      render: (value) => (
-        <div className="text-sm text-slate-900 dark:text-white">
-          {value || '-'}
-        </div>
-      )
-    },
-    {
       key: 'valor',
       label: 'Valor',
       render: (value) => (
@@ -361,23 +286,20 @@ export const DocumentsTableView: React.FC<DocumentsTableViewProps> = ({
       )
     },
     {
-      key: 'data',
-      label: 'Data',
-      render: (value) => (
-        <div className="text-sm text-slate-600 dark:text-slate-400">
-          {value}
-        </div>
-      )
-    },
-    {
       key: 'status',
       label: 'Status',
       render: (value, row) => (
-        <div className="flex items-center space-x-1">
-          {getStatusIcon(row.status)}
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(row.status)}`}>
-            {getStatusText(row.status)}
-          </span>
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(row.status)}`}>
+          {getStatusText(row.status)}
+        </span>
+      )
+    },
+    {
+      key: 'created_at',
+      label: 'Upload',
+      render: (value) => (
+        <div className="text-xs text-slate-500 dark:text-slate-400">
+          {formatDateTime(value)}
         </div>
       )
     }
@@ -408,12 +330,9 @@ export const DocumentsTableView: React.FC<DocumentsTableViewProps> = ({
       key: 'status',
       label: 'Status',
       render: (value, row) => (
-        <div className="flex items-center space-x-1">
-          {getStatusIcon(row.status)}
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(row.status)}`}>
-            {getStatusText(row.status)}
-          </span>
-        </div>
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(row.status)}`}>
+          {getStatusText(row.status)}
+        </span>
       )
     },
     {
@@ -465,25 +384,26 @@ export const DocumentsTableView: React.FC<DocumentsTableViewProps> = ({
     }
   ];
 
-  // Filtros
+  // Filtros baseados em dados reais
   const getFilters = (): FilterOption[] => {
+    // Filtrar documentos baseado na tab ativa
+    const filteredByTab = activeTab === 'excel' 
+      ? documents.filter(d => d.arquivo?.includes('.xls') || d.arquivo?.includes('.xlsx') || d.arquivo?.includes('.csv'))
+      : documents.filter(d => !d.arquivo?.includes('.xls') && !d.arquivo?.includes('.xlsx') && !d.arquivo?.includes('.csv'));
+    
     const counts = {
-      todos: activeTab === 'pdfs_fotos' ? mockDocuments.length : mockExcelFiles.length,
-      processados: activeTab === 'pdfs_fotos' 
-        ? mockDocuments.filter(d => d.status === 'processado').length
-        : mockExcelFiles.filter(f => f.status === 'processado').length,
-      pendentes: activeTab === 'pdfs_fotos'
-        ? mockDocuments.filter(d => d.status === 'pendente').length
-        : mockExcelFiles.filter(f => f.status === 'aguardando_validacao' || f.status === 'processando').length,
-      erro: activeTab === 'pdfs_fotos'
-        ? mockDocuments.filter(d => d.status === 'erro').length
-        : mockExcelFiles.filter(f => f.status === 'erro').length
+      todos: filteredByTab.length,
+      processado: filteredByTab.filter(d => d.status === 'processado').length,
+      pendente: filteredByTab.filter(d => d.status === 'pendente').length,
+      conciliado: filteredByTab.filter(d => d.status === 'conciliado').length,
+      erro: filteredByTab.filter(d => d.status === 'erro').length
     };
 
     return [
       { key: 'todos', label: 'Todos', count: counts.todos },
-      { key: 'processados', label: 'Processados', count: counts.processados },
-      { key: 'pendentes', label: 'Pendentes', count: counts.pendentes },
+      { key: 'processado', label: 'Processados', count: counts.processado },
+      { key: 'pendente', label: 'Pendentes', count: counts.pendente },
+      { key: 'conciliado', label: 'Conciliados', count: counts.conciliado },
       { key: 'erro', label: 'Com Erro', count: counts.erro }
     ];
   };
@@ -539,17 +459,11 @@ export const DocumentsTableView: React.FC<DocumentsTableViewProps> = ({
   // Ações em massa
   const bulkActions: BulkAction[] = [
     {
-      key: 'process',
-      label: 'Processar Selecionados',
-      variant: 'primary',
-      onClick: (items) => console.log('Processar:', items)
-    },
-    {
       key: 'delete',
-      label: 'Excluir',
+      label: 'Excluir Selecionados',
       icon: Trash2,
       variant: 'danger',
-      onClick: (items) => console.log('Excluir:', items)
+      onClick: handleBulkDelete
     }
   ];
 
@@ -585,18 +499,71 @@ export const DocumentsTableView: React.FC<DocumentsTableViewProps> = ({
         </button>
       </div>
 
+      {/* Filtros Adicionais */}
+      <div className="bg-white dark:bg-slate-800 p-4 border-l border-r border-slate-200 dark:border-slate-700">
+        <div className="flex flex-wrap gap-4 items-center">
+          <div className="flex items-center space-x-2">
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              Tipo:
+            </label>
+            <select
+              value={tipoFilter}
+              onChange={(e) => setTipoFilter(e.target.value as 'todos' | 'fiscal' | 'nao_fiscal')}
+              className="px-3 py-1 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+            >
+              <option value="todos">Todos</option>
+              <option value="fiscal">Fiscal</option>
+              <option value="nao_fiscal">Não Fiscal</option>
+            </select>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              Categoria:
+            </label>
+            <select
+              value={categoriaFilter}
+              onChange={(e) => setCategoriaFilter(e.target.value as 'todos' | 'entrada' | 'saida')}
+              className="px-3 py-1 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+            >
+              <option value="todos">Todos</option>
+              <option value="entrada">Entrada</option>
+              <option value="saida">Saída</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       {/* Content */}
-      <div className="rounded-lg rounded-tl-none">
-        {activeTab === 'pdfs_fotos' ? (
+      <div className="rounded-lg rounded-tl-none rounded-tr-none">
+        {loading ? (
+          <div className="flex items-center justify-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center h-64">
+            <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
+            <p className="text-red-600 dark:text-red-400">{error}</p>
+            <button
+              onClick={refreshDocuments}
+              className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+            >
+              Tentar novamente
+            </button>
+          </div>
+        ) : (
           <DataTable
-            data={getFilteredDocuments()}
+            data={activeTab === 'excel' 
+              ? documents.filter(d => d.arquivo?.includes('.xls') || d.arquivo?.includes('.xlsx') || d.arquivo?.includes('.csv'))
+              : documents.filter(d => !d.arquivo?.includes('.xls') && !d.arquivo?.includes('.xlsx') && !d.arquivo?.includes('.csv'))
+            }
             columns={documentColumns}
             selectable
             selectedItems={selectedDocuments}
             onSelectionChange={setSelectedDocuments}
             searchable
             searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
+            onSearchChange={handleSearchChange}
             searchPlaceholder="Buscar documentos..."
             filters={getFilters()}
             activeFilter={statusFilter}
@@ -604,64 +571,24 @@ export const DocumentsTableView: React.FC<DocumentsTableViewProps> = ({
             actions={documentActions}
             bulkActions={bulkActions}
             primaryAction={{
-              label: 'Adicionar',
-              onClick: onOpenDocumentModal
+              label: activeTab === 'excel' ? 'Importar Excel' : 'Adicionar Documento',
+              onClick: activeTab === 'excel' ? onOpenExcelModal : onOpenDocumentModal
             }}
             emptyStateIcon={FileText}
-            emptyStateTitle="Nenhum documento encontrado"
-            emptyStateDescription="Não há documentos PDFs ou fotos para exibir"
+            emptyStateTitle={activeTab === 'excel' ? "Nenhum arquivo Excel encontrado" : "Nenhum documento encontrado"}
+            emptyStateDescription={activeTab === 'excel' ? "Clique em 'Importar Excel' para começar" : "Clique em 'Adicionar Documento' para começar"}
           />
-        ) : (
-          <>
-            <DataTable
-              data={getFilteredExcelFiles()}
-              columns={excelColumns}
-              selectable
-              selectedItems={selectedExcelFiles}
-              onSelectionChange={setSelectedExcelFiles}
-              searchable
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              searchPlaceholder="Buscar arquivos Excel..."
-              filters={getFilters()}
-              activeFilter={statusFilter}
-              onFilterChange={(filter) => setStatusFilter(filter as FilterStatus)}
-              actions={excelActions}
-              bulkActions={bulkActions}
-              primaryAction={{
-                label: 'Importar Excel',
-                onClick: onOpenExcelModal
-              }}
-              emptyStateIcon={FileSpreadsheet}
-              emptyStateTitle="Nenhum arquivo Excel encontrado"
-              emptyStateDescription="Não há planilhas para exibir"
-            />
-
-            {/* Info about Excel Processing */}
-            <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <div className="flex items-start">
-                <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3 flex-shrink-0" />
-                <div className="text-sm text-blue-800 dark:text-blue-300">
-                  <p className="font-medium mb-1">Processamento Inteligente de Planilhas</p>
-                  <p className="text-xs">
-                    Nossa IA analisa automaticamente o formato da sua planilha e converte os dados para o padrão 
-                    Conta Azul. Não é necessário seguir um modelo específico - trabalhamos com qualquer formato!
-                  </p>
-                </div>
-              </div>
-            </div>
-          </>
         )}
       </div>
 
       {/* Modal de Visualização */}
-      <DocumentViewModal
-        isOpen={isViewModalOpen}
-        onClose={handleCloseModal}
-        document={selectedDocument}
-        excelFile={selectedExcelFile}
-        type={modalType}
-      />
+      {isViewModalOpen && selectedDocument && (
+        <DocumentViewModal
+          isOpen={isViewModalOpen}
+          onClose={handleCloseModal}
+          document={selectedDocument}
+        />
+      )}
     </div>
   );
 };

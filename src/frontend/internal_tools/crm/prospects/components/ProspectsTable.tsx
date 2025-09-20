@@ -77,8 +77,8 @@ export const ProspectsTable: React.FC<ProspectsTableProps> = ({
     });
   };
 
-  const getPlanoBadgeColor = (plano: string) => {
-    switch (plano) {
+  const getPlanoBadgeColor = (plan: string) => {
+    switch (plan) {
       case 'controle':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
       case 'gerencial':
@@ -90,8 +90,8 @@ export const ProspectsTable: React.FC<ProspectsTableProps> = ({
     }
   };
 
-  const getPlanoDisplayName = (plano: string) => {
-    switch (plano) {
+  const getPlanoDisplayName = (plan: string) => {
+    switch (plan) {
       case 'controle':
         return 'Controle';
       case 'gerencial':
@@ -160,21 +160,21 @@ export const ProspectsTable: React.FC<ProspectsTableProps> = ({
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div>
                     <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                      {prospect.nome_contato}
+                      {prospect.contact_name}
                     </div>
                     <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
                       <Mail className="h-3 w-3" />
-                      {prospect.email_contato}
+                      {prospect.contact_email}
                     </div>
-                    {prospect.telefone_contato && (
+                    {prospect.contact_phone && (
                       <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
                         <Phone className="h-3 w-3" />
-                        {prospect.telefone_contato}
+                        {prospect.contact_phone}
                       </div>
                     )}
-                    {prospect.cargo_contato && (
+                    {prospect.contact_role && (
                       <div className="text-xs text-slate-400 dark:text-slate-500">
-                        {prospect.cargo_contato}
+                        {prospect.contact_role}
                       </div>
                     )}
                   </div>
@@ -182,42 +182,42 @@ export const ProspectsTable: React.FC<ProspectsTableProps> = ({
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div>
                     <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                      {prospect.nome_empresa}
+                      {prospect.company_name}
                     </div>
                     <div className="text-sm text-slate-500 dark:text-slate-400">
                       {prospect.cnpj}
                     </div>
-                    {prospect.segmento && (
+                    {prospect.segment && (
                       <div className="text-xs text-slate-400 dark:text-slate-500">
-                        {prospect.segmento}
+                        {prospect.segment}
                       </div>
                     )}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPlanoBadgeColor(prospect.plano)}`}>
-                    {getPlanoDisplayName(prospect.plano)}
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPlanoBadgeColor(prospect.plan)}`}>
+                    {getPlanoDisplayName(prospect.plan)}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <StatusBadge
                     currentStatus={prospect.status || 'pending'}
                     prospectId={prospect.id}
-                    prospectName={prospect.nome_contato}
+                    prospectName={prospect.contact_name}
                     onStatusChange={onStatusChange}
                   />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-slate-100">
-                  R$ {prospect.valor_mensal.toLocaleString()}/mês
+                  R$ {prospect.monthly_value.toLocaleString()}/mês
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
                     {formatDate(prospect.created_at)}
                   </div>
-                  {prospect.origem && (
+                  {prospect.source && (
                     <div className="text-xs text-slate-400 dark:text-slate-500">
-                      {prospect.origem}
+                      {prospect.source}
                     </div>
                   )}
                 </td>

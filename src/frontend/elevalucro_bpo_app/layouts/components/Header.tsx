@@ -8,6 +8,7 @@ import {
   Search
 } from 'lucide-react';
 import { ThemeToggle } from '../../shared/components/ThemeToggle';
+import { useAuth } from '../../auth/contexts/AuthContext';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -71,6 +72,10 @@ export const Header: React.FC<HeaderProps> = ({
   currentPage = 'dashboard' 
 }) => {
   const { title, subtitle } = getPageTitle(currentPage);
+  const { user } = useAuth();
+  
+  // Extrair nome do usuário (priorizar full_name, depois email)
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Usuário';
 
   return (
     <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-4 py-3">
@@ -117,7 +122,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button className="flex items-center p-2 rounded-md text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
               <User className="h-5 w-5" />
               <span className="ml-2 text-sm font-medium hidden md:block">
-                Admin
+                Olá, {userName}
               </span>
             </button>
           </div>

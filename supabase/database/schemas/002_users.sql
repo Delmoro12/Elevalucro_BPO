@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
     -- Relacionamentos
     role_id UUID NOT NULL REFERENCES roles(id),
     profile_id UUID REFERENCES profiles(id),
+    company_id UUID REFERENCES companies(id),
     
     -- Status do usuário
     is_active BOOLEAN DEFAULT true,
@@ -35,6 +36,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE INDEX IF NOT EXISTS idx_users_full_name ON users(full_name);
 CREATE INDEX IF NOT EXISTS idx_users_role_id ON users(role_id);
 CREATE INDEX IF NOT EXISTS idx_users_profile_id ON users(profile_id);
+CREATE INDEX IF NOT EXISTS idx_users_company_id ON users(company_id);
 CREATE INDEX IF NOT EXISTS idx_users_is_active ON users(is_active);
 CREATE INDEX IF NOT EXISTS idx_users_verification_level ON users(verification_level);
 CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);

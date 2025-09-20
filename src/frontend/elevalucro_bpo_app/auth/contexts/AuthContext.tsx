@@ -7,6 +7,28 @@ import { AuthUser, AuthContextType } from '../types/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Helper function to decode JWT token
+const decodeJWT = (token: string): any => {
+  try {
+    let payload = token.split('.')[1];
+    
+    // Adicionar padding se necessário para base64
+    const padding = payload.length % 4;
+    if (padding) {
+      payload += '='.repeat(4 - padding);
+    }
+    
+    // Substituir caracteres URL-safe para base64 padrão
+    payload = payload.replace(/-/g, '+').replace(/_/g, '/');
+    
+    const decoded = JSON.parse(atob(payload));
+    return decoded;
+  } catch (error) {
+    console.error('Error decoding JWT:', error);
+    return null;
+  }
+};
+
 interface AuthProviderProps {
   children: ReactNode;
 }
@@ -14,6 +36,7 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [jwtClaims, setJwtClaims] = useState<any>(null);
 
   useEffect(() => {
     // Get initial session
@@ -37,8 +60,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       } else if (session?.user) {
         setUser(session.user as AuthUser);
         
-        // Set cookie for middleware if session exists
+        // Decode JWT to get custom claims
         if (session.access_token) {
+          const decoded = decodeJWT(session.access_token);
+          if (decoded) {
+            setJwtClaims(decoded.user_metadata || {});
+            console.log('🔓 JWT claims extracted:', decoded.user_metadata);
+          }
+          
+          // Set cookie for middleware
           document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=3600; SameSite=Lax`;
           console.log('🍪 Auth context: Cookie set for existing session');
         }
@@ -57,13 +87,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         if (session?.user) {
           setUser(session.user as AuthUser);
           
-          // Set cookie for middleware on session changes
+          // Decode JWT to get custom claims on auth state changes
           if (session.access_token) {
+            const decoded = decodeJWT(session.access_token);
+            if (decoded) {
+              setJwtClaims(decoded.user_metadata || {});
+              console.log('🔓 JWT claims updated on auth change:', decoded.user_metadata);
+            }
+            
+            // Set cookie for middleware
             document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=3600; SameSite=Lax`;
             console.log('🍪 Auth state change: Cookie set for session');
           }
         } else {
           setUser(null);
+          setJwtClaims(null);
           
           // Clear cookie on logout
           document.cookie = 'sb-access-token=; path=/; max-age=0; SameSite=Lax';
@@ -145,10 +183,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   // Helper computed properties
   const isAuthenticated = !!user;
-  const companyId = user?.user_metadata?.company_id || null;
-  const profileId = user?.user_metadata?.profile_id || null;
-  const role = user?.user_metadata?.role || null;
-  const subscriptionPlan = user?.user_metadata?.subscription_plan || null;
+  // Get companyId from JWT claims (from custom JWT hook) instead of user_metadata
+  const companyId = jwtClaims?.company_id || user?.user_metadata?.company_id || null;
+  const profileId = jwtClaims?.profile_id || user?.user_metadata?.profile_id || null;
+  const role = jwtClaims?.role || user?.user_metadata?.role || null;
+  const subscriptionPlan = jwtClaims?.subscription_plan || user?.user_metadata?.subscription_plan || null;
 
   const value: AuthContextType = {
     user,

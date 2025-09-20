@@ -3,103 +3,69 @@
 import React from 'react';
 import { 
   FileText,
-  FileSpreadsheet,
   Download,
   Calendar,
   DollarSign,
   Building2,
-  AlertCircle,
-  Clock,
-  CheckCircle,
+  User,
   Tag,
   Hash,
-  User,
-  FileIcon,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
+  CreditCard,
+  AlertCircle
 } from 'lucide-react';
 import { ModalSidebar } from '../../shared/components';
-
-interface Document {
-  id: string;
-  nome: string;
-  tipo: 'fiscal' | 'nao_fiscal';
-  categoria: 'entrada' | 'saida';
-  valor?: string;
-  data: string;
-  empresaPessoa?: string;
-  status: 'processado' | 'pendente' | 'erro';
-  arquivo: string;
-  tamanho?: string;
-  dataUpload?: string;
-}
-
-interface ExcelFile {
-  id: string;
-  nome: string;
-  status: 'processando' | 'processado' | 'erro' | 'aguardando_validacao';
-  dataUpload: string;
-  tamanho: string;
-  linhasProcessadas?: number;
-  linhasTotal?: number;
-  erros?: string[];
-}
+import { Document } from '../types';
 
 interface DocumentViewModalProps {
   isOpen: boolean;
   onClose: () => void;
-  document?: Document | null;
-  excelFile?: ExcelFile | null;
-  type: 'document' | 'excel';
+  document: Document;
 }
 
 export const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
   isOpen,
   onClose,
-  document,
-  excelFile,
-  type
+  document
 }) => {
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'processado':
-        return <CheckCircle className="h-4 w-4 text-emerald-500" />;
-      case 'pendente':
-      case 'processando':
-      case 'aguardando_validacao':
-        return <Clock className="h-4 w-4 text-yellow-500" />;
-      case 'erro':
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
-      default:
-        return null;
-    }
-  };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'processado':
-        return 'Processado';
-      case 'pendente':
-        return 'Pendente';
-      case 'processando':
-        return 'Processando';
-      case 'aguardando_validacao':
-        return 'Aguardando Validação';
-      case 'erro':
-        return 'Erro';
-      default:
-        return status;
+  const handleDownload = async () => {
+    if (!document.arquivo) {
+      alert('Nenhum arquivo disponível para download.');
+      return;
+    }
+
+    try {
+      // Importar o serviço dinamicamente para evitar problemas de SSR
+      const { useStorageService } = await import('../services/storageService');
+      const storageService = useStorageService();
+      
+      console.log('📥 Downloading document:', document.arquivo);
+      
+      const result = await storageService.downloadFile(document.arquivo);
+      
+      if (result.success && result.url) {
+        // Abrir o arquivo em uma nova aba
+        window.open(result.url, '_blank');
+      } else {
+        console.error('Download failed:', result.error);
+        alert(`Erro no download: ${result.error || 'Erro desconhecido'}`);
+      }
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Erro ao fazer download do arquivo. Tente novamente.');
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'processado':
-        return 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400';
       case 'pendente':
-      case 'processando':
-      case 'aguardando_validacao':
+        return 'bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400';
+      case 'processado':
         return 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-600 dark:text-yellow-400';
+      case 'conciliado':
+        return 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400';
       case 'erro':
         return 'bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400';
       default:
@@ -107,264 +73,179 @@ export const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
     }
   };
 
-  const renderDocumentContent = () => {
-    if (!document) return null;
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '-';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('pt-BR');
+    } catch {
+      return dateString;
+    }
+  };
 
+  const formatDateTime = (dateString?: string) => {
+    if (!dateString) return '-';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  const renderField = (
+    label: string,
+    value: any,
+    icon: React.ElementType,
+    isSpecialDisplay?: 'tipo_documento' | 'categoria' | 'date'
+  ) => {
+    const IconComponent = icon;
+    
     return (
-      <div className="p-6 space-y-6">
-        {/* Status Badge */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            {getStatusIcon(document.status)}
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(document.status)}`}>
-              {getStatusText(document.status)}
-            </span>
-          </div>
-          <button className="flex items-center px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors">
-            <Download className="h-4 w-4 mr-2" />
-            Download
-          </button>
+      <div className="bg-slate-50 dark:bg-slate-900 rounded-md p-3">
+        <div className="flex items-center space-x-2 mb-1">
+          <IconComponent className="h-3.5 w-3.5 text-slate-400" />
+          <h4 className="font-medium text-slate-900 dark:text-white text-xs">{label}</h4>
         </div>
-
-        {/* Document Info */}
-        <div className="grid grid-cols-1 gap-4">
-          {/* Arquivo */}
-          <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
-            <div className="flex items-center space-x-3 mb-2">
-              <FileIcon className="h-5 w-5 text-slate-400" />
-              <h4 className="font-medium text-slate-900 dark:text-white">Arquivo</h4>
-            </div>
-            <div className="text-sm text-slate-600 dark:text-slate-400">
-              <p className="font-medium">{document.arquivo}</p>
-              <p className="text-xs mt-1">Tamanho: {document.tamanho}</p>
-              <p className="text-xs">Upload: {document.dataUpload}</p>
-            </div>
-          </div>
-
-          {/* Tipo e Categoria */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
-              <div className="flex items-center space-x-2 mb-2">
-                <Tag className="h-4 w-4 text-slate-400" />
-                <h4 className="font-medium text-slate-900 dark:text-white text-sm">Tipo</h4>
-              </div>
-              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                document.tipo === 'fiscal'
-                  ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400'
-                  : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
-              }`}>
-                {document.tipo === 'fiscal' ? 'Fiscal' : 'Não Fiscal'}
-              </span>
-            </div>
-
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
-              <div className="flex items-center space-x-2 mb-2">
-                {document.categoria === 'entrada' ? (
-                  <TrendingUp className="h-4 w-4 text-emerald-500" />
+        
+        <div className="text-slate-700 dark:text-slate-300 text-sm">
+          {isSpecialDisplay === 'tipo_documento' && value ? (
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+              value === 'fiscal'
+                ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400'
+                : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+            }`}>
+              {value === 'fiscal' ? 'Fiscal' : 'Não Fiscal'}
+            </span>
+          ) : isSpecialDisplay === 'categoria' && value ? (
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+              value === 'entrada'
+                ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400'
+                : 'bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400'
+            }`}>
+              <div className="flex items-center space-x-1">
+                {value === 'entrada' ? (
+                  <TrendingUp className="h-3 w-3" />
                 ) : (
-                  <TrendingDown className="h-4 w-4 text-red-500" />
+                  <TrendingDown className="h-3 w-3" />
                 )}
-                <h4 className="font-medium text-slate-900 dark:text-white text-sm">Categoria</h4>
+                <span>{value === 'entrada' ? 'Entrada' : 'Saída'}</span>
               </div>
-              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                document.categoria === 'entrada'
-                  ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400'
-                  : 'bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400'
-              }`}>
-                {document.categoria === 'entrada' ? 'Entrada' : 'Saída'}
-              </span>
-            </div>
-          </div>
-
-          {/* Empresa/Pessoa */}
-          {document.empresaPessoa && (
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
-              <div className="flex items-center space-x-2 mb-2">
-                <Building2 className="h-4 w-4 text-slate-400" />
-                <h4 className="font-medium text-slate-900 dark:text-white text-sm">
-                  {document.categoria === 'entrada' ? 'Cliente' : 'Fornecedor'}
-                </h4>
-              </div>
-              <p className="text-slate-700 dark:text-slate-300">{document.empresaPessoa}</p>
-            </div>
-          )}
-
-          {/* Valor */}
-          {document.valor && (
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
-              <div className="flex items-center space-x-2 mb-2">
-                <DollarSign className="h-4 w-4 text-slate-400" />
-                <h4 className="font-medium text-slate-900 dark:text-white text-sm">Valor</h4>
-              </div>
-              <p className="text-lg font-semibold text-slate-900 dark:text-white">{document.valor}</p>
-            </div>
-          )}
-
-          {/* Data */}
-          <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
-            <div className="flex items-center space-x-2 mb-2">
-              <Calendar className="h-4 w-4 text-slate-400" />
-              <h4 className="font-medium text-slate-900 dark:text-white text-sm">Data do Documento</h4>
-            </div>
-            <p className="text-slate-700 dark:text-slate-300">{document.data}</p>
-          </div>
-        </div>
-
-        {/* Dados Extraídos pela IA */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
-          <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-3 flex items-center">
-            <AlertCircle className="h-4 w-4 mr-2" />
-            Dados Processados pela IA
-          </h4>
-          <div className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
-            <p>• Nome do documento extraído automaticamente</p>
-            <p>• Tipo fiscal identificado pela análise do conteúdo</p>
-            <p>• Valor monetário reconhecido e formatado</p>
-            <p>• Data extraída do cabeçalho do documento</p>
-            <p>• Empresa/fornecedor identificado via OCR</p>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const renderExcelContent = () => {
-    if (!excelFile) return null;
-
-    return (
-      <div className="p-6 space-y-6">
-        {/* Status Badge */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            {getStatusIcon(excelFile.status)}
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(excelFile.status)}`}>
-              {getStatusText(excelFile.status)}
             </span>
-          </div>
-          {excelFile.status === 'aguardando_validacao' && (
-            <button className="flex items-center px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors">
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Validar Dados
-            </button>
+          ) : isSpecialDisplay === 'date' ? (
+            formatDate(value)
+          ) : (
+            value || '-'
           )}
-        </div>
-
-        {/* File Info */}
-        <div className="grid grid-cols-1 gap-4">
-          {/* Arquivo */}
-          <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
-            <div className="flex items-center space-x-3 mb-2">
-              <FileSpreadsheet className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-              <h4 className="font-medium text-slate-900 dark:text-white">Arquivo Excel</h4>
-            </div>
-            <div className="text-sm text-slate-600 dark:text-slate-400">
-              <p className="font-medium">{excelFile.nome}</p>
-              <p className="text-xs mt-1">Tamanho: {excelFile.tamanho}</p>
-              <p className="text-xs">Upload: {excelFile.dataUpload}</p>
-            </div>
-          </div>
-
-          {/* Progresso de Processamento */}
-          {excelFile.linhasTotal && (
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
-              <div className="flex items-center space-x-2 mb-3">
-                <Hash className="h-4 w-4 text-slate-400" />
-                <h4 className="font-medium text-slate-900 dark:text-white text-sm">Progresso</h4>
-              </div>
-              
-              {excelFile.status === 'processando' && excelFile.linhasProcessadas ? (
-                <div>
-                  <div className="flex items-center justify-between text-sm text-slate-600 dark:text-slate-400 mb-2">
-                    <span>{excelFile.linhasProcessadas}/{excelFile.linhasTotal} linhas</span>
-                    <span>{Math.round((excelFile.linhasProcessadas / excelFile.linhasTotal) * 100)}%</span>
-                  </div>
-                  <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                    <div 
-                      className="bg-emerald-600 h-2 rounded-full transition-all"
-                      style={{ width: `${(excelFile.linhasProcessadas / excelFile.linhasTotal) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              ) : (
-                <p className="text-slate-700 dark:text-slate-300">
-                  {excelFile.linhasTotal} linhas processadas
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Erros */}
-          {excelFile.erros && excelFile.erros.length > 0 && (
-            <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 border border-red-200 dark:border-red-800">
-              <div className="flex items-center space-x-2 mb-3">
-                <AlertCircle className="h-4 w-4 text-red-500" />
-                <h4 className="font-medium text-red-900 dark:text-red-200 text-sm">Erros Encontrados</h4>
-              </div>
-              <div className="space-y-2">
-                {excelFile.erros.map((erro, index) => (
-                  <p key={index} className="text-sm text-red-800 dark:text-red-300">
-                    • {erro}
-                  </p>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Informações do Processamento */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
-          <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-3 flex items-center">
-            <AlertCircle className="h-4 w-4 mr-2" />
-            Processamento Inteligente
-          </h4>
-          <div className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
-            <p>• IA analisou automaticamente a estrutura da planilha</p>
-            <p>• Identificou colunas de data, valor, descrição e categoria</p>
-            <p>• Converteu para o formato padrão Conta Azul</p>
-            <p>• Validou consistência dos dados financeiros</p>
-            {excelFile.status === 'aguardando_validacao' && (
-              <p className="font-medium">• Aguardando sua aprovação para importação</p>
-            )}
-          </div>
         </div>
       </div>
     );
   };
 
-  const getModalTitle = () => {
-    if (type === 'document' && document) {
-      return document.nome;
-    }
-    if (type === 'excel' && excelFile) {
-      return excelFile.nome;
-    }
-    return 'Detalhes';
-  };
-
-  const getModalIcon = () => {
-    return type === 'document' ? FileText : FileSpreadsheet;
-  };
-
-  const getModalSubtitle = () => {
-    if (type === 'document' && document) {
-      return `${document.arquivo} • ${document.tamanho}`;
-    }
-    if (type === 'excel' && excelFile) {
-      return `${excelFile.tamanho} • ${excelFile.dataUpload}`;
-    }
-    return '';
-  };
+  const footer = (
+    <div className="border-t border-slate-200 dark:border-slate-700 px-6 py-4">
+      <div className="flex justify-end">
+        <button 
+          onClick={handleDownload}
+          className="flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors"
+        >
+          <Download className="h-4 w-4 mr-2" />
+          Download
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <ModalSidebar
       isOpen={isOpen}
       onClose={onClose}
-      title={getModalTitle()}
-      subtitle={getModalSubtitle()}
-      icon={getModalIcon()}
+      title={document?.nome || 'Documento'}
+      subtitle={`${document?.arquivo} • ${document?.tamanho}`}
+      icon={FileText}
       width="lg"
+      footer={footer}
     >
-      {type === 'document' ? renderDocumentContent() : renderExcelContent()}
+      <div className="p-4 space-y-4 overflow-y-auto flex-1">
+        {/* Status */}
+        <div className="flex items-center justify-between">
+          <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(document.status)}`}>
+            {document.status.charAt(0).toUpperCase() + document.status.slice(1)}
+          </span>
+          <div className="text-xs text-slate-500 dark:text-slate-400">
+            Upload: {formatDateTime(document.data_upload)}
+          </div>
+        </div>
+
+        {/* Dados Básicos */}
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold text-slate-900 dark:text-white">Informações Básicas</h3>
+          
+          {renderField('Nome do Documento', document.nome, FileText)}
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {renderField('Tipo', document.tipo_documento, Tag, 'tipo_documento')}
+            {renderField('Categoria', document.categoria, TrendingUp, 'categoria')}
+          </div>
+        </div>
+
+        {/* Dados Financeiros */}
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold text-slate-900 dark:text-white">Dados Financeiros</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {renderField('Valor', document.valor, DollarSign)}
+            {renderField('Data do Documento', document.data_documento, Calendar, 'date')}
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {renderField('Forma de Pagamento', document.forma_pagamento, CreditCard)}
+            {renderField('Centro de Custo', document.centro_custo, Building2)}
+          </div>
+        </div>
+
+        {/* Dados das Partes */}
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold text-slate-900 dark:text-white">Partes Envolvidas</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {renderField('Fornecedor', document.fornecedor, Building2)}
+            {renderField('Cliente', document.cliente, User)}
+          </div>
+          
+          {renderField('CNPJ', document.cnpj, Hash)}
+        </div>
+
+        {/* Dados Específicos */}
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold text-slate-900 dark:text-white">Detalhes do Documento</h3>
+          
+          {renderField('Descrição', document.descricao, FileText)}
+          {renderField('Observações', document.observacoes, AlertCircle)}
+        </div>
+
+        {/* Metadados */}
+        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-md p-3 border border-blue-200 dark:border-blue-800">
+          <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-2 flex items-center text-sm">
+            <AlertCircle className="h-3.5 w-3.5 mr-2" />
+            Dados Processados pela IA
+          </h4>
+          <div className="text-xs text-blue-800 dark:text-blue-300 space-y-1">
+            <p>• Confiança da IA: {document.confianca_ia}%</p>
+            <p>• Dados completos: {document.dados_completos ? 'Sim' : 'Não'}</p>
+            <p>• Processado em: {formatDateTime(document.created_at)}</p>
+            {document.updated_at !== document.created_at && (
+              <p>• Última atualização: {formatDateTime(document.updated_at)}</p>
+            )}
+          </div>
+        </div>
+      </div>
     </ModalSidebar>
   );
 };

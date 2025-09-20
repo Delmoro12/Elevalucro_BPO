@@ -44,8 +44,8 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
     });
   };
 
-  const getPlanoBadgeColor = (plano: string) => {
-    switch (plano) {
+  const getPlanoBadgeColor = (plan: string) => {
+    switch (plan) {
       case 'controle':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
       case 'gerencial':
@@ -57,8 +57,8 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
     }
   };
 
-  const getPlanoDisplayName = (plano: string) => {
-    switch (plano) {
+  const getPlanoDisplayName = (plan: string) => {
+    switch (plan) {
       case 'controle':
         return 'Controle';
       case 'gerencial':
@@ -87,16 +87,16 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
           <h4 className="font-medium text-slate-900 dark:text-slate-100 truncate">
-            {prospect.nome_contato}
+            {prospect.contact_name}
           </h4>
           <p className="text-sm text-slate-600 dark:text-slate-400 truncate">
-            {prospect.nome_empresa}
+            {prospect.company_name}
           </p>
         </div>
         
         {/* Badge do plano */}
-        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPlanoBadgeColor(prospect.plano)}`}>
-          {getPlanoDisplayName(prospect.plano)}
+        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPlanoBadgeColor(prospect.plan)}`}>
+          {getPlanoDisplayName(prospect.plan)}
         </span>
       </div>
 
@@ -104,13 +104,13 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
       <div className="space-y-1 mb-3">
         <div className="flex items-center text-xs text-slate-600 dark:text-slate-400">
           <Mail className="h-3 w-3 mr-1 flex-shrink-0" />
-          <span className="truncate">{prospect.email_contato}</span>
+          <span className="truncate">{prospect.contact_email}</span>
         </div>
         
-        {prospect.telefone_contato && (
+        {prospect.contact_phone && (
           <div className="flex items-center text-xs text-slate-600 dark:text-slate-400">
             <Phone className="h-3 w-3 mr-1 flex-shrink-0" />
-            <span>{prospect.telefone_contato}</span>
+            <span>{prospect.contact_phone}</span>
           </div>
         )}
 
@@ -124,7 +124,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center text-sm font-medium text-emerald-600 dark:text-emerald-400">
           <DollarSign className="h-3 w-3 mr-1" />
-          R$ {prospect.valor_mensal.toLocaleString()}/mês
+          R$ {prospect.monthly_value.toLocaleString()}/mês
         </div>
         
         <div className="flex items-center text-xs text-slate-500 dark:text-slate-400">

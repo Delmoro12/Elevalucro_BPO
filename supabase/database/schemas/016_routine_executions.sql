@@ -15,7 +15,10 @@ CREATE TABLE IF NOT EXISTS "public"."routine_executions" (
     "next_execution_date" "date",
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"(),
-    CONSTRAINT "routine_executions_status_check" CHECK ((("status")::"text" = ANY ((ARRAY['completed'::character varying, 'partially_completed'::character varying, 'failed'::character varying])::"text"[])))
+    CONSTRAINT "routine_executions_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "routine_executions_status_check" CHECK ((("status")::"text" = ANY ((ARRAY['completed'::character varying, 'partially_completed'::character varying, 'failed'::character varying])::"text"[]))),
+    CONSTRAINT "routine_executions_company_routine_id_fkey" FOREIGN KEY ("company_routine_id") REFERENCES "public"."companies_routines"("id") ON DELETE RESTRICT,
+    CONSTRAINT "routine_executions_executed_by_fkey" FOREIGN KEY ("executed_by") REFERENCES "public"."users"("id") ON DELETE SET NULL
 );
 
 ALTER TABLE "public"."routine_executions" OWNER TO "postgres";
@@ -30,3 +33,14 @@ COMMENT ON COLUMN "public"."routine_executions"."notes" IS 'Notes about the exec
 COMMENT ON COLUMN "public"."routine_executions"."attachments" IS 'Array of attachment URLs (documents, screenshots, etc)';
 COMMENT ON COLUMN "public"."routine_executions"."time_spent_minutes" IS 'Time spent on execution in minutes';
 COMMENT ON COLUMN "public"."routine_executions"."next_execution_date" IS 'Calculated date for next execution';
+
+-- =============================================================================
+-- Indexes
+-- =============================================================================
+
+CREATE INDEX IF NOT EXISTS "idx_routine_executions_company_routine_id" ON "public"."routine_executions"("company_routine_id");
+CREATE INDEX IF NOT EXISTS "idx_routine_executions_executed_at" ON "public"."routine_executions"("executed_at");
+CREATE INDEX IF NOT EXISTS "idx_routine_executions_executed_by" ON "public"."routine_executions"("executed_by");
+CREATE INDEX IF NOT EXISTS "idx_routine_executions_status" ON "public"."routine_executions"("status");
+CREATE INDEX IF NOT EXISTS "idx_routine_executions_created_at" ON "public"."routine_executions"("created_at");
+CREATE INDEX IF NOT EXISTS "idx_routine_executions_next_execution_date" ON "public"."routine_executions"("next_execution_date");
