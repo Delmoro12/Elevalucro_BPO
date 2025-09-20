@@ -184,7 +184,7 @@ export const ConfigTable: React.FC<ConfigTableProps> = ({
         }
       ]}
       activeTab={activeTab}
-      onTabChange={onTabChange}
+      onTabChange={(key: string) => onTabChange(key as ConfigTabType)}
       
       onRefresh={onRefresh}
       

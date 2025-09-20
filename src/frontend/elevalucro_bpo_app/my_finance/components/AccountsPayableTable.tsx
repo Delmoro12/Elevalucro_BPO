@@ -164,9 +164,9 @@ export const AccountsPayableTable: React.FC<AccountsPayableTableProps> = ({ comp
               record.status_vencimento === 'vence_em_breve' ? 'text-yellow-600 dark:text-yellow-400' :
               'text-slate-500 dark:text-slate-400'
             }`}>
-              {record.dias_vencimento < 0 ? `${Math.abs(record.dias_vencimento)} dias em atraso` :
-               record.dias_vencimento === 0 ? 'Vence hoje' :
-               `${record.dias_vencimento} dias restantes`}
+              {(record.dias_vencimento ?? 0) < 0 ? `${Math.abs(record.dias_vencimento ?? 0)} dias em atraso` :
+               (record.dias_vencimento ?? 0) === 0 ? 'Vence hoje' :
+               `${record.dias_vencimento ?? 0} dias restantes`}
             </p>
           )}
           {record.status === 'paid' && record.payment_date && (
@@ -324,7 +324,11 @@ export const AccountsPayableTable: React.FC<AccountsPayableTableProps> = ({ comp
       {/* Modal de Visualização */}
       {showViewModal && selectedTransaction && (
         <FinancialViewModal
-          transaction={selectedTransaction}
+          transaction={{
+            ...selectedTransaction,
+            type: 'payable' as const,
+            created_by_side: 'client_side'
+          }}
           isOpen={showViewModal}
           onClose={handleCloseModal}
         />

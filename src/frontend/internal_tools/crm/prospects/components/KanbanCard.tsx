@@ -66,7 +66,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
       case 'avancado':
         return 'Avançado';
       default:
-        return plano;
+        return plan;
     }
   };
 

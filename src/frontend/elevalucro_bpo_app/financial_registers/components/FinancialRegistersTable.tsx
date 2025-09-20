@@ -7,7 +7,7 @@ import type {
   DataTable03Column, 
   DataTable03Tab, 
   DataTable03DateFilter,
-  DataTable03SelectFilter
+  DataTable03Filter
 } from '../../shared/components/DataTable03';
 import { useFinancialRegisters } from '../hooks/useFinancialRegisters';
 import type { FinancialRegister, FinancialRegisterStatusTab } from '../types/financialRegisters';
@@ -341,14 +341,16 @@ export const FinancialRegistersTable: React.FC<FinancialRegistersTableProps> = (
           label: 'Vencimento'
         }}
 
-        // Filtro por tipo
-        selectFilters={[
+        // Filtros
+        filters={[
           {
-            value: typeFilter,
-            onChange: setTypeFilter,
-            options: typeFilterOptions,
+            key: 'type',
+            label: 'Tipo',
+            type: 'select',
             placeholder: 'Filtrar por tipo',
-            label: 'Tipo'
+            options: typeFilterOptions,
+            value: typeFilter,
+            onChange: setTypeFilter
           }
         ]}
         
@@ -380,18 +382,6 @@ export const FinancialRegistersTable: React.FC<FinancialRegistersTableProps> = (
         // Clique na linha (ativo em ambas as tabs mas com comportamento diferente)
         onRowClick={onEdit ? handleRowClick : undefined}
         
-        // Ações
-        rowActions={[
-          ...(onEdit ? [{
-            label: 'Editar',
-            onClick: onEdit
-          }] : []),
-          ...(onDelete ? [{
-            label: 'Excluir',
-            onClick: onDelete,
-            variant: 'danger' as const
-          }] : [])
-        ]}
         
         // Refresh
         onRefresh={handleRefresh}

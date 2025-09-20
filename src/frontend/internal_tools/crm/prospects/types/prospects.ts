@@ -101,4 +101,10 @@ export interface ProspectUpdatePayload {
   status?: ProspectStatus;
   origem?: string;
   observacoes?: string;
+  // Aliases para compatibilidade
+  source?: string;
+  notes?: string;
+  bancos?: string[];
+  ferramentas?: string[];
+  organizacao?: string[];
 }

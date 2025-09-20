@@ -9,9 +9,10 @@ import {
   OccurrenceOptions,
   DaysOfWeekOptions
 } from '../../types/accountsReceivable';
+import { RecurrenceConfig } from '../../../../../../types/shared';
 import { RecurrenceCalculator } from '../../utils/recurrenceCalculator';
 import { FinancialCategory } from '../../types/config';
-import { ClientClient } from '../../types/clientsClients';
+import { ClientSupplier } from '../../../../../../types/internal_tools/clientsSuppliers';
 
 interface AccountsReceivableModalSidebarProps {
   isOpen: boolean;
@@ -21,7 +22,7 @@ interface AccountsReceivableModalSidebarProps {
   title: string;
   account?: AccountReceivable | null;
   categories?: FinancialCategory[];
-  clients?: ClientClient[];
+  clients?: ClientSupplier[];
 }
 
 export const AccountsReceivableModalSidebar: React.FC<AccountsReceivableModalSidebarProps> = ({
@@ -43,7 +44,7 @@ export const AccountsReceivableModalSidebar: React.FC<AccountsReceivableModalSid
 
   // Controles de estado
   const isEditMode = !!account; // Se tem account, é edição
-  const isReadOnly = account?.status === 'received'; // Se está recebida, é só leitura
+  const isReadOnly = account?.status === 'paid'; // Se está paga, é só leitura
   const isOccurrenceDisabled = isEditMode; // Tipo de ocorrência desabilitado na edição
 
   // Helper para classes de input
@@ -61,7 +62,7 @@ export const AccountsReceivableModalSidebar: React.FC<AccountsReceivableModalSid
   useEffect(() => {
     if (isOpen && account) {
       // Extrair dados do recurrence_config JSONB
-      const config = account.recurrence_config || {};
+      const config = (account.recurrence_config || {}) as RecurrenceConfig;
       
       const formDataToSet = {
         pix_number: account.pix_number || '',
@@ -120,7 +121,7 @@ export const AccountsReceivableModalSidebar: React.FC<AccountsReceivableModalSid
   // Get filtered clients
   const getFilteredClients = () => {
     return clients
-      .filter(s => s.type === 'client' || s.type === 'both')
+      .filter(s => s.type === 'client')
       .filter(s => 
         s.name.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
         (s.cnpj && s.cnpj.includes(clientSearchTerm)) ||

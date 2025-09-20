@@ -13,6 +13,12 @@ export const useRoutinesHistory = (): UseRoutinesHistoryReturn => {
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [lastParams, setLastParams] = useState<{
+    companyId: string;
+    filters: RoutinesHistoryFilters;
+    page: number;
+    pageSize: number;
+  } | null>(null);
 
   const fetchRoutines = useCallback(async (
     companyId: string,
@@ -23,6 +29,9 @@ export const useRoutinesHistory = (): UseRoutinesHistoryReturn => {
     try {
       setLoading(true);
       setError(null);
+
+      // Salvar os parâmetros para uso no refresh
+      setLastParams({ companyId, filters, page, pageSize });
 
       const response = await routinesApi.listRoutinesHistory(companyId, filters, page, pageSize);
       
@@ -42,8 +51,10 @@ export const useRoutinesHistory = (): UseRoutinesHistoryReturn => {
 
   const refreshRoutines = useCallback(async () => {
     // Recarrega com os mesmos filtros da última busca
-    await fetchRoutines();
-  }, [fetchRoutines]);
+    if (lastParams) {
+      await fetchRoutines(lastParams.companyId, lastParams.filters, lastParams.page, lastParams.pageSize);
+    }
+  }, [fetchRoutines, lastParams]);
 
   return {
     routines,

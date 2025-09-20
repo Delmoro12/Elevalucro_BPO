@@ -17,11 +17,11 @@ export interface AccountReceivable {
   number_of_document?: string;
   notes?: string;
   occurrence: 'unique' | 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'semiannual' | 'annual' | 'installments';
-  status: 'pending' | 'received' | 'cancelled';
+  status: 'pending' | 'paid' | 'cancelled';
   
-  // Campos de recebimento (diferente de pagamento)
-  receipt_date?: string;
-  received_amount?: number;
+  // Campos de pagamento/recebimento
+  payment_date?: string;
+  paid_amount?: number;
   financial_account_id?: string;
   
   // Campos de recorrência
@@ -130,10 +130,10 @@ export interface UpdateAccountReceivableRequest extends Partial<CreateAccountRec
   id: string;
 }
 
-export interface ProcessReceiptRequest {
+export interface ProcessPaymentRequest {
   financial_account_id: string;
-  receipt_date: string;
-  received_amount: number;
+  payment_date: string;
+  paid_amount: number;
   notes?: string;
 }
 
@@ -153,7 +153,7 @@ export interface AccountReceivableSummaryApiResponse {
 }
 
 // Tab types para filtros
-export type AccountReceivableStatusTab = 'all' | 'open' | 'received' | 'overdue' | 'cancelled';
+export type AccountReceivableStatusTab = 'all' | 'open' | 'paid' | 'overdue' | 'cancelled';
 
 // Filter types
 export interface AccountReceivableFilters {
@@ -180,7 +180,7 @@ export interface UseAccountsReceivableResult {
   createAccount: (data: CreateAccountReceivableRequest) => Promise<AccountReceivable>;
   updateAccount: (data: UpdateAccountReceivableRequest) => Promise<AccountReceivable>;
   deleteAccount: (id: string) => Promise<void>;
-  processReceipt: (id: string, receiptData: ProcessReceiptRequest) => Promise<AccountReceivable>;
+  processReceipt: (id: string, receiptData: ProcessPaymentRequest) => Promise<AccountReceivable>;
   markAsCancelled: (id: string) => Promise<AccountReceivable>;
   cloneAccount: (id: string) => Promise<AccountReceivable>;
   reverseReceipt: (id: string) => Promise<AccountReceivable>;

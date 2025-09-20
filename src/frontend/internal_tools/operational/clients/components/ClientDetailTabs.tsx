@@ -366,13 +366,16 @@ export const ClientDetailTabs: React.FC<ClientDetailTabsProps> = ({ client }) =>
       <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-1">
         <div className="flex gap-1 overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing select-none" 
              onMouseDown={(e) => {
-               const startX = e.pageX - e.currentTarget.offsetLeft;
-               const scrollLeft = e.currentTarget.scrollLeft;
+               const element = e.currentTarget as HTMLElement;
+               if (!element) return;
+               
+               const startX = e.pageX - element.offsetLeft;
+               const scrollLeft = element.scrollLeft;
                
                const handleMouseMove = (e: MouseEvent) => {
-                 const x = e.pageX - e.currentTarget.offsetLeft;
+                 const x = e.pageX - element.offsetLeft;
                  const walk = (x - startX) * 2;
-                 e.currentTarget.scrollLeft = scrollLeft - walk;
+                 element.scrollLeft = scrollLeft - walk;
                };
                
                const handleMouseUp = () => {

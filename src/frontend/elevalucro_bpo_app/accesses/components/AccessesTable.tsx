@@ -208,18 +208,6 @@ export const AccessesTable: React.FC<AccessesTableProps> = ({
             // Clique na linha
             onRowClick={onEdit}
             
-            // Ações
-            rowActions={[
-              ...(onEdit ? [{
-                label: 'Editar',
-                onClick: onEdit
-              }] : []),
-              ...(onDelete ? [{
-                label: 'Excluir',
-                onClick: onDelete,
-                variant: 'danger' as const
-              }] : [])
-            ]}
             
             // Refresh
             onRefresh={onRefresh}

@@ -9,6 +9,7 @@ import {
   OccurrenceOptions,
   DaysOfWeekOptions
 } from '../../types/accountsPayable';
+import { RecurrenceConfig } from '../../../../../../types/shared';
 import { RecurrenceCalculator } from '../../utils/recurrenceCalculator';
 import { FinancialCategory } from '../../types/config';
 import { ClientSupplier } from '../../types/clientsSuppliers';
@@ -61,7 +62,7 @@ export const AccountsPayableModalSidebar: React.FC<AccountsPayableModalSidebarPr
   useEffect(() => {
     if (isOpen && account) {
       // Extrair dados do recurrence_config JSONB
-      const config = account.recurrence_config || {};
+      const config = (account.recurrence_config || {}) as RecurrenceConfig;
       
       const formDataToSet = {
         pix_number: account.pix_number || '',
@@ -120,7 +121,7 @@ export const AccountsPayableModalSidebar: React.FC<AccountsPayableModalSidebarPr
   // Get filtered suppliers
   const getFilteredSuppliers = () => {
     return suppliers
-      .filter(s => s.type === 'supplier' || s.type === 'both')
+      .filter(s => s.type === 'supplier')
       .filter(s => 
         s.name.toLowerCase().includes(supplierSearchTerm.toLowerCase()) ||
         (s.cnpj && s.cnpj.includes(supplierSearchTerm)) ||

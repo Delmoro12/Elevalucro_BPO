@@ -90,7 +90,7 @@ export const ClientSupplierModal: React.FC<ClientSupplierModalProps> = ({
       newErrors.type = 'Tipo é obrigatório';
     }
 
-    if (!formData.cnpj.trim()) {
+    if (!formData.cnpj?.trim()) {
       newErrors.cnpj = 'CNPJ é obrigatório';
     }
 

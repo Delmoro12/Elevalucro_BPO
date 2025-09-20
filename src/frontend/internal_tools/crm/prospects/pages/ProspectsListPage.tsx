@@ -126,9 +126,9 @@ export const ProspectsListPage: React.FC = () => {
               Mostrando {prospects.length} prospect{prospects.length !== 1 ? 's' : ''}
             </div>
             <div className="flex items-center gap-4">
-              <div>Controle: {prospects.filter(p => p.plano === 'controle').length}</div>
-              <div>Gerencial: {prospects.filter(p => p.plano === 'gerencial').length}</div>
-              <div>Avançado: {prospects.filter(p => p.plano === 'avancado').length}</div>
+              <div>Controle: {prospects.filter(p => p.plan === 'controle').length}</div>
+              <div>Gerencial: {prospects.filter(p => p.plan === 'gerencial').length}</div>
+              <div>Avançado: {prospects.filter(p => p.plan === 'avancado').length}</div>
             </div>
           </div>
         </div>

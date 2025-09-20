@@ -277,14 +277,13 @@ export const CashMovementsTable: React.FC<CashMovementsTableProps> = ({
       key: 'edit',
       icon: Edit2,
       title: 'Editar',
-      onClick: onEdit
+      onClick: onEdit || (() => {})
     },
     {
       key: 'delete',
       icon: Trash2,
       title: 'Excluir',
-      onClick: (movement: CashMovement) => onDelete?.(movement.id),
-      color: 'text-red-600 hover:text-red-900'
+      onClick: (movement: CashMovement) => onDelete?.(movement.id)
     }
   ];
 

@@ -15,14 +15,13 @@ import type {
   DataTable02Column, 
   DataTable02Tab,
   DataTable02DateFilter,
-  DataTable02SelectFilter
+  DataTable02Filter
 } from '../../../../shared/components/DataTable02';
 import { CashFlowTransaction, CashFlowFilters } from '../../types/cashFlow';
 
 interface CashFlowTableProps {
   transactions: CashFlowTransaction[];
   loading: boolean;
-  error: string | null;
   filters: CashFlowFilters;
   onFiltersChange: (filters: Partial<CashFlowFilters>) => void;
   onRefresh: () => void;
@@ -33,7 +32,6 @@ interface CashFlowTableProps {
 export const CashFlowTable: React.FC<CashFlowTableProps> = ({
   transactions,
   loading,
-  error,
   filters,
   onFiltersChange,
   onRefresh,
@@ -66,15 +64,13 @@ export const CashFlowTable: React.FC<CashFlowTableProps> = ({
       key: 'credit',
       label: 'Créditos',
       count: tabCounts.credits,
-      icon: TrendingUp,
-      color: 'text-green-600 dark:text-green-400'
+      icon: TrendingUp
     },
     {
       key: 'debit',
       label: 'Débitos',
       count: tabCounts.debits,
-      icon: TrendingDown,
-      color: 'text-red-600 dark:text-red-400'
+      icon: TrendingDown
     },
     {
       key: 'realized',
@@ -187,7 +183,6 @@ export const CashFlowTable: React.FC<CashFlowTableProps> = ({
       key: 'credit_value',
       title: 'Crédito',
       width: '120px',
-      align: 'right' as const,
       render: (value, row) => (
         <div className="text-sm text-right">
           {row.cash_flow_type === 'CRÉDITO' ? (
@@ -204,7 +199,6 @@ export const CashFlowTable: React.FC<CashFlowTableProps> = ({
       key: 'debit_value',
       title: 'Débito',
       width: '120px',
-      align: 'right' as const,
       render: (value, row) => (
         <div className="text-sm text-right">
           {row.cash_flow_type === 'DÉBITO' ? (
@@ -232,9 +226,10 @@ export const CashFlowTable: React.FC<CashFlowTableProps> = ({
   ];
 
   // Filtros avançados
-  const selectFilters: DataTable02SelectFilter[] = [
+  const selectFilters: DataTable02Filter[] = [
     {
       key: 'financial_account_id',
+      type: 'select',
       label: 'Conta Financeira',
       value: filters.financial_account_id || 'all',
       options: [
@@ -244,10 +239,11 @@ export const CashFlowTable: React.FC<CashFlowTableProps> = ({
           label: account.description
         }))
       ],
-      onChange: (value) => onFiltersChange({ financial_account_id: value === 'all' ? undefined : value })
+      onChange: (value: string) => onFiltersChange({ financial_account_id: value === 'all' ? undefined : value })
     },
     {
       key: 'category_id',
+      type: 'select',
       label: 'Categoria',
       value: filters.category_id || 'all',
       options: [
@@ -257,13 +253,13 @@ export const CashFlowTable: React.FC<CashFlowTableProps> = ({
           label: category.description
         }))
       ],
-      onChange: (value) => onFiltersChange({ category_id: value === 'all' ? undefined : value })
+      onChange: (value: string) => onFiltersChange({ category_id: value === 'all' ? undefined : value })
     }
   ];
 
   const handleTabChange = (tabKey: string) => {
     setActiveTab(tabKey);
-    onFiltersChange({ type: tabKey === 'all' ? undefined : tabKey as any });
+    onFiltersChange({ type: tabKey === 'all' ? undefined : tabKey as 'credit' | 'debit' });
   };
 
   const handleSearch = (value: string) => {
@@ -290,7 +286,6 @@ export const CashFlowTable: React.FC<CashFlowTableProps> = ({
       data={filteredData}
       columns={columns}
       loading={loading}
-      error={error}
       
       // Configuração de tabs
       tabs={tabs}
@@ -302,32 +297,10 @@ export const CashFlowTable: React.FC<CashFlowTableProps> = ({
       onSearchChange={handleSearch}
       searchPlaceholder="Buscar por cliente, fornecedor, categoria..."
       
-      // Configuração de filtros
-      selectFilters={selectFilters}
-      onDateFilterChange={handleDateFilter}
       
-      // Ações da toolbar
-      toolbarActions={[
-        {
-          label: 'Atualizar',
-          icon: RefreshCw,
-          onClick: onRefresh,
-          variant: 'secondary'
-        },
-        {
-          label: 'Exportar',
-          icon: Download,
-          onClick: () => {
-            // TODO: Implementar exportação
-            console.log('Exportar fluxo de caixa');
-          },
-          variant: 'secondary'
-        }
-      ]}
       
       // Configurações gerais
       emptyMessage="Nenhuma transação de fluxo de caixa encontrada"
-      rowsPerPage={50}
     />
   );
 };

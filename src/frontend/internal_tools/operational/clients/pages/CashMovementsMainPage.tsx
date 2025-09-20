@@ -8,7 +8,7 @@ import { cashMovementsApi } from '../services/cashMovements.api';
 import { useFinancialAccounts } from '../hooks/useFinancialConfig';
 import { useCashMovementsIndicators } from '../hooks/useCashMovementsIndicators';
 import { CashMovementsFilters } from '../types/indicators';
-import { DataTable02DateFilter } from '../../../../shared/components/DataTable02';
+import { DataTable02DateFilter } from '../../../shared/components/DataTable02';
 
 interface CashMovementsMainPageProps {
   companyId: string;

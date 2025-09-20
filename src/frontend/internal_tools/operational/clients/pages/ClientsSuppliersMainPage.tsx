@@ -37,7 +37,7 @@ export const ClientsSuppliersMainPage: React.FC<ClientsSuppliersMainPageProps> =
     // Converter string para boolean para is_active
     const processedFilters = {
       ...newFilters,
-      is_active: newFilters.is_active === 'true' ? true : newFilters.is_active === 'false' ? false : undefined,
+      is_active: (newFilters.is_active as any) === 'true' ? true : (newFilters.is_active as any) === 'false' ? false : newFilters.is_active,
     };
     
     fetchClientsSuppliers(processedFilters);

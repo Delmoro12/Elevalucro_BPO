@@ -35,7 +35,7 @@ export const useAccountsReceivable = (companyId: string) => {
       // Adicionar campos de validação BPO para internal tools
       const enhancedData = {
         ...data,
-        created_by_side: 'bpo_side',
+        created_by_side: 'bpo_side' as const,
         validated: true,
         validated_at: new Date().toISOString(),
         validated_by: user.id

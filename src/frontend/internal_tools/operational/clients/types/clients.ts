@@ -1,5 +1,5 @@
 // Tipos para gestão operacional de clientes
-export type ClientStatus = 'ativo' | 'suspenso' | 'cancelado' | 'pendente';
+export type ClientStatus = 'ativo' | 'inativo' | 'suspenso' | 'cancelado' | 'pendente';
 export type ClientPlan = 'controle' | 'gerencial' | 'avancado';
 
 export interface OperationalClient {

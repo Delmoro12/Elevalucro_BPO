@@ -99,7 +99,7 @@ export const ProspectsTable: React.FC<ProspectsTableProps> = ({
       case 'avancado':
         return 'Avançado';
       default:
-        return plano;
+        return plan;
     }
   };
 
@@ -259,8 +259,8 @@ export const ProspectsTable: React.FC<ProspectsTableProps> = ({
       {/* Modal de Confirmação de Deleção */}
       <DeleteConfirmModal
         isOpen={deleteModalState.isOpen}
-        prospectName={deleteModalState.prospect?.nome_contato || ''}
-        prospectCompany={deleteModalState.prospect?.nome_empresa || ''}
+        prospectName={deleteModalState.prospect?.contact_name || ''}
+        prospectCompany={deleteModalState.prospect?.company_name || ''}
         prospectStatus={deleteModalState.prospect?.status || 'pending'}
         isDeleting={deletingId === deleteModalState.prospect?.id}
         onClose={handleDeleteCancel}

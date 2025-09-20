@@ -49,7 +49,6 @@ export function convertFormDataToProspect(formData: FormData, origem?: string): 
     
     // Metadados
     source: origem || 'site',
-    observacoes: undefined
   };
 }
 

@@ -5,7 +5,7 @@ import type {
   AccountReceivable,
   CreateAccountReceivableRequest,
   UpdateAccountReceivableRequest,
-  ProcessReceiptRequest,
+  ProcessPaymentRequest,
   AccountReceivableApiResponse,
   UseAccountsReceivableResult,
   AccountReceivableFilters
@@ -152,7 +152,7 @@ export const useAccountsReceivable = (
   };
 
   // Função para processar recebimento
-  const processReceipt = async (id: string, receiptData: ProcessReceiptRequest): Promise<AccountReceivable> => {
+  const processReceipt = async (id: string, receiptData: ProcessPaymentRequest): Promise<AccountReceivable> => {
     try {
       const response = await fetch(`${API_BASE}/${id}/receive`, {
         method: 'POST',

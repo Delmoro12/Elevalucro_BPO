@@ -190,7 +190,7 @@ export const AccountsPayableTable: React.FC<AccountsPayableTableProps> = ({
         break;
       case 'installments':
         const installmentText = account.installment_number ? 
-          `${account.installment_number}/${account.installment_count || '?'}` : 
+          `${account.installment_number}/${account.recurrence_config?.installment_count || '?'}` : 
           'Parcelado';
         badgeText = installmentText;
         badgeColor = 'bg-teal-100 text-teal-800';

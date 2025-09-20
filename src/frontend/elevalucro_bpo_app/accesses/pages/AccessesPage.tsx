@@ -152,8 +152,7 @@ export const AccessesPage: React.FC = () => {
         message={`Tem certeza que deseja excluir o acesso "${accessToDelete?.description}"?`}
         confirmText="Excluir"
         cancelText="Cancelar"
-        type="danger"
-        icon={Trash2}
+        variant="danger"
       />
     </div>
   );

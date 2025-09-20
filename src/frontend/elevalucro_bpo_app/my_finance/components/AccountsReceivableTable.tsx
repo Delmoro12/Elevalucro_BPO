@@ -15,7 +15,7 @@ import { FinancialViewModal } from '../../shared/components/FinancialViewModal';
 interface TabCounts {
   all: number;
   open: number;
-  received: number;
+  paid: number;
   overdue: number;
   cancelled: number;
 }
@@ -48,13 +48,13 @@ export const AccountsReceivableTable: React.FC<AccountsReceivableTableProps> = (
           acc.overdue++;
         }
       } else if (account.status === 'paid') {
-        acc.received++;
+        acc.paid++;
       } else if (account.status === 'cancelled') {
         acc.cancelled++;
       }
       
       return acc;
-    }, { all: 0, open: 0, received: 0, overdue: 0, cancelled: 0 });
+    }, { all: 0, open: 0, paid: 0, overdue: 0, cancelled: 0 });
   };
 
   const tabCounts = getTabCounts();
@@ -77,7 +77,7 @@ export const AccountsReceivableTable: React.FC<AccountsReceivableTableProps> = (
       // Mostrar todas as contas
     } else if (activeTab === 'open' && account.status !== 'pending') {
       return false;
-    } else if (activeTab === 'received' && account.status !== 'paid') {
+    } else if (activeTab === 'paid' && account.status !== 'paid') {
       return false;
     } else if (activeTab === 'overdue') {
       const today = new Date().toISOString().split('T')[0];
@@ -143,9 +143,9 @@ export const AccountsReceivableTable: React.FC<AccountsReceivableTableProps> = (
       render: (value, record) => (
         <div className="text-right">
           <p className="font-semibold text-slate-900 dark:text-white">R$ {value}</p>
-          {record.status === 'received' && record.received_amount && (
+          {record.status === 'paid' && record.paid_amount && (
             <p className="text-xs text-emerald-600 dark:text-emerald-400">
-              Recebido: R$ {record.received_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              Pago: R$ {record.paid_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </p>
           )}
         </div>
@@ -164,14 +164,14 @@ export const AccountsReceivableTable: React.FC<AccountsReceivableTableProps> = (
               record.status_vencimento === 'vence_em_breve' ? 'text-yellow-600 dark:text-yellow-400' :
               'text-slate-500 dark:text-slate-400'
             }`}>
-              {record.dias_vencimento < 0 ? `${Math.abs(record.dias_vencimento)} dias em atraso` :
-               record.dias_vencimento === 0 ? 'Vence hoje' :
-               `${record.dias_vencimento} dias restantes`}
+              {(record.dias_vencimento ?? 0) < 0 ? `${Math.abs(record.dias_vencimento ?? 0)} dias em atraso` :
+               (record.dias_vencimento ?? 0) === 0 ? 'Vence hoje' :
+               `${record.dias_vencimento ?? 0} dias restantes`}
             </p>
           )}
-          {record.status === 'received' && record.receipt_date && (
+          {record.status === 'paid' && record.payment_date && (
             <p className="text-xs text-emerald-600 dark:text-emerald-400">
-              Recebido em: {new Date(record.receipt_date).toLocaleDateString('pt-BR')}
+              Pago em: {new Date(record.payment_date).toLocaleDateString('pt-BR')}
             </p>
           )}
         </div>
@@ -201,7 +201,7 @@ export const AccountsReceivableTable: React.FC<AccountsReceivableTableProps> = (
       title: 'Status',
       width: '100px',
       render: (value, record) => {
-        if (value === 'received') {
+        if (value === 'paid') {
           return (
             <span className="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 rounded text-xs font-medium">
               ✅ Recebida
@@ -245,7 +245,7 @@ export const AccountsReceivableTable: React.FC<AccountsReceivableTableProps> = (
   const tabs: DataTable03Tab[] = [
     { key: 'all', label: 'Todas', icon: FileText, count: tabCounts.all },
     { key: 'open', label: 'Em aberto', icon: Clock, count: tabCounts.open },
-    { key: 'received', label: 'Recebidas', icon: CheckCircle, count: tabCounts.received },
+    { key: 'paid', label: 'Pagas', icon: CheckCircle, count: tabCounts.paid },
     { key: 'overdue', label: 'Atrasadas', icon: AlertTriangle, count: tabCounts.overdue },
     { key: 'cancelled', label: 'Canceladas', icon: XCircle, count: tabCounts.cancelled }
   ];
@@ -318,7 +318,11 @@ export const AccountsReceivableTable: React.FC<AccountsReceivableTableProps> = (
       {/* Modal de Visualização */}
       {showViewModal && selectedTransaction && (
         <FinancialViewModal
-          transaction={selectedTransaction}
+          transaction={{
+            ...selectedTransaction,
+            type: 'receivable' as const,
+            created_by_side: 'client_side'
+          }}
           isOpen={showViewModal}
           onClose={handleCloseModal}
         />

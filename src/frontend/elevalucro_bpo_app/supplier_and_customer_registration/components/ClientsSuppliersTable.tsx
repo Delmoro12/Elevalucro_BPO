@@ -7,7 +7,7 @@ import type {
   DataTable03Column, 
   DataTable03Tab, 
   DataTable03DateFilter,
-  DataTable03SelectFilter
+  DataTable03Filter
 } from '../../shared/components/DataTable03';
 import { ClientSupplier, ClientSupplierStatusTab, ClientSupplierFilters } from '../types/clientsSuppliers';
 import { useClientsSuppliers } from '../hooks/useClientsSuppliers';
@@ -277,18 +277,6 @@ export const ClientsSuppliersTable: React.FC<ClientsSuppliersTableProps> = ({
         // Clique na linha
         onRowClick={onEdit}
         
-        // Ações
-        rowActions={[
-          ...(onEdit ? [{
-            label: 'Editar',
-            onClick: onEdit
-          }] : []),
-          ...(onDelete ? [{
-            label: 'Excluir',
-            onClick: onDelete,
-            variant: 'danger' as const
-          }] : [])
-        ]}
         
         // Refresh
         onRefresh={onRefresh}

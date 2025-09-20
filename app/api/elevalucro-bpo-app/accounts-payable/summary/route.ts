@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '../../../../../src/lib/supabase'
+import { FinancialTransactionSummary } from '../../../../../src/types/elevalucro_bpo_app'
 
 export async function GET(request: NextRequest) {
   try {
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Calcular métricas manualmente
-    const allTransactions = transactions || []
+    const allTransactions: FinancialTransactionSummary[] = transactions || []
     
     // Contadores por status
     const totalContas = allTransactions.length

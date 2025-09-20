@@ -187,12 +187,9 @@ export const RoutinesHistoryTable: React.FC<RoutinesHistoryTableProps> = ({ comp
         
         // Paginação
         pagination={{
-          current: currentPage,
           pageSize: 25,
-          total: total,
           showTotal: true,
-          showSizeChanger: false,
-          onChange: handlePageChange
+          showSizeChanger: false
         }}
         
         // Estados vazios

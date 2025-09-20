@@ -280,12 +280,12 @@ export const CashMovementsTable: React.FC<CashMovementsTableProps> = ({
         searchPlaceholder="Buscar por descrição, conta, tipo..."
         
         // Filtro de data
-        dateFilter={{
+        dateFilter={onDateFilterChange ? {
           value: dateFilter,
           onChange: onDateFilterChange,
           dateField: 'date',
           label: 'Período'
-        }}
+        } : undefined}
         
         // Filtros
         filters={

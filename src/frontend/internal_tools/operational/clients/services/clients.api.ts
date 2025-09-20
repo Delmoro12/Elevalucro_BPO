@@ -121,25 +121,39 @@ export const getCompanyWithAdmin = async (companyId: string): Promise<CompanyWit
     // Buscar dados da company com operadores BPO
     const { data: company, error: companyError } = await supabase
       .from('companies')
-      .select(`
-        *,
-        bpo_operator:bpo_operator_id(
-          id,
-          full_name,
-          email
-        ),
-        analyst_bpo:analyst_bpo_id(
-          id,
-          full_name,
-          email
-        )
-      `)
+      .select('*')
       .eq('id', companyId)
       .single();
 
     if (companyError) {
       console.error('Error fetching company:', companyError);
       return null;
+    }
+
+    if (!company) {
+      return null;
+    }
+
+    // Buscar operador BPO se existir
+    let bpo_operator = null;
+    if (company.bpo_operator_id) {
+      const { data: bpoOperator } = await supabase
+        .from('users')
+        .select('id, full_name, email')
+        .eq('id', company.bpo_operator_id)
+        .single();
+      bpo_operator = bpoOperator;
+    }
+
+    // Buscar analista BPO se existir  
+    let analyst_bpo = null;
+    if (company.analyst_bpo_id) {
+      const { data: analystBpo } = await supabase
+        .from('users')
+        .select('id, full_name, email')
+        .eq('id', company.analyst_bpo_id)
+        .single();
+      analyst_bpo = analystBpo;
     }
 
     // Buscar o usuário admin da company
@@ -162,12 +176,32 @@ export const getCompanyWithAdmin = async (companyId: string): Promise<CompanyWit
 
     // Encontrar o admin (assumindo que tem role client_admin)
     const adminUser = adminUsers?.find(user => 
-      user.roles?.name === 'client_admin' || 
-      user.roles?.name === 'client_user'
+      user.roles?.name === 'client_admin' || user.roles?.name === 'client_user'
     ) || adminUsers?.[0];
 
-    return {
-      ...company,
+    const result = {
+      id: company.id,
+      name: company.name,
+      cnpj: company.cnpj,
+      cnpj_raw: company.cnpj_raw,
+      phone: company.phone,
+      email: company.email,
+      website: company.website,
+      segment: company.segment,
+      address_street: company.address_street,
+      address_number: company.address_number,
+      address_complement: company.address_complement,
+      address_neighborhood: company.address_neighborhood,
+      address_city: company.address_city,
+      address_state: company.address_state,
+      address_zipcode: company.address_zipcode,
+      subscription_plan: company.subscription_plan,
+      subscription_status: company.subscription_status,
+      lifecycle_stage: company.lifecycle_stage,
+      onboarding_progress: company.onboarding_progress,
+      created_at: company.created_at,
+      bpo_operator,
+      analyst_bpo,
       admin_user: adminUser ? {
         id: adminUser.id,
         full_name: adminUser.full_name,
@@ -176,6 +210,8 @@ export const getCompanyWithAdmin = async (companyId: string): Promise<CompanyWit
         whatsapp: adminUser.whatsapp
       } : undefined
     };
+    
+    return result;
   } catch (error) {
     console.error('Error in getCompanyWithAdmin:', error);
     return null;
@@ -192,7 +228,7 @@ export const getOperationalClientById = async (companyId: string): Promise<Opera
     }
 
     // Mapear para o formato OperationalClient
-    return {
+    const operationalClient = {
       id: companyData.id,
       company_id: companyData.id,
       nome_empresa: companyData.name,
@@ -212,6 +248,8 @@ export const getOperationalClientById = async (companyId: string): Promise<Opera
       proxima_acao: undefined,
       tags: []
     };
+    
+    return operationalClient;
   } catch (error) {
     console.error('Error in getOperationalClientById:', error);
     return null;

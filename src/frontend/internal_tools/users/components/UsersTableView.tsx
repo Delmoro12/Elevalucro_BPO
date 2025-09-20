@@ -140,10 +140,9 @@ export const UsersTableView: React.FC<UsersTableViewProps> = ({
   const actions: TableAction<BpoUser>[] = [
     {
       key: 'edit',
-      label: 'Editar',
+      title: 'Editar',
       icon: Edit,
-      onClick: onEdit,
-      variant: 'secondary',
+      onClick: onEdit || (() => {}),
     },
   ];
 
@@ -153,11 +152,6 @@ export const UsersTableView: React.FC<UsersTableViewProps> = ({
       columns={columns}
       actions={actions}
       loading={loading}
-      emptyState={{
-        title: 'Nenhum usuário encontrado',
-        description: 'Não há usuários BPO que correspondam aos filtros aplicados.',
-        icon: User,
-      }}
     />
   );
 };

@@ -102,7 +102,6 @@ export const CashFlowMainPage: React.FC<CashFlowMainPageProps> = ({
         <CashFlowTable
           transactions={transactions}
           loading={transactionsLoading}
-          error={transactionsError}
           filters={filters}
           onFiltersChange={updateFilters}
           onRefresh={refetch}

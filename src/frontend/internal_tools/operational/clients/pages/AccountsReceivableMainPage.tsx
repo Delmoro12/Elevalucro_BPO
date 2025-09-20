@@ -83,7 +83,7 @@ export const AccountsReceivableMainPage: React.FC<AccountsReceivableMainPageProp
       // Chamar serviço para deletar série (todas as contas não recebidas)
       const result = await accountsReceivableRecurrenceService.deleteRecurringSeries(
         showSeriesDeleteConfirm, 
-        'unpaid'
+        'current'
       );
       
       console.log('✅ Série deletada:', result);

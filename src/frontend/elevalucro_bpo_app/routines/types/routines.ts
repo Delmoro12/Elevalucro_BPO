@@ -34,6 +34,6 @@ export interface UseRoutinesHistoryReturn {
   total: number;
   currentPage: number;
   totalPages: number;
-  fetchRoutines: (filters?: RoutinesHistoryFilters, page?: number) => Promise<void>;
+  fetchRoutines: (companyId: string, filters?: RoutinesHistoryFilters, page?: number) => Promise<void>;
   refreshRoutines: () => Promise<void>;
 }

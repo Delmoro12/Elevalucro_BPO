@@ -123,23 +123,30 @@ export const RoutinesSidebarModal: React.FC<RoutinesSidebarModalProps> = ({
       return;
     }
 
-    const dataToSave = {
-      ...formData,
-      company_id: companyId,
-      // Convert empty strings to null for optional fields
-      routine_id: formData.routine_id || null,
-      assigned_to: formData.assigned_to || null,
-      custom_frequency: formData.custom_frequency || null,
-      custom_description: formData.custom_description || null,
-      custom_instructions: formData.custom_instructions || null,
-      // For new routines, use today's date; for edits, don't send start_date
-      start_date: mode === 'create' ? new Date().toISOString().split('T')[0] : undefined
-    };
+    let dataToSave;
 
     if (mode === 'edit') {
-      (dataToSave as UpdateRoutineData).id = routineData.id;
-      // Remove start_date from update to keep existing value
-      delete dataToSave.start_date;
+      dataToSave = {
+        ...formData,
+        id: routineData.id,
+        company_id: companyId,
+        routine_id: formData.routine_id || null,
+        assigned_to: formData.assigned_to || null,
+        custom_frequency: formData.custom_frequency || null,
+        custom_description: formData.custom_description || null,
+        custom_instructions: formData.custom_instructions || null,
+      } as UpdateRoutineData;
+    } else {
+      dataToSave = {
+        ...formData,
+        company_id: companyId,
+        routine_id: formData.routine_id || null,
+        assigned_to: formData.assigned_to || null,
+        custom_frequency: formData.custom_frequency || null,
+        custom_description: formData.custom_description || null,
+        custom_instructions: formData.custom_instructions || null,
+        start_date: new Date().toISOString().split('T')[0]
+      } as CreateRoutineData;
     }
 
     const success = await onSave(dataToSave);

@@ -315,16 +315,6 @@ export const RecordConciliationTable: React.FC<RecordConciliationTableProps> = (
           label: 'Vencimento'
         }}
 
-        // Filtro por tipo
-        selectFilters={[
-          {
-            value: typeFilter,
-            onChange: setTypeFilter,
-            options: typeFilterOptions,
-            placeholder: 'Filtrar por tipo',
-            label: 'Tipo'
-          }
-        ]}
         
         // Tabs
         tabs={tabs}
@@ -350,25 +340,6 @@ export const RecordConciliationTable: React.FC<RecordConciliationTableProps> = (
         // Clique na linha
         onRowClick={onView ? handleRowClick : undefined}
         
-        // Ações
-        rowActions={[
-          ...(activeTab === 'pending_validation' && onValidate ? [{
-            label: 'Validar',
-            onClick: onValidate,
-            icon: CheckCircle
-          }] : []),
-          ...(activeTab === 'pending_validation' && onReject ? [{
-            label: 'Rejeitar',
-            onClick: onReject,
-            icon: XCircle,
-            variant: 'danger' as const
-          }] : []),
-          ...(onView ? [{
-            label: 'Visualizar',
-            onClick: onView,
-            icon: Eye
-          }] : [])
-        ]}
         
         // Classes
         className="h-full"

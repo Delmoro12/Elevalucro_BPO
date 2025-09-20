@@ -135,7 +135,7 @@ export const RecordConciliationSidebarModal: React.FC<RecordConciliationSidebarM
       const validationData: ReconciliationValidationRequest = {
         validated: true,
         validated_at: new Date().toISOString(),
-        validated_by: userId, // Usar o ID do usuário da sessão
+        validated_by: userId || '', // Usar o ID do usuário da sessão
         notes: formData.notes.trim() || undefined,
         category_id: formData.category_id
       };

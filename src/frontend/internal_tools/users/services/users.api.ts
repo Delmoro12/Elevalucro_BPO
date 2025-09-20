@@ -5,7 +5,12 @@ import {
   UpdateUserPayload 
 } from '../types/users';
 import { supabase } from '@/src/lib/supabase';
-import { UserFormData } from '../components/UserFormSidebar';
+// Interface simples para dados do formulário
+interface UserFormData {
+  email: string;
+  full_name: string;
+  phone?: string;
+}
 
 // Buscar usuários BPO (role = 'bpo_side')
 export async function getBpoUsers(filters: UserFilters = {}): Promise<UserListResponse> {

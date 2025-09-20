@@ -7,13 +7,15 @@ const anthropic = new Anthropic({
 });
 
 export interface DocumentData {
-  tipo: 'nfe' | 'cupom_fiscal' | 'recibo' | 'boleto' | 'extrato' | 'outro';
+  tipo: 'fiscal' | 'nao_fiscal';
   valor?: string;
   data?: string;
   fornecedor?: string;
   cliente?: string;
   cnpj?: string;
+  numeroNota?: string;
   formaPagamento?: string;
+  centroCusto?: string;
   descricao?: string;
   dadosCompletos: boolean;
   camposFaltantes: string[];

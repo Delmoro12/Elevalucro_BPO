@@ -21,6 +21,14 @@ import { Document } from '../types';
 type FilterStatus = 'todos' | 'processado' | 'pendente' | 'conciliado' | 'erro';
 type TabType = 'pdfs_fotos' | 'excel';
 
+interface ExcelFile {
+  id: string;
+  nome: string;
+  status: string;
+  data_upload: string;
+  [key: string]: any;
+}
+
 interface DocumentsTableViewProps {
   onOpenDocumentModal: () => void;
   onOpenExcelModal: () => void;
@@ -77,6 +85,7 @@ export const DocumentsTableView: React.FC<DocumentsTableViewProps> = ({
   // Modal states
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [selectedExcelFile, setSelectedExcelFile] = useState<any>(null);
   
   // Hook para buscar documentos reais
   const {
@@ -185,6 +194,11 @@ export const DocumentsTableView: React.FC<DocumentsTableViewProps> = ({
   // Handlers para modal
   const handleViewDocument = (document: Document) => {
     setSelectedDocument(document);
+    setIsViewModalOpen(true);
+  };
+
+  const handleViewExcelFile = (excelFile: ExcelFile) => {
+    setSelectedExcelFile(excelFile);
     setIsViewModalOpen(true);
   };
 

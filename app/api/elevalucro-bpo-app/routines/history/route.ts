@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
     const totalPages = Math.ceil((count || 0) / pageSize);
 
     // Formatar dados para a resposta
-    const formattedData = (data || []).map(routine => ({
+    const formattedData = (data || []).map((routine: any) => ({
       ...routine,
       executed_at_formatted: new Date(routine.executed_at).toLocaleString('pt-BR'),
       created_at_formatted: new Date(routine.created_at).toLocaleString('pt-BR'),
