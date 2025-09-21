@@ -63,3 +63,14 @@ export interface ClientUpdatePayload {
   proxima_acao?: string;
   tags?: string[];
 }
+
+// Interface para usuário com role (usado em queries com join)
+export interface UserWithRole {
+  id: string;
+  full_name: string;
+  email: string;
+  phone?: string;
+  whatsapp?: string;
+  role_id: string;
+  roles: { name: string };
+}

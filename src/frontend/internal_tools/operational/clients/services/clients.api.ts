@@ -3,7 +3,8 @@ import {
   ClientListResponse, 
   ClientFilters,
   ClientUpdatePayload,
-  ClientPlan 
+  ClientPlan,
+  UserWithRole 
 } from '../types/clients';
 import { supabase } from '@/src/lib/supabase';
 
@@ -168,7 +169,8 @@ export const getCompanyWithAdmin = async (companyId: string): Promise<CompanyWit
         role_id,
         roles:role_id(name)
       `)
-      .eq('company_id', companyId);
+      .eq('company_id', companyId)
+      .returns<UserWithRole[]>();
 
     if (adminError) {
       console.error('Error fetching admin user:', adminError);
@@ -200,8 +202,8 @@ export const getCompanyWithAdmin = async (companyId: string): Promise<CompanyWit
       lifecycle_stage: company.lifecycle_stage,
       onboarding_progress: company.onboarding_progress,
       created_at: company.created_at,
-      bpo_operator,
-      analyst_bpo,
+      bpo_operator: bpo_operator || undefined,
+      analyst_bpo: analyst_bpo || undefined,
       admin_user: adminUser ? {
         id: adminUser.id,
         full_name: adminUser.full_name,
