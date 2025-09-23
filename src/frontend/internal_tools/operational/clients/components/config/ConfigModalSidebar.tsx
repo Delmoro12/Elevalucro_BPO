@@ -48,6 +48,7 @@ export const ConfigModalSidebar: React.FC<ConfigModalSidebarProps> = ({
         const group = item as DREGroup;
         setFormData({
           description: group.description || '',
+          type: group.type || 'despesa',
           sort_order: group.sort_order || 0
         });
       } else if (type === 'accounts') {
@@ -61,7 +62,7 @@ export const ConfigModalSidebar: React.FC<ConfigModalSidebarProps> = ({
       if (type === 'categories') {
         setFormData({ description: '', dre_groups_id: '' });
       } else if (type === 'groups') {
-        setFormData({ description: '', sort_order: 0 });
+        setFormData({ description: '', type: 'despesa', sort_order: 0 });
       } else {
         setFormData({ description: '' });
       }
@@ -74,6 +75,10 @@ export const ConfigModalSidebar: React.FC<ConfigModalSidebarProps> = ({
 
     if (!formData.description?.trim()) {
       newErrors.description = 'Descrição é obrigatória';
+    }
+
+    if (type === 'groups' && !formData.type) {
+      newErrors.type = 'Tipo é obrigatório';
     }
 
     if (type === 'groups' && (formData.sort_order === undefined || formData.sort_order === null)) {
@@ -167,6 +172,31 @@ export const ConfigModalSidebar: React.FC<ConfigModalSidebarProps> = ({
                     </option>
                   ))}
                 </select>
+              </div>
+            )}
+
+            {/* Campo específico para Grupos - Tipo */}
+            {type === 'groups' && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  Tipo *
+                </label>
+                <select
+                  value={formData.type || 'despesa'}
+                  onChange={(e) => setFormData({ ...formData, type: e.target.value as 'receita' | 'despesa' })}
+                  className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
+                    errors.type ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'
+                  }`}
+                >
+                  <option value="receita">📈 Receita</option>
+                  <option value="despesa">📉 Despesa</option>
+                </select>
+                {errors.type && (
+                  <p className="mt-1 text-sm text-red-500">{errors.type}</p>
+                )}
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  Define se o grupo é para receitas ou despesas
+                </p>
               </div>
             )}
 

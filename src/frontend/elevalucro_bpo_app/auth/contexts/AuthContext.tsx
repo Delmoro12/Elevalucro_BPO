@@ -107,12 +107,47 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           document.cookie = 'sb-access-token=; path=/; max-age=0; SameSite=Lax';
           console.log('🍪 Auth state change: Cookie cleared on logout');
         }
+
+        // Se o usuário foi deslogado inesperadamente (sem ter clicado em logout)
+        if (event === 'SIGNED_OUT' && session === null) {
+          console.log('🚨 Usuário foi deslogado automaticamente (token expirado)');
+          // Opcional: mostrar notificação para o usuário
+          // toast.warning('Sua sessão expirou. Faça login novamente.');
+        }
         
         setLoading(false);
       }
     );
 
-    return () => subscription.unsubscribe();
+    // Configurar refresh automático do token
+    // Verificar a cada 30 minutos se o token precisa ser renovado
+    const tokenRefreshInterval = setInterval(async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.access_token) {
+        try {
+          // Decodificar o token para verificar a expiração
+          const payload = JSON.parse(atob(session.access_token.split('.')[1]));
+          const expirationTime = payload.exp * 1000; // Converter para milliseconds
+          const currentTime = Date.now();
+          const timeUntilExpiry = expirationTime - currentTime;
+          
+          // Se o token expira em menos de 10 minutos, renovar
+          if (timeUntilExpiry < 10 * 60 * 1000) {
+            console.log('🔄 Token próximo do vencimento, renovando automaticamente...');
+            await supabase.auth.refreshSession();
+            console.log('✅ Token renovado com sucesso');
+          }
+        } catch (error) {
+          console.error('❌ Erro ao verificar/renovar token:', error);
+        }
+      }
+    }, 30 * 60 * 1000); // Verificar a cada 30 minutos
+
+    return () => {
+      subscription.unsubscribe();
+      clearInterval(tokenRefreshInterval);
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {

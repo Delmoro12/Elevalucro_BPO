@@ -75,8 +75,8 @@ export const CashMovementsTable: React.FC<CashMovementsTableProps> = ({
       // Manter compatibilidade com valores antigos (se existirem)
       'manual_adjustment': 'Ajuste Manual',
       'initial_balance': 'Saldo Inicial',
-      'account_payment': 'Pagamento de Conta',
-      'account_receipt': 'Recebimento',
+      'account_payment': 'Pagamento de Conta (Automático)',
+      'account_receipt': 'Recebimento (Automático)',
       'transfer': 'Transferência',
       'other': 'Outros'
     };
@@ -272,18 +272,27 @@ export const CashMovementsTable: React.FC<CashMovementsTableProps> = ({
     }
   ];
 
+  // Função para verificar se uma movimentação pode ser editada/excluída
+  const canManageMovement = (movement: CashMovement) => {
+    // Não permitir edição/exclusão de movimentações criadas automaticamente
+    const automaticTypes = ['account_payment', 'account_receipt'];
+    return !movement.reference_type || !automaticTypes.includes(movement.reference_type);
+  };
+
   const actions = [
     {
       key: 'edit',
       icon: Edit2,
       title: 'Editar',
-      onClick: onEdit || (() => {})
+      onClick: onEdit || (() => {}),
+      show: canManageMovement
     },
     {
       key: 'delete',
       icon: Trash2,
       title: 'Excluir',
-      onClick: (movement: CashMovement) => onDelete?.(movement.id)
+      onClick: (movement: CashMovement) => onDelete?.(movement.id),
+      show: canManageMovement
     }
   ];
 
@@ -339,7 +348,12 @@ export const CashMovementsTable: React.FC<CashMovementsTableProps> = ({
         loading={loading}
         emptyMessage="Nenhuma movimentação encontrada"
         emptyDescription="Comece adicionando a primeira movimentação."
-        onRowClick={onEdit}
+        onRowClick={(movement: CashMovement) => {
+          // Só permitir clique se a movimentação pode ser editada
+          if (canManageMovement(movement)) {
+            onEdit?.(movement);
+          }
+        }}
       />
   );
 };

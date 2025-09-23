@@ -1,4 +1,5 @@
 import { AccountPayable } from '../types/accountsPayable';
+import { supabase } from '@/src/lib/supabase';
 
 const BASE_URL = '/api/accounts-payable';
 
@@ -85,6 +86,10 @@ export const accountsPayableActionsApi = {
 
   // Clonar conta (criar nova baseada na existente)
   cloneAccount: async (id: string): Promise<AccountPayable> => {
+    // Obter o usuário atual da sessão
+    const { data: { session } } = await supabase.auth.getSession();
+    const currentUserId = session?.user?.id;
+
     // Primeiro, buscar a conta original
     const getResponse = await fetch(`${BASE_URL}/${id}`);
     
@@ -109,7 +114,13 @@ export const accountsPayableActionsApi = {
       notes: original.notes,
       category_id: original.category_id,
       occurrence: original.occurrence || 'unique',
-      status: 'pending' // Sempre resetar para pending
+      status: 'pending', // Sempre resetar para pending
+      // Adicionar campos de validação e auditoria
+      created_by_side: 'bpo_side',
+      validated: true, // BPO já valida ao clonar
+      validated_at: new Date().toISOString(),
+      validated_by: currentUserId,
+      user_id: currentUserId // Para created_by
     };
     
     // Ajustar data de vencimento (adicionar 30 dias)

@@ -25,11 +25,17 @@ export function middleware(request: NextRequest) {
   const isAppSubdomain = hostname.startsWith('app.')     // app.elevalucro.com.br
   const isToolsSubdomain = hostname.startsWith('tools.') // tools.elevalucro.com.br
   const isMainDomain = !isAppSubdomain && !isToolsSubdomain // elevalucro.com.br
+  
+  // Para desenvolvimento: tratar localhost:4000 como tools se a rota for de internal tools
+  const isDevelopment = hostname.includes('localhost')
+  const toolsRoutes = ['/leads', '/prospects', '/customer-success', '/onboarding', '/operational-clients', '/routines', '/users']
+  const isToolsRoute = toolsRoutes.some(route => pathname.startsWith(route))
+  const shouldTreatAsTools = isDevelopment && isToolsRoute
 
   // ============================================
   // 3. ROTEAMENTO DO DOMÍNIO PRINCIPAL
   // ============================================
-  if (isMainDomain) {
+  if (isMainDomain && !shouldTreatAsTools) {
     console.log(`🏠 Main Domain: ${pathname}`)
 
     // Redirect da homepage para landing page geral
@@ -168,7 +174,7 @@ export function middleware(request: NextRequest) {
   // ============================================
   // 5. ROTEAMENTO DO SUBDOMÍNIO TOOLS (FUNCIONÁRIOS)
   // ============================================
-  if (isToolsSubdomain) {
+  if (isToolsSubdomain || shouldTreatAsTools) {
     console.log(`🔧 Tools Subdomain: ${pathname}`)
 
     // Redirect da raiz para prospects
@@ -220,6 +226,7 @@ export function middleware(request: NextRequest) {
     // Lista de rotas que precisam de autenticação (mas são permitidas se autenticado)
     const protectedRoutes = [
       '/api',                // API routes protegidas
+      '/leads',              // Leads (CRM)
       '/prospects',          // Páginas internas
       '/customer-success',   // Página de sucesso do cliente
       '/onboarding',         // Onboarding operacional
@@ -248,7 +255,7 @@ export function middleware(request: NextRequest) {
     // Se não é uma rota protegida nem pública, redirecionar para login
     if (!isProtectedRoute) {
       console.log(`🚫 Tools: Unknown route '${pathname}' → login`)
-      const loginUrl = new URL('/auth/login', request.url)
+      const loginUrl = new URL('/tools-auth/login', request.url)
       loginUrl.searchParams.set('redirect', pathname)
       return NextResponse.redirect(loginUrl)
     }

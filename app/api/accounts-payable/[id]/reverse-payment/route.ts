@@ -18,8 +18,11 @@ export async function POST(
 
     // Tentar usar função SQL transacional primeiro
     const { data: result, error: rpcError } = await supabase.rpc(
-      'reverse_account_payment',
-      { p_account_id: params.id }
+      'reverse_financial_transaction',
+      { 
+        p_transaction_id: params.id,
+        p_transaction_type: 'payable'
+      }
     )
 
     if (!rpcError) {
@@ -37,9 +40,10 @@ export async function POST(
       
       // 1. Buscar a conta para verificar se está paga
       const { data: account, error: accountError } = await supabase
-        .from('accounts_payable')
+        .from('financial_transactions')
         .select('*')
         .eq('id', params.id)
+        .eq('type', 'payable')
         .single()
 
       if (accountError || !account) {
@@ -94,7 +98,7 @@ export async function POST(
 
       // 4. Reverter status da conta para pending
       const { data: updatedAccount, error: updateError } = await supabase
-        .from('accounts_payable')
+        .from('financial_transactions')
         .update({
           status: 'pending',
           payment_date: null,
@@ -103,6 +107,7 @@ export async function POST(
           updated_at: new Date().toISOString()
         })
         .eq('id', params.id)
+        .eq('type', 'payable')
         .select(`
           *,
           companies_clients_suppliers (

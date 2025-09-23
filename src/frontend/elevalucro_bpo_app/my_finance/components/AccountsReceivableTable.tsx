@@ -245,7 +245,7 @@ export const AccountsReceivableTable: React.FC<AccountsReceivableTableProps> = (
   const tabs: DataTable03Tab[] = [
     { key: 'all', label: 'Todas', icon: FileText, count: tabCounts.all },
     { key: 'open', label: 'Em aberto', icon: Clock, count: tabCounts.open },
-    { key: 'paid', label: 'Pagas', icon: CheckCircle, count: tabCounts.paid },
+    { key: 'paid', label: 'Recebidas', icon: CheckCircle, count: tabCounts.paid },
     { key: 'overdue', label: 'Atrasadas', icon: AlertTriangle, count: tabCounts.overdue },
     { key: 'cancelled', label: 'Canceladas', icon: XCircle, count: tabCounts.cancelled }
   ];

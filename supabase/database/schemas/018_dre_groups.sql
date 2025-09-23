@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS dre_groups (
     
     -- Informações do grupo
     description TEXT NOT NULL, -- Descrição do grupo
+    type VARCHAR(10) NOT NULL CHECK (type IN ('receita', 'despesa')), -- Tipo do grupo (receita/despesa)
     sort_order INTEGER NOT NULL DEFAULT 0, -- Ordenação numérica
     
     -- Auditoria
@@ -47,6 +48,7 @@ CREATE TRIGGER trigger_update_dre_groups_updated_at
 COMMENT ON TABLE dre_groups IS 'Grupos para segmentação das categorias no DRE';
 COMMENT ON COLUMN dre_groups.company_id IS 'Referência para a empresa dona do grupo';
 COMMENT ON COLUMN dre_groups.description IS 'Descrição do grupo DRE';
+COMMENT ON COLUMN dre_groups.type IS 'Tipo do grupo: receita ou despesa';
 COMMENT ON COLUMN dre_groups.sort_order IS 'Ordem de exibição no DRE';
 COMMENT ON COLUMN dre_groups.created_by IS 'Usuário que criou o registro';
 COMMENT ON COLUMN dre_groups.updated_by IS 'Usuário que editou o registro';

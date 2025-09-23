@@ -99,7 +99,8 @@ export const FinancialRegistersModalSidebar: React.FC<FinancialRegistersModalSid
     type: 'receivable',
     value: 0,
     occurrence: 'unique',
-    status: 'pending'
+    status: 'pending',
+    date_of_issue: new Date().toLocaleDateString('pt-BR')
   });
   const [formattedValue, setFormattedValue] = useState(''); // Estado para o valor formatado
   const [loading, setLoading] = useState(false);
@@ -149,7 +150,7 @@ export const FinancialRegistersModalSidebar: React.FC<FinancialRegistersModalSid
         companies_clients_suppliers_id: register.companies_clients_suppliers_id || '',
         due_date: register.due_date || '',
         value: registerValue,
-        date_of_issue: register.date_of_issue || '',
+        date_of_issue: register.date_of_issue || new Date().toLocaleDateString('pt-BR'),
         number_of_document: register.number_of_document || '',
         notes: register.notes || '',
         occurrence: register.occurrence || 'unique',
@@ -679,7 +680,7 @@ export const FinancialRegistersModalSidebar: React.FC<FinancialRegistersModalSid
             {/* Observações (span completo) */}
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                Observações
+                Observações *
               </label>
               <textarea
                 rows={3}
@@ -688,6 +689,7 @@ export const FinancialRegistersModalSidebar: React.FC<FinancialRegistersModalSid
                 disabled={isReadOnly}
                 className={`${getInputClasses()} resize-none`}
                 placeholder="Digite observações sobre a conta..."
+                required
               />
             </div>
 

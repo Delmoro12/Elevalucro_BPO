@@ -41,6 +41,10 @@ export const financialRegistersApi = {
   // Criar novo registro (sempre com validated = false)
   create: async (companyId: string, formData: FinancialRegisterFormData): Promise<FinancialRegister> => {
     try {
+      // Obter o usuário atual da sessão
+      const { data: { session } } = await supabase.auth.getSession();
+      const currentUserId = session?.user?.id;
+
       const endpoint = formData.type === 'receivable' ? 'accounts-receivable' : 'accounts-payable';
       const headers = await getAuthHeaders();
       const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
@@ -52,7 +56,8 @@ export const financialRegistersApi = {
           created_by_side: 'client_side', // Registros criados pelo cliente BPO
           validated: false, // Sempre criar como não validado
           validated_at: null,
-          validated_by: null
+          validated_by: null,
+          user_id: currentUserId // Para campo created_by
         }),
       });
       const data = await response.json();

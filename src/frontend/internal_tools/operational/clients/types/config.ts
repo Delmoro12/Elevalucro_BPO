@@ -23,6 +23,7 @@ export interface DREGroup {
   id: string;
   company_id: string;
   description: string;
+  type: 'receita' | 'despesa';
   sort_order: number;
   created_at: string;
   created_by?: string;
@@ -32,6 +33,7 @@ export interface DREGroup {
 
 export interface DREGroupFormData {
   description: string;
+  type: 'receita' | 'despesa';
   sort_order: number;
 }
 

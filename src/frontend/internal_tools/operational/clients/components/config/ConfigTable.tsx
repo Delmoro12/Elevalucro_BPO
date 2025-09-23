@@ -78,6 +78,22 @@ export const ConfigTable: React.FC<ConfigTableProps> = ({
             )
           },
           {
+            key: 'type',
+            title: 'Tipo',
+            render: (value, record) => {
+              const group = record as DREGroup;
+              return (
+                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                  group.type === 'receita' 
+                    ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300' 
+                    : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300'
+                }`}>
+                  {group.type === 'receita' ? '📈 Receita' : '📉 Despesa'}
+                </span>
+              )
+            }
+          },
+          {
             key: 'sort_order',
             title: 'Ordem',
             render: (value) => (
