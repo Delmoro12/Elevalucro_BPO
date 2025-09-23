@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { company_id, description, sort_order } = body
+    const { company_id, description, sort_order, type } = body
 
     // Validações
     if (!company_id || !description) {
@@ -86,13 +86,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (!type || !['receita', 'despesa'].includes(type)) {
+      return NextResponse.json(
+        { success: false, error: 'type é obrigatório e deve ser "receita" ou "despesa"' },
+        { status: 400 }
+      )
+    }
+
     // Criar grupo DRE
     const { data: group, error } = await supabase
       .from('dre_groups')
       .insert([{
         company_id,
         description: description.trim(),
-        sort_order: parseInt(sort_order)
+        sort_order: parseInt(sort_order),
+        type
       }])
       .select()
       .single()

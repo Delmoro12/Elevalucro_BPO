@@ -75,7 +75,7 @@ export async function PATCH(
     }
 
     const body = await request.json()
-    const { description, sort_order } = body
+    const { description, sort_order, type } = body
 
     // Validações
     if (!description?.trim()) {
@@ -92,14 +92,29 @@ export async function PATCH(
       )
     }
 
+    if (type && !['receita', 'despesa'].includes(type)) {
+      return NextResponse.json(
+        { success: false, error: 'type deve ser "receita" ou "despesa"' },
+        { status: 400 }
+      )
+    }
+
+    // Preparar objeto de atualização
+    const updateData: any = {
+      description: description.trim(),
+      sort_order: parseInt(sort_order),
+      updated_at: new Date().toISOString()
+    }
+    
+    // Adicionar type se foi fornecido
+    if (type) {
+      updateData.type = type
+    }
+
     // Atualizar grupo
     const { data: group, error } = await supabase
       .from('dre_groups')
-      .update({
-        description: description.trim(),
-        sort_order: parseInt(sort_order),
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('id', id)
       .select()
       .single()
