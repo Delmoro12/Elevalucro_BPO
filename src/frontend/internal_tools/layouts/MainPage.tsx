@@ -10,6 +10,8 @@ import { LayoutContext, useLayoutProvider } from '../shared/hooks/useLayout';
 import { CrmMainPage } from '../crm/pages/CrmMainPage';
 import { OperationalMainPage } from '../operational/pages/OperationalMainPage';
 import { UsersMainPage } from '../users/pages/UsersMainPage';
+import { AnalyticsPage } from '../analytics/pages/AnalyticsPage';
+import { SettingsPage } from '../settings/pages/SettingsPage';
 
 export const MainPage: React.FC = () => {
   const layoutProviderValue = useLayoutProvider();
@@ -145,27 +147,9 @@ export const MainPage: React.FC = () => {
       case 'users':
         return <UsersMainPage />;
       case 'analytics':
-        return (
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-8 text-center">
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">
-              Analytics
-            </h2>
-            <p className="text-slate-600 dark:text-slate-400">
-              Funcionalidade em desenvolvimento
-            </p>
-          </div>
-        );
+        return <AnalyticsPage />;
       case 'settings':
-        return (
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-8 text-center">
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">
-              Configurações
-            </h2>
-            <p className="text-slate-600 dark:text-slate-400">
-              Funcionalidade em desenvolvimento
-            </p>
-          </div>
-        );
+        return <SettingsPage />;
       default:
         return (
           <CrmMainPage 

@@ -28,7 +28,7 @@ export function middleware(request: NextRequest) {
   
   // Para desenvolvimento: tratar localhost:4000 como tools se a rota for de internal tools
   const isDevelopment = hostname.includes('localhost')
-  const toolsRoutes = ['/leads', '/prospects', '/customer-success', '/onboarding', '/operational-clients', '/routines', '/users']
+  const toolsRoutes = ['/leads', '/prospects', '/customer-success', '/onboarding', '/operational-clients', '/routines', '/users', '/analytics', '/settings']
   const isToolsRoute = toolsRoutes.some(route => pathname.startsWith(route))
   const shouldTreatAsTools = isDevelopment && isToolsRoute
 
@@ -233,7 +233,9 @@ export function middleware(request: NextRequest) {
       '/operational-clients', // Clientes operacionais
       '/routines',           // Rotinas operacionais
       '/users',              // Usuários BPO
-      '/funcionarios'
+      '/funcionarios',
+      '/analytics',          // Analytics
+      '/settings'            // Configurações
     ]
 
     // Verifica se é uma rota pública
