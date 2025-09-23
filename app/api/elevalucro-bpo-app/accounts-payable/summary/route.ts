@@ -26,13 +26,12 @@ export async function GET(request: NextRequest) {
     }
     
     // Buscar resumo usando a view de transações financeiras, filtrando apenas despesas (type = payable)
-    // IMPORTANTE: Aqui não filtramos por validated=true pois queremos mostrar TODOS os registros criados pelo cliente
+    // IMPORTANTE: Aqui não filtramos por validated=true pois queremos mostrar TODOS os registros da empresa
     const { data: transactions, error } = await supabase
       .from('financial_transactions_view')
       .select('*')
       .eq('company_id', companyId)
       .eq('type', 'payable')
-      .eq('created_by_side', 'client_side') // Apenas registros criados pelo cliente
 
     if (error) {
       console.error('❌ Database error:', error)
