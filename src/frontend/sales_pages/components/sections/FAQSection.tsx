@@ -2,48 +2,21 @@
 
 import { useState } from "react";
 import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
+import { useTranslation } from '@/src/i18n';
+import { type Locale } from '@/src/i18n/config';
 
 interface FAQItem {
   question: string;
   answer: string;
 }
 
-const defaultFAQs: FAQItem[] = [
-  {
-    question: "Como funciona a segurança dos pagamentos?",
-    answer: "Nossa equipe NÃO tem acesso às suas contas bancárias. Nós organizamos tudo e enviamos para sua aprovação via app. Só você tem autorização para aprovar ou rejeitar pagamentos. É 100% seguro."
-  },
-  {
-    question: "Quanto tempo leva para estar 100% operacional?",
-    answer: "Em 30 dias seu financeiro estará completamente organizado e operacional. Temos um processo de onboarding estruturado semana a semana, com acompanhamento dedicado."
-  },
-  {
-    question: "É mais barato que contratar um funcionário?",
-    answer: "Sim! Um analista financeiro CLT custa em média R$ 3.500 + encargos (total ~R$ 7.000). Nossos planos começam em R$ 1.200/mês com uma equipe inteira cuidando do seu financeiro."
-  },
-  {
-    question: "Preciso mudar meu contador?",
-    answer: "Não! Nós cuidamos da gestão financeira (fluxo de caixa, pagamentos, recebimentos). Seu contador continua cuidando da parte fiscal e contábil. Na verdade, facilitamos o trabalho dele com documentos organizados."
-  },
-  {
-    question: "Como funciona o app de aprovação?",
-    answer: "Você recebe uma notificação diária no WhatsApp com um link seguro. Ao clicar, acessa nosso app onde vê todos os pagamentos do dia com detalhes. Em 2-3 minutos você aprova ou rejeita cada um."
-  },
-  {
-    question: "E se eu não gostar do serviço?",
-    answer: "Temos garantia de satisfação de 30 dias. Se não ficar satisfeito, devolvemos 100% do valor pago. Mas isso nunca aconteceu - 100% dos nossos clientes renovam."
-  },
-  {
-    question: "Vocês atendem empresas de qual porte?",
-    answer: "Atendemos desde pequenas empresas faturando R$ 50 mil/mês até empresas de médio porte com faturamento acima de R$ 1 milhão/mês. Temos planos adequados para cada necessidade."
-  },
-  {
-    question: "Posso cancelar a qualquer momento?",
-    answer: "Sim! Não temos fidelidade. Você pode cancelar quando quiser, apenas avisando com 30 dias de antecedência."
-  }
-];
+interface FAQSectionProps {
+  locale?: Locale;
+}
 
-export default function FAQSection() {
+export default function FAQSection({ locale = 'pt-BR' }: FAQSectionProps) {
+  const { t, tArray } = useTranslation(locale);
+  const faqItems: FAQItem[] = tArray('faq.items') || [];
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleFAQ = (index: number) => {
@@ -58,7 +31,9 @@ export default function FAQSection() {
           Tire suas dúvidas
         </div>
         <h2 className="text-3xl md:text-4xl font-semibold mb-6">
-          Perguntas <span className="text-emerald-300">frequentes</span>
+          {t('faq.title').split(t('faq.titleHighlight'))[0]}
+          <span className="text-emerald-300">{t('faq.titleHighlight')}</span>
+          {t('faq.title').split(t('faq.titleHighlight'))[1]}
         </h2>
         <p className="text-xl text-slate-300/90 max-w-3xl mx-auto">
           Tudo que você precisa saber antes de começar
@@ -66,7 +41,7 @@ export default function FAQSection() {
       </div>
 
       <div className="space-y-4">
-        {defaultFAQs.map((faq, index) => (
+        {faqItems.map((faq, index) => (
           <div 
             key={index}
             className="rounded-xl border border-white/10 bg-slate-900/60 overflow-hidden"

@@ -1,18 +1,30 @@
 "use client";
 
+import LanguageSelector from './LanguageSelector';
+import { useTranslation } from '@/src/i18n';
+import { type Locale } from '@/src/i18n/config';
+
 interface HeaderProps {
   logoAlt?: string;
+  locale?: Locale;
+  onLocaleChange?: (locale: Locale) => void;
 }
 
-export default function Header({ logoAlt = "ElevaLucro - BPO Financeiro" }: HeaderProps) {
+export default function Header({ 
+  logoAlt = "ElevaLucro - BPO Financeiro", 
+  locale = 'pt-BR',
+  onLocaleChange
+}: HeaderProps) {
+  const { t } = useTranslation(locale);
+
   const navItems = [
-    { href: "#como-funciona", label: "Como funciona" },
-    { href: "#beneficios", label: "Benefícios" },
+    { href: "#como-funciona", label: t('footer.links.howItWorks') },
+    { href: "#beneficios", label: t('footer.links.benefits') },
     { href: "#seguranca", label: "Segurança" },
     { href: "#interface", label: "Interface" },
     { href: "#resultados", label: "Resultados" },
-    { href: "#planos", label: "Planos" },
-    { href: "#contato", label: "Contato" }
+    { href: "#planos", label: t('footer.links.plans') },
+    { href: "#contato", label: t('footer.links.contact') }
   ];
 
   return (
@@ -25,17 +37,26 @@ export default function Header({ logoAlt = "ElevaLucro - BPO Financeiro" }: Head
             className="h-10 w-auto"
           />
         </div>
-        <nav className="hidden md:flex items-center gap-6 text-sm text-slate-300">
-          {navItems.map((item) => (
-            <a 
-              key={item.href}
-              href={item.href} 
-              className="hover:text-white transition-colors"
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
+        <div className="flex items-center gap-4">
+          <nav className="hidden md:flex items-center gap-6 text-sm text-slate-300">
+            {navItems.map((item) => (
+              <a 
+                key={item.href}
+                href={item.href} 
+                className="hover:text-white transition-colors"
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+          
+          <div className="border-l border-white/10 pl-4">
+            <LanguageSelector 
+              currentLocale={locale} 
+              onLocaleChange={onLocaleChange || (() => {})} 
+            />
+          </div>
+        </div>
       </div>
     </header>
   );

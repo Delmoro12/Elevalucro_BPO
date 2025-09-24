@@ -1,15 +1,11 @@
 "use client";
 
 import { Brain, Code2, Scale, Heart, GraduationCap, Megaphone, Calculator, Compass } from "lucide-react";
+import { useTranslation } from '@/src/i18n';
+import { type Locale } from '@/src/i18n/config';
 
 interface SolutionSectionProps {
-  title: string;
-  titleHighlight: string;
-  description: string;
-  highlightBox: {
-    text: string;
-    emphasis: string;
-  };
+  locale?: Locale;
 }
 
 const serviceExamples = [
@@ -56,18 +52,16 @@ const serviceExamples = [
 ];
 
 export default function SolutionSection({
-  title,
-  titleHighlight,
-  description,
-  highlightBox
+  locale = 'pt-BR'
 }: SolutionSectionProps) {
+  const { t } = useTranslation(locale);
   return (
     <section id="solucao" className="mx-auto max-w-6xl px-4 py-16">
       <div className="text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-semibold mb-6">
-          {title.split(titleHighlight)[0]}
-          <span className="text-emerald-300">{titleHighlight}</span>
-          {title.split(titleHighlight)[1]}
+          {t('solution.title').split(t('solution.titleHighlight'))[0]}
+          <span className="text-emerald-300">{t('solution.titleHighlight')}</span>
+          {t('solution.title').split(t('solution.titleHighlight'))[1]}
         </h2>
         <p className="text-xl text-slate-300/90 max-w-4xl mx-auto mb-8">
           Com a ElevaLucro, você terceiriza toda a operação financeira para um time especializado em BPO financeiro para empresas de serviços:
@@ -89,9 +83,9 @@ export default function SolutionSection({
       
       <div className="rounded-2xl border border-emerald-500/20 p-8 bg-emerald-500/5 text-center">
         <p className="text-lg text-slate-300/90">
-          {highlightBox.text.split(highlightBox.emphasis)[0]}
-          <span className="text-emerald-300 font-semibold">{highlightBox.emphasis}</span>
-          {highlightBox.text.split(highlightBox.emphasis)[1]}
+          {t('solution.highlightBox.text').split(t('solution.highlightBox.emphasis'))[0]}
+          <span className="text-emerald-300 font-semibold">{t('solution.highlightBox.emphasis')}</span>
+          {t('solution.highlightBox.text').split(t('solution.highlightBox.emphasis'))[1]}
         </p>
       </div>
     </section>

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { TrendingUp } from "lucide-react";
+import { useLocale } from '@/src/i18n/useLocale';
+import { useTranslation } from '@/src/i18n';
 
 // Componentes comuns
 import Header from "../components/common/Header";
@@ -27,6 +29,8 @@ import CTASection from "../components/sections/CTASection";
 import PlanosGenericos from "../shared/PlanosGenericos";
 
 export default function LandingGeneralRefactored() {
+  const { locale, changeLocale, isClient } = useLocale();
+  const { t } = useTranslation(locale);
   const [showModal, setShowModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("");
 
@@ -45,44 +49,34 @@ export default function LandingGeneralRefactored() {
     { text: "Custo alto para ter um financeiro interno competente" }
   ];
 
+  // Show loading while client-side hydration happens
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white flex items-center justify-center">
+        <div className="animate-pulse text-emerald-300">Carregando...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
       {/* Header */}
-      <Header />
+      <Header locale={locale} onLocaleChange={changeLocale} />
 
       {/* Hero Section */}
       <HeroSection
-        badge={{
-          icon: <TrendingUp className="h-4 w-4" />,
-          text: "BPO Financeiro Especializado"
-        }}
-        title="O financeiro da sua empresa nas mãos de"
-        titleHighlight="especialistas"
-        subtitle="Terceirize toda a operação financeira para quem entende do assunto. Nossa equipe cuida de lançamentos, pagamentos e relatórios enquanto você foca no que realmente importa: fazer sua empresa crescer."
-        ctaText="Conhecer a solução"
+        locale={locale}
+        badgeIcon={<TrendingUp className="h-4 w-4" />}
       />
 
       {/* Pain Points Section */}
-      <PainPointsSection
-        title="Sua empresa precisa de"
-        titleHighlight="estratégia"
-        description="Empresários e gestores perdem tempo valioso com controles financeiros manuais que só geram dor de cabeça e riscos desnecessários:"
-        painPoints={painPoints}
-      />
+      <PainPointsSection locale={locale} />
 
       {/* Solution Section */}
-      <SolutionSection
-        title="A retaguarda financeira da sua empresa, nas mãos de especialistas"
-        titleHighlight="retaguarda financeira"
-        description=""
-        highlightBox={{
-          text: "BPO significa Business Process Outsourcing - terceirização de processos. Na prática: você não precisa mais se preocupar com lançamentos, pagamentos e conciliações. Nossa equipe especializada assume toda essa operação, com transparência e segurança total.",
-          emphasis: "Nossa equipe especializada assume toda essa operação"
-        }}
-      />
+      <SolutionSection locale={locale} />
 
       {/* Technology Differential Section - DIFERENCIAL PRINCIPAL */}
-      <TechnologyDifferentialSection />
+      <TechnologyDifferentialSection locale={locale} />
 
       {/* Operational Flow Section */}
       <OperationalFlowSection />
@@ -91,7 +85,7 @@ export default function LandingGeneralRefactored() {
       <SystemShowcaseSection />
 
       {/* Interface Section */}
-      <InterfaceSection />
+      <InterfaceSection locale={locale} />
 
       {/* Benefits Section */}
       <BenefitsSection />
@@ -100,7 +94,7 @@ export default function LandingGeneralRefactored() {
       <ComparisonSection />
 
       {/* Results Section */}
-      <ResultsSection />
+      <ResultsSection locale={locale} />
 
       {/* Onboarding Section */}
       <OnboardingSection />
@@ -109,30 +103,33 @@ export default function LandingGeneralRefactored() {
       <section id="planos" className="mx-auto max-w-6xl px-4 py-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-semibold mb-6">
-            Escolha o plano ideal para sua <span className="text-emerald-300">empresa</span>
+            {t('pricing.title').split(t('pricing.titleHighlight'))[0]}
+            <span className="text-emerald-300">{t('pricing.titleHighlight')}</span>
+            {t('pricing.title').split(t('pricing.titleHighlight'))[1]}
           </h2>
           <p className="text-xl text-slate-300/90 max-w-3xl mx-auto">
-            Comece com o que sua empresa precisa hoje e evolua conforme cresce
+            {t('pricing.subtitle')}
           </p>
         </div>
         <div className="rounded-2xl border border-white/10 p-8 bg-white/5">
-          <PlanosGenericos onSelectPlan={handleOpenModal} />
+          <PlanosGenericos onSelectPlan={handleOpenModal} locale={locale} />
           <p className="mt-6 text-xs text-slate-400">
-            * O escopo final é ajustado via SLA no onboarding. Valores para empresas de até R$ 500k/mês de faturamento.
+            {t('pricing.disclaimer')}
           </p>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <FAQSection />
+      <FAQSection locale={locale} />
 
       {/* Final CTA Section */}
       <CTASection
+        locale={locale}
         onButtonClick={() => handleOpenModal("Gerencial")}
       />
 
       {/* Footer */}
-      <Footer />
+      <Footer locale={locale} />
 
       {/* Contact Modal */}
       <ContactModal

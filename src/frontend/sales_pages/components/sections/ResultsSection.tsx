@@ -1,6 +1,8 @@
 "use client";
 
 import { Star, TrendingUp, Clock, PiggyBank, Target } from "lucide-react";
+import { useTranslation } from '@/src/i18n';
+import { type Locale } from '@/src/i18n/config';
 
 interface Testimonial {
   text: string;
@@ -63,15 +65,22 @@ const defaultMetrics: Metric[] = [
   }
 ];
 
-export default function ResultsSection() {
+interface ResultsSectionProps {
+  locale?: Locale;
+}
+
+export default function ResultsSection({ locale = 'pt-BR' }: ResultsSectionProps) {
+  const { t } = useTranslation(locale);
   return (
     <section id="resultados" className="mx-auto max-w-6xl px-4 py-16">
       <div className="text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-semibold mb-6">
-          Empresas que já <span className="text-emerald-300">elevaram seus lucros</span> com a ElevaLucro
+          {t('results.title').split(t('results.titleHighlight'))[0]}
+          <span className="text-emerald-300">{t('results.titleHighlight')}</span>
+          {t('results.title').split(t('results.titleHighlight'))[1]}
         </h2>
         <p className="text-xl text-slate-300/90 max-w-3xl mx-auto">
-          Resultados reais de quem confia na nossa parceria
+          {t('results.subtitle')}
         </p>
       </div>
 

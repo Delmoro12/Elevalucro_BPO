@@ -1,65 +1,63 @@
 "use client";
 
 import { FileText, Users, Clock, BarChart3, TrendingUp, CheckCircle } from "lucide-react";
-
-interface Feature {
-  icon: React.ReactNode;
-  text: string;
-}
-
-const defaultFeatures: Feature[] = [
-  {
-    icon: <FileText className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />,
-    text: "Enviar documentos facilmente com IA para registro automático (notas fiscais, comprovantes, contratos)"
-  },
-  {
-    icon: <Users className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />,
-    text: "Tirar dúvidas com operadores ou gerente de conta, sem e-mails infinitos"
-  },
-  {
-    icon: <Clock className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />,
-    text: "Acompanhar o trabalho em tempo real"
-  },
-  {
-    icon: <BarChart3 className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />,
-    text: "Consultar indicadores financeiros prontos para análise"
-  },
-  {
-    icon: <TrendingUp className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />,
-    text: "Visualizar fluxo de caixa atualizado diariamente"
-  },
-  {
-    icon: <CheckCircle className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />,
-    text: "Ter visão clara do DRE com lucros e custos estruturados"
-  }
-];
+import { useTranslation } from '@/src/i18n';
+import { type Locale } from '@/src/i18n/config';
 
 interface InterfaceSectionProps {
-  features?: Feature[];
+  locale?: Locale;
 }
 
-export default function InterfaceSection({ features = defaultFeatures }: InterfaceSectionProps) {
+export default function InterfaceSection({ locale = 'pt-BR' }: InterfaceSectionProps) {
+  const { t, tArray } = useTranslation(locale);
+  
+  const features = [
+    {
+      icon: <FileText className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />,
+      text: tArray('interface.features')[0]
+    },
+    {
+      icon: <Users className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />,
+      text: tArray('interface.features')[1]
+    },
+    {
+      icon: <Clock className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />,
+      text: tArray('interface.features')[2]
+    },
+    {
+      icon: <BarChart3 className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />,
+      text: tArray('interface.features')[3]
+    },
+    {
+      icon: <TrendingUp className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />,
+      text: tArray('interface.features')[4]
+    },
+    {
+      icon: <CheckCircle className="h-5 w-5 text-emerald-300 mt-0.5 flex-shrink-0" />,
+      text: tArray('interface.features')[5]
+    }
+  ];
   return (
     <section id="interface" className="mx-auto max-w-6xl px-4 py-16">
       <div className="text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-semibold mb-6">
-          Uma <span className="text-emerald-300">interface exclusiva</span> feita para sua empresa
+          {t('interface.title').split('interface exclusiva')[0]}
+          <span className="text-emerald-300">{t('interface.titleHighlight')}</span>
+          {t('interface.title').split('interface exclusiva')[1]}
         </h2>
         <p className="text-slate-300/90 text-lg mb-12 max-w-3xl mx-auto">
-          Não são planilhas! É um app moderno, intuitivo e desenvolvido especialmente para o controle financeiro empresarial
+          {t('interface.subtitle')}
         </p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-12 items-start">
         <div>
-          <h3 className="text-2xl font-semibold mb-4">Tecnologia própria, não planilhas genéricas</h3>
+          <h3 className="text-2xl font-semibold mb-4">{t('interface.techTitle')}</h3>
           <p className="text-slate-300/90 mb-6">
-            Enquanto outros BPOs usam planilhas Excel ou sistemas genéricos, nós desenvolvemos 
-            uma plataforma exclusiva pensada em cada detalhe da gestão financeira empresarial.
+            {t('interface.techDescription')}
           </p>
           <p className="text-slate-300/90">
-            <span className="text-emerald-300 font-semibold">Resultado:</span> você tem mais 
-            clareza, mais controle e mais tempo para focar no crescimento do seu negócio.
+            <span className="text-emerald-300 font-semibold">{t('interface.techResult')}</span> {t('interface.techResultText')}
           </p>
         </div>
         <div className="rounded-2xl border border-white/10 p-8 bg-white/5">
@@ -72,7 +70,7 @@ export default function InterfaceSection({ features = defaultFeatures }: Interfa
             ))}
           </div>
           <div className="mt-6 p-4 rounded-xl bg-emerald-400/10 text-emerald-200 text-center">
-            <p className="font-medium">Tudo em um só lugar, simples e confiável.</p>
+            <p className="font-medium">{t('interface.bottomText')}</p>
           </div>
         </div>
       </div>

@@ -19,25 +19,25 @@ const screenDemos: ScreenDemo[] = [
     id: "dashboard",
     title: "Dashboard Executivo",
     subtitle: "Visão completa da saúde financeira em tempo real",
-    image: "/images/Tela_app2.png",
+    image: "/images/dashboard-executivo.png",
     icon: <BarChart3 className="h-6 w-6" />,
     position: "center",
     delay: 0
   },
   {
     id: "mobile",
-    title: "App de Aprovação",
-    subtitle: "Aprove pagamentos em segundos, onde estiver",
-    image: "/images/Tela_app2.png",
+    title: "Registros Financeiros",
+    subtitle: "Envie suas movimentações através do painel, por importação de planilhas ou integração com seu sistema",
+    image: "/images/registros-financeiros.png",
     icon: <Smartphone className="h-6 w-6" />,
     position: "right",
     delay: 0.2
   },
   {
     id: "reports",
-    title: "Relatórios Inteligentes",
-    subtitle: "DRE e indicadores prontos para análise",
-    image: "/images/Tela_app2.png",
+    title: "Gestão Financeira",
+    subtitle: "Acompanhe em tempo real suas entradas e saídas e realize aprovações de pagamentos",
+    image: "/images/gestao-financeira.png",
     icon: <Eye className="h-6 w-6" />,
     position: "left",
     delay: 0.4
@@ -45,8 +45,8 @@ const screenDemos: ScreenDemo[] = [
   {
     id: "audit",
     title: "Auditoria Completa",
-    subtitle: "Transparência total em cada movimento",
-    image: "/images/Tela_app2.png",
+    subtitle: "Transparência total em cada movimento através de histórico de rotinas executadas por nossa equipe",
+    image: "/images/auditoria-completa.png",
     icon: <Shield className="h-6 w-6" />,
     position: "center",
     delay: 0.6
@@ -73,22 +73,22 @@ export default function SystemShowcaseSection() {
   const titleY = useTransform(smoothProgress, [0, 0.2], ["0%", "-50%"]);
   const titleOpacity = useTransform(smoothProgress, [0, 0.2], [1, 0]);
 
-  // Screen transitions with freeze zones
-  const screen1Y = useTransform(smoothProgress, [0, 0.15], ["100%", "0%"]);
-  const screen1Scale = useTransform(smoothProgress, [0, 0.15, 0.35, 0.5], [0.8, 1.2, 1.2, 0.8]);
-  const screen1Opacity = useTransform(smoothProgress, [0, 0.15, 0.35, 0.5], [0, 1, 1, 0]);
+  // Screen transitions with extended freeze zones for longer visibility
+  const screen1Y = useTransform(smoothProgress, [0, 0.12], ["100%", "0%"]);
+  const screen1Scale = useTransform(smoothProgress, [0, 0.12, 0.38, 0.5], [0.8, 1.2, 1.2, 0.8]);
+  const screen1Opacity = useTransform(smoothProgress, [0, 0.12, 0.38, 0.5], [0, 1, 1, 0]);
 
-  const screen2Y = useTransform(smoothProgress, [0.3, 0.4], ["100%", "0%"]);
-  const screen2Scale = useTransform(smoothProgress, [0.3, 0.4, 0.6, 0.7], [0.8, 1.2, 1.2, 0.8]);
-  const screen2Opacity = useTransform(smoothProgress, [0.3, 0.4, 0.6, 0.7], [0, 1, 1, 0]);
+  const screen2Y = useTransform(smoothProgress, [0.28, 0.35], ["100%", "0%"]);
+  const screen2Scale = useTransform(smoothProgress, [0.28, 0.35, 0.63, 0.72], [0.8, 1.2, 1.2, 0.8]);
+  const screen2Opacity = useTransform(smoothProgress, [0.28, 0.35, 0.63, 0.72], [0, 1, 1, 0]);
 
-  const screen3Y = useTransform(smoothProgress, [0.55, 0.65], ["100%", "0%"]);
-  const screen3Scale = useTransform(smoothProgress, [0.55, 0.65, 0.85, 0.9], [0.8, 1.2, 1.2, 0.8]);
-  const screen3Opacity = useTransform(smoothProgress, [0.55, 0.65, 0.85, 0.9], [0, 1, 1, 0]);
+  const screen3Y = useTransform(smoothProgress, [0.50, 0.60], ["100%", "0%"]);
+  const screen3Scale = useTransform(smoothProgress, [0.50, 0.60, 0.87, 0.92], [0.8, 1.2, 1.2, 0.8]);
+  const screen3Opacity = useTransform(smoothProgress, [0.50, 0.60, 0.87, 0.92], [0, 1, 1, 0]);
 
-  const screen4Y = useTransform(smoothProgress, [0.8, 0.9], ["100%", "0%"]);
-  const screen4Scale = useTransform(smoothProgress, [0.8, 0.9, 1], [0.8, 1.3, 1.3]);
-  const screen4Opacity = useTransform(smoothProgress, [0.8, 0.9, 1], [0, 1, 1]);
+  const screen4Y = useTransform(smoothProgress, [0.75, 0.85], ["100%", "0%"]);
+  const screen4Scale = useTransform(smoothProgress, [0.75, 0.85, 1], [0.8, 1.3, 1.3]);
+  const screen4Opacity = useTransform(smoothProgress, [0.75, 0.85, 1], [0, 1, 1]);
 
   const transforms = [
     { y: screen1Y, scale: screen1Scale, opacity: screen1Opacity },
@@ -97,12 +97,12 @@ export default function SystemShowcaseSection() {
     { y: screen4Y, scale: screen4Scale, opacity: screen4Opacity }
   ];
 
-  // Update current screen based on scroll
+  // Update current screen based on scroll with extended timing
   useEffect(() => {
     const unsubscribe = smoothProgress.on("change", (value) => {
-      if (value < 0.35) setCurrentScreen(0);
-      else if (value < 0.6) setCurrentScreen(1);
-      else if (value < 0.85) setCurrentScreen(2);
+      if (value < 0.38) setCurrentScreen(0);
+      else if (value < 0.63) setCurrentScreen(1);
+      else if (value < 0.87) setCurrentScreen(2);
       else setCurrentScreen(3);
     });
 

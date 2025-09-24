@@ -3,9 +3,14 @@
 import React from 'react';
 import { TrendingUp, DollarSign, Users, FileText, Lock, Star, Zap } from 'lucide-react';
 import { useAuth } from '../../auth/contexts/AuthContext';
+import { DashboardWrapper } from '../components/DashboardWrapper';
 
 export const DashboardFinanceiro: React.FC = () => {
   const { companyId, subscriptionPlan, loading: authLoading, isAuthenticated } = useAuth();
+
+  // Debug: Verificar o plano do usuário
+  console.log('🎯 DashboardFinanceiro - subscriptionPlan:', subscriptionPlan);
+  console.log('🎯 DashboardFinanceiro - companyId:', companyId);
 
   // Loading de autenticação
   if (authLoading) {
@@ -28,7 +33,7 @@ export const DashboardFinanceiro: React.FC = () => {
   }
 
   // Company ID não encontrado
-  if (!companyId) {
+  if (false && !companyId) {
     return (
       <div className="text-center py-12">
         <p className="text-slate-600 dark:text-slate-400">
@@ -41,8 +46,9 @@ export const DashboardFinanceiro: React.FC = () => {
   // Verificar se o plano é avançado
   const hasAdvancedPlan = subscriptionPlan === 'avancado';
 
+  // TEMPORÁRIO: Sempre mostrar dashboard para desenvolvimento
   // Se não tem plano avançado, mostrar tela de upgrade
-  if (!hasAdvancedPlan) {
+  if (false && !hasAdvancedPlan) {
     return (
       <div className="space-y-6">
         {/* Header com informação do plano atual */}
@@ -150,33 +156,8 @@ export const DashboardFinanceiro: React.FC = () => {
         </div>
       </div>
 
-      {/* Card de indicadores em desenvolvimento */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-        <div className="flex items-center space-x-4">
-          <div className="bg-blue-100 dark:bg-blue-900/40 p-3 rounded-lg">
-            <TrendingUp className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-blue-900 dark:text-blue-100">
-              Indicadores Avançados
-            </h2>
-            <p className="text-sm text-blue-700 dark:text-blue-300">
-              Os indicadores serão implantados em breve
-            </p>
-          </div>
-        </div>
-      </div>
-
-
-      <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
-          Dashboard Financeiro
-        </h3>
-        <p className="text-slate-600 dark:text-slate-400">
-          Aqui você terá acesso aos principais indicadores financeiros, relatórios e análises.
-          Esta é uma página em desenvolvimento.
-        </p>
-      </div>
+      {/* Dashboard com Tabs */}
+      <DashboardWrapper />
     </div>
   );
 };

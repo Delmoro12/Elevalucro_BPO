@@ -1,22 +1,26 @@
-import { CheckCircle } from "lucide-react"
+import { CheckCircle } from "lucide-react";
+import { useTranslation } from '@/src/i18n';
+import { type Locale } from '@/src/i18n/config';
 
 interface PlanosGenericosProps {
-  onSelectPlan?: (plan: string) => void
+  onSelectPlan?: (plan: string) => void;
+  locale?: Locale;
 }
 
-export default function PlanosGenericos({ onSelectPlan }: PlanosGenericosProps) {
+export default function PlanosGenericos({ onSelectPlan, locale = 'pt-BR' }: PlanosGenericosProps) {
+  const { t } = useTranslation(locale);
   return (
     <div className="mt-8 grid md:grid-cols-3 gap-6">
       {/* Plano Controle */}
       <div className="flex flex-col p-6 rounded-2xl bg-slate-900/60 border border-white/10">
         <div className="flex items-baseline justify-between">
-          <h3 className="text-xl font-semibold">Controle</h3>
+          <h3 className="text-xl font-semibold">{t('plans.control.name')}</h3>
           <span className="text-emerald-300 font-semibold">
-            R$ 1.200,00<span className="text-slate-400 text-sm"> / mês</span>
+            {t('plans.control.price')}<span className="text-slate-400 text-sm">{t('plans.control.period')}</span>
           </span>
         </div>
         <p className="mt-2 text-sm text-slate-300/90">
-          Básico organizado. Tiramos sua empresa do operacional.
+          {t('plans.control.description')}
         </p>
         <ul className="flex-1 mt-4 space-y-2 text-sm text-slate-300/90">
           <li className="flex gap-2 items-start">
@@ -49,7 +53,7 @@ export default function PlanosGenericos({ onSelectPlan }: PlanosGenericosProps) 
             <button 
               onClick={() => onSelectPlan("Controle")}
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-              Escolher Plano Controle
+{t('plans.control.cta')}
             </button>
           )}
         </div>
@@ -58,13 +62,13 @@ export default function PlanosGenericos({ onSelectPlan }: PlanosGenericosProps) 
       {/* Plano Gerencial */}
       <div className="flex flex-col p-6 rounded-2xl bg-slate-900/60 border border-white/10">
         <div className="flex items-baseline justify-between">
-          <h3 className="text-xl font-semibold">Gerencial</h3>
+          <h3 className="text-xl font-semibold">{t('plans.management.name')}</h3>
           <span className="text-emerald-300 font-semibold">
-            R$ 1.500,00<span className="text-slate-400 text-sm"> / mês</span>
+            {t('plans.management.price')}<span className="text-slate-400 text-sm">{t('plans.management.period')}</span>
           </span>
         </div>
         <p className="mt-2 text-sm text-slate-300/90">
-          Tudo do Controle + visão de gestão e cobrança ativa.
+          {t('plans.management.description')}
         </p>
         <ul className="flex-1 mt-4 space-y-2 text-sm text-slate-300/90">
           <li className="flex gap-2 items-start">
@@ -101,7 +105,7 @@ export default function PlanosGenericos({ onSelectPlan }: PlanosGenericosProps) 
             <button 
               onClick={() => onSelectPlan("Gerencial")}
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-              Escolher Plano Gerencial
+{t('plans.management.cta')}
             </button>
           )}
         </div>
@@ -110,13 +114,13 @@ export default function PlanosGenericos({ onSelectPlan }: PlanosGenericosProps) 
       {/* Plano Avançado */}
       <div className="flex flex-col p-6 rounded-2xl bg-slate-900/60 border border-white/10 ring-1 ring-emerald-300/30">
         <div className="flex items-baseline justify-between">
-          <h3 className="text-xl font-semibold">Avançado</h3>
+          <h3 className="text-xl font-semibold">{t('plans.advanced.name')}</h3>
           <span className="text-emerald-300 font-semibold">
-            R$ 1.900,00<span className="text-slate-400 text-sm"> / mês</span>
+            {t('plans.advanced.price')}<span className="text-slate-400 text-sm">{t('plans.advanced.period')}</span>
           </span>
         </div>
         <p className="mt-2 text-sm text-slate-300/90">
-          Tudo do Gerencial + inteligência financeira para crescer.
+          {t('plans.advanced.description')}
         </p>
         <ul className="flex-1 mt-4 space-y-2 text-sm text-slate-300/90">
           <li className="flex gap-2 items-start">
@@ -145,7 +149,7 @@ export default function PlanosGenericos({ onSelectPlan }: PlanosGenericosProps) 
             <button 
               onClick={() => onSelectPlan("Avançado")}
               className="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-              🔥 Escolher Plano Avançado
+{t('plans.advanced.cta')}
             </button>
           )}
         </div>

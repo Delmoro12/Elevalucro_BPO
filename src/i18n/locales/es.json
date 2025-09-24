@@ -1,0 +1,195 @@
+{
+  "hero": {
+    "badge": "BPO Financiero Especializado",
+    "title": "Las finanzas de tu empresa en manos de",
+    "titleHighlight": "especialistas",
+    "subtitle": "Terceriza toda la operación financiera a quienes entienden del tema. Nuestro equipo se encarga de registros, pagos e informes mientras te concentras en lo que realmente importa: hacer crecer tu empresa.",
+    "ctaText": "Conocer la solución"
+  },
+  "painPoints": {
+    "title": "Tu empresa necesita",
+    "titleHighlight": "estrategia",
+    "description": "Empresarios y gerentes pierden tiempo valioso con controles financieros manuales que solo generan dolores de cabeza y riesgos innecesarios:",
+    "points": [
+      "Hojas de cálculo confusas que nunca cuadran y generan retrabajo",
+      "Falta de visibilidad sobre flujo de caja y salud financiera",
+      "Decisiones importantes tomadas sin números confiables",
+      "Riesgo de errores, multas y retrasos en pagos",
+      "Tiempo perdido en tareas operacionales en lugar de estrategia",
+      "Alto costo de tener un financiero interno competente"
+    ]
+  },
+  "solution": {
+    "title": "La retaguardia financiera de tu empresa, en manos de especialistas",
+    "titleHighlight": "retaguardia financiera",
+    "highlightBox": {
+      "text": "BPO significa Business Process Outsourcing - tercerización de procesos. En la práctica: ya no necesitas preocuparte por registros, pagos y conciliaciones. Nuestro equipo especializado asume toda esta operación, con transparencia y seguridad total.",
+      "emphasis": "Nuestro equipo especializado asume toda esta operación"
+    }
+  },
+  "interface": {
+    "title": "Una interfaz exclusiva hecha para tu empresa",
+    "titleHighlight": "interfaz exclusiva",
+    "subtitle": "¡No son hojas de cálculo! Es una app moderna, intuitiva y desarrollada especialmente para el control financiero empresarial",
+    "techTitle": "Tecnología propia, no hojas de cálculo genéricas",
+    "techDescription": "Mientras otros BPOs usan hojas de cálculo Excel o sistemas genéricos, nosotros desarrollamos una plataforma exclusiva pensada en cada detalle de la gestión financiera empresarial.",
+    "techResult": "Resultado:",
+    "techResultText": "tienes más claridad, más control y más tiempo para enfocarte en el crecimiento de tu negocio.",
+    "features": [
+      "Enviar documentos fácilmente con IA para registro automático (facturas, comprobantes, contratos)",
+      "Resolver dudas con operadores o gerente de cuenta, sin emails infinitos",
+      "Seguir el trabajo en tiempo real",
+      "Consultar indicadores financieros listos para análisis",
+      "Visualizar flujo de caja actualizado diariamente",
+      "Tener visión clara del Estado de Resultados con ganancias y costos estructurados"
+    ],
+    "bottomText": "Todo en un solo lugar, simple y confiable."
+  },
+  "plans": {
+    "title": "Elige el plan ideal para tu empresa",
+    "titleHighlight": "empresa",
+    "subtitle": "Comienza con lo que tu empresa necesita hoy y evoluciona según crece",
+    "disclaimer": "* El alcance final se ajusta vía SLA en el onboarding. Valores para empresas de hasta $500k/mes de facturación.",
+    "control": {
+      "name": "Control",
+      "price": "$1.200,00",
+      "period": "/ mes",
+      "description": "Básico organizado. Sacamos tu empresa de lo operacional.",
+      "cta": "Elegir Plan Control"
+    },
+    "management": {
+      "name": "Gerencial",
+      "price": "$1.500,00",
+      "period": "/ mes",
+      "description": "Todo del Control + visión de gestión y cobranza activa.",
+      "cta": "Elegir Plan Gerencial"
+    },
+    "advanced": {
+      "name": "Avanzado",
+      "price": "$1.900,00",
+      "period": "/ mes",
+      "description": "Todo del Gerencial + inteligencia financiera para crecer.",
+      "cta": "🔥 Elegir Plan Avanzado"
+    }
+  },
+  "footer": {
+    "description": "BPO Financiero especializado en elevar los resultados de tu empresa con tecnología y transparencia.",
+    "quickLinks": "Enlaces Rápidos",
+    "contact": "Contáctanos",
+    "whatsapp": "WhatsApp: (35) 99700-6169",
+    "email": "E-mail: comercial@elevalucro.com.br",
+    "hours": "Atención: Lun-Vie, 9h-18h",
+    "copyright": "ElevaLucro • BPO Financiero",
+    "tagline": "Gestión financiera que eleva resultados",
+    "links": {
+      "howItWorks": "Cómo funciona",
+      "benefits": "Beneficios",
+      "plans": "Planes",
+      "contact": "Contacto"
+    }
+  },
+  "faq": {
+    "title": "Preguntas Frecuentes",
+    "titleHighlight": "Preguntas Frecuentes",
+    "items": [
+      {
+        "question": "¿Cómo funciona la seguridad de los pagos?",
+        "answer": "Nuestro equipo NO tiene acceso a tus cuentas bancarias. Organizamos todo y enviamos para tu aprobación vía app. Solo tú tienes autorización para aprobar o rechazar pagos. Es 100% seguro."
+      },
+      {
+        "question": "¿Cuánto tiempo toma estar 100% operacional?",
+        "answer": "En 30 días tus finanzas estarán completamente organizadas y operacionales. Tenemos un proceso de onboarding estructurado semana a semana, con acompañamiento dedicado."
+      },
+      {
+        "question": "¿Es más barato que contratar un empleado?",
+        "answer": "¡Sí! Un analista financiero cuesta en promedio $3.500 + cargas sociales (total ~$7.000). Nuestros planes comienzan en $1.200/mes con todo un equipo cuidando tus finanzas."
+      },
+      {
+        "question": "¿Necesito cambiar mi contador?",
+        "answer": "¡No! Nosotros nos encargamos de la gestión financiera (flujo de caja, pagos, cobros). Tu contador sigue encargándose de la parte fiscal y contable. De hecho, facilitamos su trabajo con documentos organizados."
+      },
+      {
+        "question": "¿Cómo funciona la app de aprobación?",
+        "answer": "Recibes una notificación diaria en WhatsApp con un enlace seguro. Al hacer clic, accedes a nuestra app donde ves todos los pagos del día con detalles. En 2-3 minutos apruebas o rechazas cada uno."
+      },
+      {
+        "question": "¿Y si no me gusta el servicio?",
+        "answer": "Tenemos garantía de satisfacción de 30 días. Si no quedas satisfecho, devolvemos 100% del valor pagado. Pero eso nunca ha pasado - 100% de nuestros clientes renuevan."
+      },
+      {
+        "question": "¿Atienden empresas de qué tamaño?",
+        "answer": "Atendemos desde pequeñas empresas facturando $50 mil/mes hasta empresas medianas con facturación superior a $1 millón/mes. Tenemos planes adecuados para cada necesidad."
+      },
+      {
+        "question": "¿Puedo cancelar en cualquier momento?",
+        "answer": "¡Sí! No tenemos fidelización. Puedes cancelar cuando quieras, solo avisando con 30 días de anticipación."
+      }
+    ]
+  },
+  "technology": {
+    "badge": "Diferencial tecnológico exclusivo",
+    "title": "Sistema 100% propio creado especialmente para BPO financiero",
+    "titleHighlight": "100% propio",
+    "subtitle": "Mientras otros BPOs usan ERPs genéricos del mercado, desarrollamos nuestra propia plataforma pensada específicamente para integrar perfectamente con tu empresa.",
+    "traditional": {
+      "title": "BPOs tradicionales usan",
+      "items": [
+        {
+          "title": "ERPs genéricos",
+          "description": "Sistemas hechos para cualquier empresa, no optimizados para BPO"
+        },
+        {
+          "title": "Hojas de cálculo Excel",
+          "description": "Controles manuales sujetos a errores y retrabajo"
+        },
+        {
+          "title": "Integraciones limitadas",
+          "description": "Dificultad para conectar con los sistemas del cliente"
+        },
+        {
+          "title": "Reportes genéricos",
+          "description": "Información estandarizada, no personalizada para cada empresa"
+        }
+      ]
+    },
+    "ours": {
+      "title": "Nuestra tecnología propia",
+      "items": [
+        {
+          "title": "Sistema diseñado para BPO",
+          "description": "Cada funcionalidad pensada específicamente para gestión financiera tercerizada"
+        },
+        {
+          "title": "Integración perfecta",
+          "description": "Conecta fácilmente con herramientas que ya usas"
+        },
+        {
+          "title": "Transparencia total",
+          "description": "Sigues todo en tiempo real por tu app personalizada"
+        },
+        {
+          "title": "Interfaz moderna",
+          "description": "App intuitiva desarrollada pensando en la experiencia del usuario"
+        }
+      ]
+    }
+  },
+  "cta": {
+    "title": "Eleva los resultados de tu empresa",
+    "titleHighlight": "resultados",
+    "subtitle": "Simplifica tu gestión financiera y gana tiempo para lo que realmente importa: hacer crecer tu empresa.",
+    "buttonText": "Quiero organizar mis finanzas",
+    "benefits": [
+      "Sin fidelización",
+      "Garantía de 30 días",
+      "Onboarding incluido",
+      "Soporte vía WhatsApp"
+    ]
+  },
+  "pricing": {
+    "title": "Elige el plan ideal para tu empresa",
+    "titleHighlight": "empresa",
+    "subtitle": "Comienza con lo que tu empresa necesita hoy y evoluciona según crece",
+    "disclaimer": "* El alcance final se ajusta vía SLA en el onboarding. Valores para empresas de hasta $500k/mes de facturación."
+  }
+}

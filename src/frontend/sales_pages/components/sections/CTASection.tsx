@@ -1,29 +1,20 @@
 "use client";
 
 import { ArrowRight, CheckCircle } from "lucide-react";
+import { useTranslation } from '@/src/i18n';
+import { type Locale } from '@/src/i18n/config';
 
 interface CTASectionProps {
-  title?: string;
-  subtitle?: string;
-  buttonText?: string;
+  locale?: Locale;
   onButtonClick?: () => void;
-  benefits?: string[];
 }
 
-const defaultBenefits = [
-  "Sem fidelidade",
-  "Garantia de 30 dias",
-  "Onboarding incluído",
-  "Suporte via WhatsApp"
-];
-
 export default function CTASection({
-  title = "Eleve os resultados da sua empresa",
-  subtitle = "Simplifique sua gestão financeira e ganhe tempo para o que realmente importa: fazer sua empresa crescer.",
-  buttonText = "Quero organizar meu financeiro",
-  onButtonClick,
-  benefits = defaultBenefits
+  locale = 'pt-BR',
+  onButtonClick
 }: CTASectionProps) {
+  const { t, tArray } = useTranslation(locale);
+  const benefits = tArray('cta.benefits') || [];
   
   const handleClick = () => {
     if (onButtonClick) {
@@ -40,28 +31,24 @@ export default function CTASection({
     <section id="contato" className="mx-auto max-w-6xl px-4 py-20">
       <div className="rounded-3xl bg-gradient-to-br from-emerald-500/10 to-emerald-400/5 border border-emerald-500/20 p-12 text-center">
         <h2 className="text-4xl md:text-5xl font-semibold mb-6">
-          {title.includes("resultados") ? (
-            <>
-              Eleve os <span className="text-emerald-300">resultados</span> da sua empresa
-            </>
-          ) : (
-            title
-          )}
+          {t('cta.title').split(t('cta.titleHighlight'))[0]}
+          <span className="text-emerald-300">{t('cta.titleHighlight')}</span>
+          {t('cta.title').split(t('cta.titleHighlight'))[1]}
         </h2>
         <p className="text-xl text-slate-300/90 mb-8 max-w-3xl mx-auto">
-          {subtitle}
+          {t('cta.subtitle')}
         </p>
         
         <button 
           onClick={handleClick}
           className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-10 py-5 rounded-xl font-semibold text-xl transition-colors mb-8"
         >
-          {buttonText}
+          {t('cta.buttonText')}
           <ArrowRight className="h-6 w-6" />
         </button>
 
         <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-300">
-          {benefits.map((benefit, index) => (
+          {benefits.map((benefit: string, index: number) => (
             <span key={index} className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-emerald-300" />
               {benefit}

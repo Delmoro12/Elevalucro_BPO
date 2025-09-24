@@ -1,6 +1,14 @@
 "use client";
 
-export default function Footer() {
+import { useTranslation } from '@/src/i18n';
+import { type Locale } from '@/src/i18n/config';
+
+interface FooterProps {
+  locale?: Locale;
+}
+
+export default function Footer({ locale = 'pt-BR' }: FooterProps) {
+  const { t } = useTranslation(locale);
   const currentYear = new Date().getFullYear();
   
   return (
@@ -15,36 +23,35 @@ export default function Footer() {
               className="h-8 w-auto mb-4"
             />
             <p className="text-sm text-slate-400">
-              BPO Financeiro especializado em elevar os resultados da sua empresa 
-              com tecnologia e transparência.
+              {t('footer.description')}
             </p>
           </div>
 
           {/* Links rápidos */}
           <div>
-            <h4 className="font-semibold text-white mb-4">Links Rápidos</h4>
+            <h4 className="font-semibold text-white mb-4">{t('footer.quickLinks')}</h4>
             <ul className="space-y-2 text-sm text-slate-400">
-              <li><a href="#como-funciona" className="hover:text-white transition-colors">Como funciona</a></li>
-              <li><a href="#beneficios" className="hover:text-white transition-colors">Benefícios</a></li>
-              <li><a href="#planos" className="hover:text-white transition-colors">Planos</a></li>
-              <li><a href="#contato" className="hover:text-white transition-colors">Contato</a></li>
+              <li><a href="#como-funciona" className="hover:text-white transition-colors">{t('footer.links.howItWorks')}</a></li>
+              <li><a href="#beneficios" className="hover:text-white transition-colors">{t('footer.links.benefits')}</a></li>
+              <li><a href="#planos" className="hover:text-white transition-colors">{t('footer.links.plans')}</a></li>
+              <li><a href="#contato" className="hover:text-white transition-colors">{t('footer.links.contact')}</a></li>
             </ul>
           </div>
 
           {/* Contato */}
           <div>
-            <h4 className="font-semibold text-white mb-4">Fale Conosco</h4>
+            <h4 className="font-semibold text-white mb-4">{t('footer.contact')}</h4>
             <ul className="space-y-2 text-sm text-slate-400">
-              <li>WhatsApp: (35) 99700-6169</li>
-              <li>E-mail: comercial@elevalucro.com.br</li>
-              <li>Atendimento: Seg-Sex, 9h-18h</li>
+              <li>{t('footer.whatsapp')}</li>
+              <li>{t('footer.email')}</li>
+              <li>{t('footer.hours')}</li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-white/10 pt-8 text-sm text-slate-400 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p>© {currentYear} ElevaLucro • BPO Financeiro</p>
-          <p className="text-slate-500">Gestão financeira que eleva resultados</p>
+          <p>© {currentYear} {t('footer.copyright')}</p>
+          <p className="text-slate-500">{t('footer.tagline')}</p>
         </div>
       </div>
     </footer>

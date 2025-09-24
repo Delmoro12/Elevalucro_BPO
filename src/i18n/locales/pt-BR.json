@@ -1,0 +1,240 @@
+{
+  "hero": {
+    "badge": "BPO Financeiro Especializado",
+    "title": "O financeiro da sua empresa nas mãos de",
+    "titleHighlight": "especialistas",
+    "subtitle": "Terceirize toda a operação financeira para quem entende do assunto. Nossa equipe cuida de lançamentos, pagamentos e relatórios enquanto você foca no que realmente importa: fazer sua empresa crescer.",
+    "ctaText": "Conhecer a solução"
+  },
+  "painPoints": {
+    "title": "Sua empresa precisa de",
+    "titleHighlight": "estratégia",
+    "description": "Empresários e gestores perdem tempo valioso com controles financeiros manuais que só geram dor de cabeça e riscos desnecessários:",
+    "points": [
+      "Planilhas confusas que nunca batem e geram retrabalho",
+      "Falta de visibilidade sobre fluxo de caixa e saúde financeira", 
+      "Decisões importantes tomadas sem números confiáveis",
+      "Risco de erros, multas e atrasos em pagamentos",
+      "Tempo perdido com tarefas operacionais ao invés de estratégia",
+      "Custo alto para ter um financeiro interno competente"
+    ]
+  },
+  "solution": {
+    "title": "A retaguarda financeira da sua empresa, nas mãos de especialistas",
+    "titleHighlight": "retaguarda financeira",
+    "highlightBox": {
+      "text": "BPO significa Business Process Outsourcing - terceirização de processos. Na prática: você não precisa mais se preocupar com lançamentos, pagamentos e conciliações. Nossa equipe especializada assume toda essa operação, com transparência e segurança total.",
+      "emphasis": "Nossa equipe especializada assume toda essa operação"
+    }
+  },
+  "interface": {
+    "title": "Uma interface exclusiva feita para sua empresa",
+    "titleHighlight": "interface exclusiva", 
+    "subtitle": "Não são planilhas! É um app moderno, intuitivo e desenvolvido especialmente para o controle financeiro empresarial",
+    "techTitle": "Tecnologia própria, não planilhas genéricas",
+    "techDescription": "Enquanto outros BPOs usam planilhas Excel ou sistemas genéricos, nós desenvolvemos uma plataforma exclusiva pensada em cada detalhe da gestão financeira empresarial.",
+    "techResult": "Resultado:",
+    "techResultText": "você tem mais clareza, mais controle e mais tempo para focar no crescimento do seu negócio.",
+    "features": [
+      "Enviar documentos facilmente com IA para registro automático (notas fiscais, comprovantes, contratos)",
+      "Tirar dúvidas com operadores ou gerente de conta, sem e-mails infinitos", 
+      "Acompanhar o trabalho em tempo real",
+      "Consultar indicadores financeiros prontos para análise",
+      "Visualizar fluxo de caixa atualizado diariamente",
+      "Ter visão clara do DRE com lucros e custos estruturados"
+    ],
+    "bottomText": "Tudo em um só lugar, simples e confiável."
+  },
+  "plans": {
+    "title": "Escolha o plano ideal para sua empresa",
+    "titleHighlight": "empresa",
+    "subtitle": "Comece com o que sua empresa precisa hoje e evolua conforme cresce",
+    "disclaimer": "* O escopo final é ajustado via SLA no onboarding. Valores para empresas de até R$ 500k/mês de faturamento.",
+    "control": {
+      "name": "Controle",
+      "price": "R$ 1.200,00",
+      "period": "/ mês",
+      "description": "Básico organizado. Tiramos sua empresa do operacional.",
+      "cta": "Escolher Plano Controle"
+    },
+    "management": {
+      "name": "Gerencial", 
+      "price": "R$ 1.500,00",
+      "period": "/ mês",
+      "description": "Tudo do Controle + visão de gestão e cobrança ativa.",
+      "cta": "Escolher Plano Gerencial"
+    },
+    "advanced": {
+      "name": "Avançado",
+      "price": "R$ 1.900,00", 
+      "period": "/ mês",
+      "description": "Tudo do Gerencial + inteligência financeira para crescer.",
+      "cta": "🔥 Escolher Plano Avançado"
+    }
+  },
+  "results": {
+    "title": "Empresas que já elevaram seus lucros com a ElevaLucro",
+    "titleHighlight": "elevaram seus lucros",
+    "subtitle": "Resultados reais de quem confia na nossa parceria",
+    "metrics": [
+      {
+        "value": "95%",
+        "label": "Redução de tempo com financeiro"
+      },
+      {
+        "value": "60%", 
+        "label": "Economia vs funcionário CLT"
+      },
+      {
+        "value": "100%",
+        "label": "Dos clientes renovam"
+      },
+      {
+        "value": "30 dias",
+        "label": "Para estar 100% organizado"
+      }
+    ],
+    "testimonials": [
+      {
+        "text": "Antes eu perdia 2 horas por dia com planilhas. Hoje, em 5 minutos no app da ElevaLucro sei exatamente como está minha empresa.",
+        "author": "Carlos Mendes",
+        "role": "CEO",
+        "company": "Mendes Consultoria"
+      },
+      {
+        "text": "A transparência é impressionante. Consigo ver cada centavo, aprovar pagamentos e ter relatórios que antes levavam semanas para fazer.",
+        "author": "Ana Paula",
+        "role": "Diretora Financeira", 
+        "company": "Tech Solutions BR"
+      },
+      {
+        "text": "Economizei R$ 8.000/mês comparado a ter um analista CLT. E o melhor: a qualidade é muito superior.",
+        "author": "Roberto Silva",
+        "role": "Fundador",
+        "company": "Silva & Associados"
+      }
+    ],
+    "socialProof": "Junte-se a mais de 100 empresas que já transformaram sua gestão financeira",
+    "socialProofHighlight": "mais de 100 empresas"
+  },
+  "faq": {
+    "title": "Perguntas Frequentes",
+    "titleHighlight": "Perguntas Frequentes",
+    "items": [
+      {
+        "question": "Como funciona a segurança dos pagamentos?",
+        "answer": "Nossa equipe NÃO tem acesso às suas contas bancárias. Nós organizamos tudo e enviamos para sua aprovação via app. Só você tem autorização para aprovar ou rejeitar pagamentos. É 100% seguro."
+      },
+      {
+        "question": "Quanto tempo leva para estar 100% operacional?",
+        "answer": "Em 30 dias seu financeiro estará completamente organizado e operacional. Temos um processo de onboarding estruturado semana a semana, com acompanhamento dedicado."
+      },
+      {
+        "question": "É mais barato que contratar um funcionário?",
+        "answer": "Sim! Um analista financeiro CLT custa em média R$ 3.500 + encargos (total ~R$ 7.000). Nossos planos começam em R$ 1.200/mês com uma equipe inteira cuidando do seu financeiro."
+      },
+      {
+        "question": "Preciso mudar meu contador?",
+        "answer": "Não! Nós cuidamos da gestão financeira (fluxo de caixa, pagamentos, recebimentos). Seu contador continua cuidando da parte fiscal e contábil. Na verdade, facilitamos o trabalho dele com documentos organizados."
+      },
+      {
+        "question": "Como funciona o app de aprovação?",
+        "answer": "Você recebe uma notificação diária no WhatsApp com um link seguro. Ao clicar, acessa nosso app onde vê todos os pagamentos do dia com detalhes. Em 2-3 minutos você aprova ou rejeita cada um."
+      },
+      {
+        "question": "E se eu não gostar do serviço?",
+        "answer": "Temos garantia de satisfação de 30 dias. Se não ficar satisfeito, devolvemos 100% do valor pago. Mas isso nunca aconteceu - 100% dos nossos clientes renovam."
+      },
+      {
+        "question": "Vocês atendem empresas de qual porte?",
+        "answer": "Atendemos desde pequenas empresas faturando R$ 50 mil/mês até empresas de médio porte com faturamento acima de R$ 1 milhão/mês. Temos planos adequados para cada necessidade."
+      },
+      {
+        "question": "Posso cancelar a qualquer momento?",
+        "answer": "Sim! Não temos fidelidade. Você pode cancelar quando quiser, apenas avisando com 30 dias de antecedência."
+      }
+    ]
+  },
+  "footer": {
+    "description": "BPO Financeiro especializado em elevar os resultados da sua empresa com tecnologia e transparência.",
+    "quickLinks": "Links Rápidos",
+    "contact": "Fale Conosco",
+    "whatsapp": "WhatsApp: (35) 99700-6169",
+    "email": "E-mail: comercial@elevalucro.com.br", 
+    "hours": "Atendimento: Seg-Sex, 9h-18h",
+    "copyright": "ElevaLucro • BPO Financeiro",
+    "tagline": "Gestão financeira que eleva resultados",
+    "links": {
+      "howItWorks": "Como funciona",
+      "benefits": "Benefícios", 
+      "plans": "Planos",
+      "contact": "Contato"
+    }
+  },
+  "technology": {
+    "badge": "Diferencial tecnológico exclusivo",
+    "title": "Sistema 100% próprio criado especialmente para BPO financeiro",
+    "titleHighlight": "100% próprio",
+    "subtitle": "Enquanto outros BPOs usam ERPs genéricos do mercado, desenvolvemos nossa própria plataforma pensada especificamente para integrar perfeitamente com sua empresa.",
+    "traditional": {
+      "title": "BPOs tradicionais usam",
+      "items": [
+        {
+          "title": "ERPs genéricos",
+          "description": "Sistemas feitos para qualquer empresa, não otimizados para BPO"
+        },
+        {
+          "title": "Planilhas Excel",
+          "description": "Controles manuais sujeitos a erros e retrabalho"
+        },
+        {
+          "title": "Integrações limitadas",
+          "description": "Dificuldade para conectar com os sistemas do cliente"
+        },
+        {
+          "title": "Relatórios genéricos",
+          "description": "Informações padronizadas, não personalizadas para cada empresa"
+        }
+      ]
+    },
+    "ours": {
+      "title": "Nossa tecnologia própria",
+      "items": [
+        {
+          "title": "Sistema desenhado para BPO",
+          "description": "Cada funcionalidade pensada especificamente para gestão financeira terceirizada"
+        },
+        {
+          "title": "Integração perfeita",
+          "description": "Conecta facilmente com ferramentas que você já usa"
+        },
+        {
+          "title": "Transparência total",
+          "description": "Você acompanha tudo em tempo real pelo seu app personalizado"
+        },
+        {
+          "title": "Interface moderna",
+          "description": "App intuitivo desenvolvido pensando na experiência do usuário"
+        }
+      ]
+    }
+  },
+  "cta": {
+    "title": "Eleve os resultados da sua empresa",
+    "titleHighlight": "resultados",
+    "subtitle": "Simplifique sua gestão financeira e ganhe tempo para o que realmente importa: fazer sua empresa crescer.",
+    "buttonText": "Quero organizar meu financeiro",
+    "benefits": [
+      "Sem fidelidade",
+      "Garantia de 30 dias",
+      "Onboarding incluído",
+      "Suporte via WhatsApp"
+    ]
+  },
+  "pricing": {
+    "title": "Escolha o plano ideal para sua empresa",
+    "titleHighlight": "empresa",
+    "subtitle": "Comece com o que sua empresa precisa hoje e evolua conforme cresce",
+    "disclaimer": "* O escopo final é ajustado via SLA no onboarding. Valores para empresas de até R$ 500k/mês de faturamento."
+  }
+}
