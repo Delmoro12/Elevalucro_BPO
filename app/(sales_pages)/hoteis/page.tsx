@@ -1,5 +1,5 @@
-import LandingHotels from '@/src/frontend/sales_pages/hotels/LandingHotels'
+import LandingGeneralRefactored from '@/src/frontend/sales_pages/general/LandingGeneralRefactored'
 
 export default function HoteisPage() {
-  return <LandingHotels />
+  return <LandingGeneralRefactored />
 }

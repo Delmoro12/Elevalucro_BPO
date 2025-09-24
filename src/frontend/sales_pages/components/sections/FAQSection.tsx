@@ -16,7 +16,7 @@ interface FAQSectionProps {
 
 export default function FAQSection({ locale = 'pt-BR' }: FAQSectionProps) {
   const { t, tArray } = useTranslation(locale);
-  const faqItems: FAQItem[] = tArray('faq.items') || [];
+  const faqItems: FAQItem[] = (tArray('faq.items') as unknown as FAQItem[]) || [];
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleFAQ = (index: number) => {

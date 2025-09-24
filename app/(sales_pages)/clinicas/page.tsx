@@ -1,5 +1,5 @@
-import LandingClinics from '@/src/frontend/sales_pages/clinics/LandingClinics'
+import LandingGeneralRefactored from '@/src/frontend/sales_pages/general/LandingGeneralRefactored'
 
 export default function ClinicasPage() {
-  return <LandingClinics />
+  return <LandingGeneralRefactored />
 }

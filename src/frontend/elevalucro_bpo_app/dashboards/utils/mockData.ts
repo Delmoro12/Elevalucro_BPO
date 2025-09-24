@@ -417,29 +417,29 @@ export const mockKPICards: KPICard[] = [
 ];
 
 export const mockChartDataFluxo: ChartData[] = [
-  { name: 'Jan', receitas: 45000, despesas: 32000, saldo: 13000 },
-  { name: 'Fev', receitas: 52000, despesas: 38000, saldo: 14000 },
-  { name: 'Mar', receitas: 48000, despesas: 35000, saldo: 13000 },
-  { name: 'Abr', receitas: 61000, despesas: 42000, saldo: 19000 },
-  { name: 'Mai', receitas: 55000, despesas: 40000, saldo: 15000 },
-  { name: 'Jun', receitas: 67000, despesas: 45000, saldo: 22000 },
-  { name: 'Jul', receitas: 72000, despesas: 48000, saldo: 24000 },
-  { name: 'Ago', receitas: 69000, despesas: 46000, saldo: 23000 },
-  { name: 'Set', receitas: 75000, despesas: 50000, saldo: 25000 },
+  { name: 'Jan', value: 13000, receitas: 45000, despesas: 32000, saldo: 13000 },
+  { name: 'Fev', value: 14000, receitas: 52000, despesas: 38000, saldo: 14000 },
+  { name: 'Mar', value: 13000, receitas: 48000, despesas: 35000, saldo: 13000 },
+  { name: 'Abr', value: 19000, receitas: 61000, despesas: 42000, saldo: 19000 },
+  { name: 'Mai', value: 15000, receitas: 55000, despesas: 40000, saldo: 15000 },
+  { name: 'Jun', value: 22000, receitas: 67000, despesas: 45000, saldo: 22000 },
+  { name: 'Jul', value: 24000, receitas: 72000, despesas: 48000, saldo: 24000 },
+  { name: 'Ago', value: 23000, receitas: 69000, despesas: 46000, saldo: 23000 },
+  { name: 'Set', value: 25000, receitas: 75000, despesas: 50000, saldo: 25000 },
 ];
 
 export const mockChartDataDRE: ChartData[] = [
-  { name: 'Receita Bruta', valor: 250000 },
-  { name: 'Receita Líquida', valor: 220000 },
-  { name: 'Lucro Bruto', valor: 110000 },
-  { name: 'Lucro Operacional', valor: 50000 },
-  { name: 'Lucro Líquido', valor: 50000 },
+  { name: 'Receita Bruta', value: 250000, valor: 250000 },
+  { name: 'Receita Líquida', value: 220000, valor: 220000 },
+  { name: 'Lucro Bruto', value: 110000, valor: 110000 },
+  { name: 'Lucro Operacional', value: 50000, valor: 50000 },
+  { name: 'Lucro Líquido', value: 50000, valor: 50000 },
 ];
 
 export const mockChartDataBalanco: ChartData[] = [
-  { name: 'Ativo Circulante', valor: 200000 },
-  { name: 'Ativo Não Circulante', valor: 300000 },
-  { name: 'Passivo Circulante', valor: 150000 },
-  { name: 'Passivo Não Circulante', valor: 100000 },
-  { name: 'Patrimônio Líquido', valor: 250000 },
+  { name: 'Ativo Circulante', value: 200000, valor: 200000 },
+  { name: 'Ativo Não Circulante', value: 300000, valor: 300000 },
+  { name: 'Passivo Circulante', value: 150000, valor: 150000 },
+  { name: 'Passivo Não Circulante', value: 100000, valor: 100000 },
+  { name: 'Patrimônio Líquido', value: 250000, valor: 250000 },
 ];

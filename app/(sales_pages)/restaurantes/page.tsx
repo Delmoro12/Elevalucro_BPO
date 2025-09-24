@@ -1,5 +1,5 @@
-import LandingRestaurants from '@/src/frontend/sales_pages/restaurants/LandingRestaurants'
+import LandingGeneralRefactored from '@/src/frontend/sales_pages/general/LandingGeneralRefactored'
 
 export default function RestaurantesPage() {
-  return <LandingRestaurants />
+  return <LandingGeneralRefactored />
 }

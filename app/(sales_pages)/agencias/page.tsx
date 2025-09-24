@@ -1,5 +1,5 @@
-import LandingAgencies from '@/src/frontend/sales_pages/agencies/LandingAgencies'
+import LandingGeneralRefactored from '@/src/frontend/sales_pages/general/LandingGeneralRefactored'
 
 export default function AgenciasPage() {
-  return <LandingAgencies />
+  return <LandingGeneralRefactored />
 }
