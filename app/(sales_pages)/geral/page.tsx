@@ -1,5 +1,5 @@
-import LandingGeneral from '@/src/frontend/sales_pages/general/LandingGeneral'
+import LandingGeneralRefactored from '@/src/frontend/sales_pages/general/LandingGeneralRefactored'
 
 export default function GeralPage() {
-  return <LandingGeneral />
+  return <LandingGeneralRefactored />
 }
