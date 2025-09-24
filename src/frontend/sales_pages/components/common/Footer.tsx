@@ -35,8 +35,8 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold text-white mb-4">Fale Conosco</h4>
             <ul className="space-y-2 text-sm text-slate-400">
-              <li>WhatsApp: (11) 9xxxx-xxxx</li>
-              <li>E-mail: contato@elevalucro.com.br</li>
+              <li>WhatsApp: (35) 99700-6169</li>
+              <li>E-mail: comercial@elevalucro.com.br</li>
               <li>Atendimento: Seg-Sex, 9h-18h</li>
             </ul>
           </div>

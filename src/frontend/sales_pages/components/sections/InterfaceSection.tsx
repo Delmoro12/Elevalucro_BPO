@@ -45,19 +45,9 @@ export default function InterfaceSection({ features = defaultFeatures }: Interfa
         <h2 className="text-3xl md:text-4xl font-semibold mb-6">
           Uma <span className="text-emerald-300">interface exclusiva</span> feita para sua empresa
         </h2>
-        <p className="text-slate-300/90 text-lg mb-8 max-w-3xl mx-auto">
+        <p className="text-slate-300/90 text-lg mb-12 max-w-3xl mx-auto">
           Não são planilhas! É um app moderno, intuitivo e desenvolvido especialmente para o controle financeiro empresarial
         </p>
-        
-        <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-8 mb-12">
-          <div className="aspect-video bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl flex items-center justify-center border border-white/10 overflow-hidden">
-            <img 
-              src="/images/Tela_app2.png" 
-              alt="Interface da ElevaLucro - Sistema de gestão financeira empresarial"
-              className="max-w-full max-h-full object-contain"
-            />
-          </div>
-        </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-12 items-start">

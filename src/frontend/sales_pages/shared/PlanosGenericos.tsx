@@ -56,7 +56,7 @@ export default function PlanosGenericos({ onSelectPlan }: PlanosGenericosProps) 
       </div>
 
       {/* Plano Gerencial */}
-      <div className="flex flex-col p-6 rounded-2xl bg-slate-900/60 border border-white/10 ring-1 ring-emerald-300/30">
+      <div className="flex flex-col p-6 rounded-2xl bg-slate-900/60 border border-white/10">
         <div className="flex items-baseline justify-between">
           <h3 className="text-xl font-semibold">Gerencial</h3>
           <span className="text-emerald-300 font-semibold">
@@ -100,15 +100,15 @@ export default function PlanosGenericos({ onSelectPlan }: PlanosGenericosProps) 
           {onSelectPlan && (
             <button 
               onClick={() => onSelectPlan("Gerencial")}
-              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-              🔥 Escolher Plano Gerencial
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+              Escolher Plano Gerencial
             </button>
           )}
         </div>
       </div>
 
       {/* Plano Avançado */}
-      <div className="flex flex-col p-6 rounded-2xl bg-slate-900/60 border border-white/10">
+      <div className="flex flex-col p-6 rounded-2xl bg-slate-900/60 border border-white/10 ring-1 ring-emerald-300/30">
         <div className="flex items-baseline justify-between">
           <h3 className="text-xl font-semibold">Avançado</h3>
           <span className="text-emerald-300 font-semibold">
@@ -144,8 +144,8 @@ export default function PlanosGenericos({ onSelectPlan }: PlanosGenericosProps) 
           {onSelectPlan && (
             <button 
               onClick={() => onSelectPlan("Avançado")}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-              Escolher Plano Avançado
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+              🔥 Escolher Plano Avançado
             </button>
           )}
         </div>

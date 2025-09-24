@@ -15,6 +15,7 @@ import SolutionSection from "../components/sections/SolutionSection";
 import TechnologyDifferentialSection from "../components/sections/TechnologyDifferentialSection";
 import OperationalFlowSection from "../components/sections/OperationalFlowSection";
 import SystemShowcaseSection from "../components/sections/SystemShowcaseSection";
+import InterfaceSection from "../components/sections/InterfaceSection";
 import BenefitsSection from "../components/sections/BenefitsSection";
 import ComparisonSection from "../components/sections/ComparisonSection";
 import ResultsSection from "../components/sections/ResultsSection";
@@ -88,6 +89,9 @@ export default function LandingGeneralRefactored() {
 
       {/* System Showcase Section */}
       <SystemShowcaseSection />
+
+      {/* Interface Section */}
+      <InterfaceSection />
 
       {/* Benefits Section */}
       <BenefitsSection />
