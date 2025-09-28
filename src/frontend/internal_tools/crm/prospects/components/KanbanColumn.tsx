@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
-import { ProspectStatus } from '../types/prospects';
+import { ProspectKanbanStage } from '../types/prospects';
 
 interface KanbanColumnProps {
-  id: ProspectStatus;
+  id: string;
   title: string;
   color: string;
   count: number;

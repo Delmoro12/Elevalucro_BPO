@@ -6,6 +6,9 @@ export async function getProspects(filters?: ProspectFilters): Promise<ProspectL
   try {
     const params = new URLSearchParams();
     
+    // Sempre filtrar apenas prospects (não leads)
+    params.append('status', 'prospect');
+    
     if (filters?.plan) params.append('plan', filters.plan);
     if (filters?.source) params.append('source', filters.source);
     if (filters?.segment) params.append('segment', filters.segment);
@@ -13,6 +16,8 @@ export async function getProspects(filters?: ProspectFilters): Promise<ProspectL
     
     const queryString = params.toString();
     const url = `${API_BASE_URL}/prospects${queryString ? `?${queryString}` : ''}`;
+    
+    console.log('🔍 Buscando prospects com filtro status=prospect:', url);
     
     const response = await fetch(url, {
       method: 'GET',
@@ -28,6 +33,7 @@ export async function getProspects(filters?: ProspectFilters): Promise<ProspectL
     const result = await response.json();
     
     if (result.success) {
+      console.log(`✅ Prospects carregados: ${result.data?.length || 0} registros`);
       return {
         data: result.data || [],
         total: result.total || 0,
@@ -62,6 +68,29 @@ export async function updateProspectStatus(id: string, status: string): Promise<
     return result.success;
   } catch (error) {
     console.error('Erro ao atualizar status:', error);
+    return false;
+  }
+}
+
+export async function updateProspectKanbanStage(id: string, kanban_stage: string): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/prospects/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ kanban_stage }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Erro ao atualizar kanban stage: ${response.statusText}`);
+    }
+    
+    const result = await response.json();
+    
+    return result.success;
+  } catch (error) {
+    console.error('Erro ao atualizar kanban stage:', error);
     return false;
   }
 }

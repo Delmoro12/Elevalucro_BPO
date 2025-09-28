@@ -11,7 +11,7 @@ import {
   Loader2,
   Check
 } from 'lucide-react';
-import { ProspectEditData, ProspectUpdatePayload, ProspectStatus } from '../types/prospects';
+import { ProspectEditData, ProspectUpdatePayload, ProspectKanbanStage } from '../types/prospects';
 
 interface ProspectEditModalProps {
   isOpen: boolean;
@@ -62,7 +62,7 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
         success_expectations: prospectData.success_expectations || '',
         plan: prospectData.plan,
         monthly_value: prospectData.monthly_value,
-        status: prospectData.status,
+        kanban_stage: prospectData.kanban_stage,
         source: prospectData.source || '',
         notes: prospectData.notes || '',
       });
@@ -165,7 +165,7 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
     }
   };
 
-  const statusOptions: { value: ProspectStatus; label: string }[] = [
+  const statusOptions: { value: ProspectKanbanStage; label: string }[] = [
     { value: 'pending', label: 'Pendente' },
     { value: 'contacted', label: 'Contatado' },
     { value: 'contract_sent', label: 'Contrato Enviado' },
@@ -661,8 +661,8 @@ export const ProspectEditModal: React.FC<ProspectEditModalProps> = ({
                           Status
                         </label>
                         <select
-                          value={formData.status || ''}
-                          onChange={(e) => handleInputChange('status', e.target.value as ProspectStatus)}
+                          value={formData.kanban_stage || ''}
+                          onChange={(e) => handleInputChange('kanban_stage', e.target.value as ProspectKanbanStage)}
                           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                         >
                           {statusOptions.map(option => (

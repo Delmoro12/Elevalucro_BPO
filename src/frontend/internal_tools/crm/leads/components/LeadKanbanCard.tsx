@@ -3,21 +3,23 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Mail, Phone, Building2, Trash2, Calendar, DollarSign } from 'lucide-react';
-import { ProspectListItem } from '../types/prospects';
+import { Mail, Phone, Building2, Trash2, Calendar, Thermometer, ArrowRight } from 'lucide-react';
+import { LeadListItem } from '../types/leads';
 
-interface KanbanCardProps {
-  prospect: ProspectListItem;
+interface LeadKanbanCardProps {
+  lead: LeadListItem;
   onEdit: (id: string) => void;
-  onDelete: (prospect: ProspectListItem) => void;
+  onDelete: (lead: LeadListItem) => void;
+  onConvert: (lead: LeadListItem) => void;
   isDeleting: boolean;
   isDragging?: boolean;
 }
 
-export const KanbanCard: React.FC<KanbanCardProps> = ({
-  prospect,
+export const LeadKanbanCard: React.FC<LeadKanbanCardProps> = ({
+  lead,
   onEdit,
   onDelete,
+  onConvert,
   isDeleting,
   isDragging = false,
 }) => {
@@ -28,7 +30,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
     transform,
     transition,
     isDragging: isSortableDragging,
-  } = useSortable({ id: prospect.id });
+  } = useSortable({ id: lead.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -57,6 +59,32 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
     }
   };
 
+  const getTemperatureColor = (temperature: string) => {
+    switch (temperature) {
+      case 'hot':
+        return 'text-red-600 dark:text-red-400';
+      case 'warm':
+        return 'text-orange-600 dark:text-orange-400';
+      case 'cold':
+        return 'text-blue-600 dark:text-blue-400';
+      default:
+        return 'text-slate-600 dark:text-slate-400';
+    }
+  };
+
+  const getTemperatureIcon = (temperature: string) => {
+    switch (temperature) {
+      case 'hot':
+        return '🔥';
+      case 'warm':
+        return '🌡️';
+      case 'cold':
+        return '❄️';
+      default:
+        return '🌡️';
+    }
+  };
+
   const getPlanoDisplayName = (plan: string) => {
     switch (plan) {
       case 'controle':
@@ -76,7 +104,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
       style={style}
       {...attributes}
       {...listeners}
-      onClick={() => onEdit(prospect.id)}
+      onClick={() => onEdit(lead.id)}
       className={`
         bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700
         p-4 cursor-pointer hover:shadow-md transition-shadow
@@ -88,52 +116,68 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
           <h4 className="font-medium text-slate-900 dark:text-slate-100 truncate">
-            {prospect.contact_name}
+            {lead.contact_name}
           </h4>
           <p className="text-sm text-slate-600 dark:text-slate-400 truncate">
-            {prospect.company_name}
+            {lead.company_name}
           </p>
         </div>
         
         {/* Badge do plano */}
-        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPlanoBadgeColor(prospect.plan || '')}`}>
-          {getPlanoDisplayName(prospect.plan || '')}
+        {lead.plan && (
+          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPlanoBadgeColor(lead.plan)}`}>
+            {getPlanoDisplayName(lead.plan)}
+          </span>
+        )}
+      </div>
+
+      {/* Temperatura */}
+      <div className="flex items-center gap-2 mb-2">
+        <Thermometer className={`h-3 w-3 ${getTemperatureColor(lead.temperature)}`} />
+        <span className={`text-xs font-medium ${getTemperatureColor(lead.temperature)}`}>
+          {getTemperatureIcon(lead.temperature)} {lead.temperature.charAt(0).toUpperCase() + lead.temperature.slice(1)}
         </span>
+        {lead.lead_source && (
+          <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">
+            {lead.lead_source}
+          </span>
+        )}
       </div>
 
       {/* Informações de contato */}
       <div className="space-y-1 mb-3">
         <div className="flex items-center text-xs text-slate-600 dark:text-slate-400">
           <Mail className="h-3 w-3 mr-1 flex-shrink-0" />
-          <span className="truncate">{prospect.contact_email}</span>
+          <span className="truncate">{lead.contact_email}</span>
         </div>
         
-        {prospect.contact_phone && (
+        {lead.contact_phone && (
           <div className="flex items-center text-xs text-slate-600 dark:text-slate-400">
             <Phone className="h-3 w-3 mr-1 flex-shrink-0" />
-            <span>{prospect.contact_phone}</span>
+            <span>{lead.contact_phone}</span>
           </div>
         )}
 
-        <div className="flex items-center text-xs text-slate-600 dark:text-slate-400">
-          <Building2 className="h-3 w-3 mr-1 flex-shrink-0" />
-          <span className="truncate">{prospect.cnpj}</span>
-        </div>
+        {lead.cnpj && (
+          <div className="flex items-center text-xs text-slate-600 dark:text-slate-400">
+            <Building2 className="h-3 w-3 mr-1 flex-shrink-0" />
+            <span className="truncate">{lead.cnpj}</span>
+          </div>
+        )}
       </div>
 
-      {/* Valor e data */}
+      {/* Segmento e data */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center text-sm font-medium text-emerald-600 dark:text-emerald-400">
-          <DollarSign className="h-3 w-3 mr-1" />
-          R$ {(prospect.monthly_value || 0).toLocaleString()}/mês
+          <Building2 className="h-3 w-3 mr-1" />
+          {lead.segment || 'Não informado'}
         </div>
         
         <div className="flex items-center text-xs text-slate-500 dark:text-slate-400">
           <Calendar className="h-3 w-3 mr-1" />
-          {formatDate(prospect.created_at)}
+          {formatDate(lead.created_at)}
         </div>
       </div>
-
 
       {/* Ações */}
       <div className="flex justify-between items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
@@ -141,11 +185,11 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onDelete(prospect);
+              onDelete(lead);
             }}
             disabled={isDeleting}
             className="p-1 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded disabled:opacity-50"
-            title="Excluir prospect"
+            title="Excluir lead"
           >
             {isDeleting ? (
               <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
@@ -154,6 +198,19 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
             )}
           </button>
         </div>
+
+        {/* Botão converter para prospect */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onConvert(lead);
+          }}
+          className="flex items-center gap-1 px-2 py-1 text-xs bg-amber-100 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200 hover:bg-amber-200 dark:hover:bg-amber-900/40 rounded transition-colors"
+          title="Converter para prospect"
+        >
+          <ArrowRight className="h-3 w-3" />
+          Converter
+        </button>
       </div>
     </div>
   );

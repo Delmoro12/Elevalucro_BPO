@@ -1,5 +1,5 @@
 // Tipos para prospects na listagem
-export type ProspectStatus = 'pending' | 'contacted' | 'contract_sent' | 'signed' | 'rejected';
+export type ProspectKanbanStage = 'pending' | 'contacted' | 'contract_sent' | 'signed' | 'rejected';
 
 export interface ProspectListItem {
   id: string;
@@ -8,11 +8,11 @@ export interface ProspectListItem {
   contact_phone?: string;
   contact_role?: string;
   company_name: string;
-  cnpj: string;
+  cnpj?: string;
   segment?: string;
-  plan: 'controle' | 'gerencial' | 'avancado';
-  monthly_value: number;
-  status: ProspectStatus;
+  plan?: 'controle' | 'gerencial' | 'avancado';
+  monthly_value?: number;
+  kanban_stage: ProspectKanbanStage;
   source?: string;
   created_at: string;
   updated_at: string;
@@ -65,11 +65,11 @@ export interface ProspectEditData {
   success_expectations?: string;
   
   // Plano selecionado
-  plan: 'controle' | 'gerencial' | 'avancado';
-  monthly_value: number;
+  plan?: 'controle' | 'gerencial' | 'avancado';
+  monthly_value?: number;
   
   // Status e metadados
-  status: ProspectStatus;
+  kanban_stage: ProspectKanbanStage;
   source?: string;
   notes?: string;
 }
@@ -98,7 +98,7 @@ export interface ProspectUpdatePayload {
   success_expectations?: string;
   plan?: 'controle' | 'gerencial' | 'avancado';
   monthly_value?: number;
-  status?: ProspectStatus;
+  kanban_stage?: ProspectKanbanStage;
   origem?: string;
   observacoes?: string;
   // Aliases para compatibilidade

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Phone, Building2, Trash2, Eye, Calendar } from 'lucide-react';
-import { ProspectListItem, ProspectStatus, ProspectUpdatePayload } from '../types/prospects';
+import { ProspectListItem, ProspectKanbanStage, ProspectUpdatePayload } from '../types/prospects';
 import { StatusBadge } from './StatusBadge';
 import { ProspectEditModal } from './ProspectEditModal';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
@@ -10,7 +10,8 @@ interface ProspectsTableProps {
   prospects: ProspectListItem[];
   loading: boolean;
   onDelete: (id: string) => Promise<boolean>;
-  onStatusChange: (id: string, newStatus: ProspectStatus) => Promise<boolean>;
+  onKanbanStageChange: (id: string, newStage: ProspectKanbanStage) => Promise<boolean>;
+  onStatusChange?: (id: string, status: string) => Promise<boolean>;
   onProspectUpdate?: () => void; // Callback para recarregar a lista após edição
 }
 
@@ -18,6 +19,7 @@ export const ProspectsTable: React.FC<ProspectsTableProps> = ({
   prospects,
   loading,
   onDelete,
+  onKanbanStageChange,
   onStatusChange,
   onProspectUpdate,
 }) => {
@@ -195,20 +197,20 @@ export const ProspectsTable: React.FC<ProspectsTableProps> = ({
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPlanoBadgeColor(prospect.plan)}`}>
-                    {getPlanoDisplayName(prospect.plan)}
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPlanoBadgeColor(prospect.plan || '')}`}>
+                    {getPlanoDisplayName(prospect.plan || '')}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <StatusBadge
-                    currentStatus={prospect.status || 'pending'}
+                    currentStatus={prospect.kanban_stage || 'pending'}
                     prospectId={prospect.id}
                     prospectName={prospect.contact_name}
-                    onStatusChange={onStatusChange}
+                    onStatusChange={onStatusChange || (() => Promise.resolve(true))}
                   />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-slate-100">
-                  R$ {prospect.monthly_value.toLocaleString()}/mês
+                  R$ {(prospect.monthly_value || 0).toLocaleString()}/mês
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
@@ -261,7 +263,7 @@ export const ProspectsTable: React.FC<ProspectsTableProps> = ({
         isOpen={deleteModalState.isOpen}
         prospectName={deleteModalState.prospect?.contact_name || ''}
         prospectCompany={deleteModalState.prospect?.company_name || ''}
-        prospectStatus={deleteModalState.prospect?.status || 'pending'}
+        prospectStatus={deleteModalState.prospect?.kanban_stage || 'pending'}
         isDeleting={deletingId === deleteModalState.prospect?.id}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}

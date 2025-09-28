@@ -13,11 +13,40 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    // Buscar prospects do banco
-    const { data: prospects, error } = await supabase
+    // Extrair parâmetros de busca da URL
+    const { searchParams } = new URL(request.url)
+    const status = searchParams.get('status')
+    const plan = searchParams.get('plan')
+    const source = searchParams.get('source')
+    const segment = searchParams.get('segment')
+    const search = searchParams.get('search')
+    
+    console.log('🔍 Filtros recebidos:', { status, plan, source, segment, search })
+    
+    // Iniciar query base
+    let query = supabase
       .from('prospects')
       .select('*')
-      .order('created_at', { ascending: false })
+    
+    // Aplicar filtros
+    if (status) {
+      query = query.eq('status', status)
+    }
+    if (plan) {
+      query = query.eq('plano', plan)
+    }
+    if (source) {
+      query = query.eq('source', source)
+    }
+    if (segment) {
+      query = query.eq('segment', segment)
+    }
+    if (search) {
+      query = query.or(`nome_empresa.ilike.%${search}%,nome_contato.ilike.%${search}%,email_contato.ilike.%${search}%`)
+    }
+    
+    // Buscar prospects do banco
+    const { data: prospects, error } = await query.order('created_at', { ascending: false })
 
     if (error) {
       console.error('❌ Database error:', error)

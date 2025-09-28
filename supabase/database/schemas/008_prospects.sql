@@ -3,14 +3,14 @@ CREATE TABLE prospects (
     
     -- Dados pessoais do contato
     contact_name VARCHAR(100) NOT NULL,
-    contact_cpf VARCHAR(14) NOT NULL,
+    contact_cpf VARCHAR(14),
     contact_email VARCHAR(255) NOT NULL,
     contact_phone VARCHAR(20),
     contact_role VARCHAR(100),
     
     -- Dados da empresa
     company_name VARCHAR(200) NOT NULL,
-    cnpj VARCHAR(18) NOT NULL,
+    cnpj VARCHAR(18),
     address VARCHAR(255),
     number VARCHAR(20),
     neighborhood VARCHAR(100),
@@ -31,15 +31,33 @@ CREATE TABLE prospects (
     success_expectations TEXT,
     
     -- Plano selecionado
-    plan VARCHAR(20) NOT NULL,
-    monthly_value DECIMAL(10,2) NOT NULL,
+    plan VARCHAR(20),
+    monthly_value DECIMAL(10,2),
     
-    -- Status do prospect
-    status VARCHAR(20) DEFAULT 'pending',
+    -- Status (lead ou prospect)
+    status VARCHAR(20) DEFAULT 'lead' CHECK (status IN ('lead', 'prospect')),
+    
+    -- Estágio no kanban
+    kanban_stage VARCHAR(20) DEFAULT 'new',
+    
+    -- Vendedor responsável
+    assigned_salesperson_id UUID REFERENCES users(id),
+    
+    -- Temperatura/nível de interesse
+    temperature VARCHAR(20) DEFAULT 'cold' CHECK (temperature IN ('cold', 'warm', 'hot')),
+    
+    -- Contatos adicionais
+    additional_contact_email VARCHAR(255),
+    additional_contact_phone VARCHAR(20),
+    
     
     -- Metadados
-    source VARCHAR(50),
+    lead_source VARCHAR(50),
     notes TEXT,
+    
+    -- Auditoria
+    created_by UUID REFERENCES users(id),
+    updated_by UUID REFERENCES users(id),
     
     -- Timestamps
     created_at TIMESTAMPTZ DEFAULT now(),
@@ -49,5 +67,9 @@ CREATE TABLE prospects (
 CREATE INDEX idx_prospects_contact_email ON prospects(contact_email);
 CREATE INDEX idx_prospects_cnpj ON prospects(cnpj);
 CREATE INDEX idx_prospects_status ON prospects(status);
+CREATE INDEX idx_prospects_kanban_stage ON prospects(kanban_stage);
+CREATE INDEX idx_prospects_assigned_salesperson_id ON prospects(assigned_salesperson_id);
+CREATE INDEX idx_prospects_temperature ON prospects(temperature);
+CREATE INDEX idx_prospects_lead_source ON prospects(lead_source);
 CREATE INDEX idx_prospects_plan ON prospects(plan);
 CREATE INDEX idx_prospects_created_at ON prospects(created_at);

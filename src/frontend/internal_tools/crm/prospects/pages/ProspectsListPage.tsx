@@ -17,7 +17,7 @@ export const ProspectsListPage: React.FC = () => {
     filters,
     updateFilters,
     deleteProspect,
-    updateStatus,
+    updateKanbanStage,
     refreshProspects,
   } = useProspects();
 
@@ -105,7 +105,7 @@ export const ProspectsListPage: React.FC = () => {
           prospects={prospects}
           loading={loading}
           onDelete={deleteProspect}
-          onStatusChange={updateStatus}
+          onKanbanStageChange={updateKanbanStage}
           onProspectUpdate={refreshProspects}
         />
       ) : (
@@ -113,7 +113,7 @@ export const ProspectsListPage: React.FC = () => {
           prospects={prospects}
           loading={loading}
           onDelete={deleteProspect}
-          onStatusChange={updateStatus}
+          onKanbanStageChange={updateKanbanStage}
           onProspectUpdate={refreshProspects}
         />
       )}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ProspectListItem, ProspectFilters, ProspectStatus } from '../types/prospects';
-import { getProspects, deleteProspect, updateProspectStatus } from '../services/prospectsCrud';
+import { ProspectListItem, ProspectFilters, ProspectKanbanStage } from '../types/prospects';
+import { getProspects, deleteProspect, updateProspectKanbanStage } from '../services/prospectsCrud';
 
 export function useProspects() {
   const [prospects, setProspects] = useState<ProspectListItem[]>([]);
@@ -38,14 +38,14 @@ export function useProspects() {
     }
   };
 
-  const handleUpdateStatus = async (id: string, newStatus: ProspectStatus) => {
+  const handleUpdateKanbanStage = async (id: string, newStage: ProspectKanbanStage) => {
     try {
-      const success = await updateProspectStatus(id, newStatus);
+      const success = await updateProspectKanbanStage(id, newStage);
       
       if (success) {
         setProspects(prev => prev.map(prospect => 
           prospect.id === id 
-            ? { ...prospect, status: newStatus, updated_at: new Date().toISOString() }
+            ? { ...prospect, kanban_stage: newStage, updated_at: new Date().toISOString() }
             : prospect
         ));
         return true;
@@ -53,7 +53,7 @@ export function useProspects() {
       
       return false;
     } catch (err) {
-      console.error('Erro ao atualizar status:', err);
+      console.error('Erro ao atualizar kanban stage:', err);
       return false;
     }
   };
@@ -78,7 +78,7 @@ export function useProspects() {
     filters,
     updateFilters,
     deleteProspect: handleDeleteProspect,
-    updateStatus: handleUpdateStatus,
+    updateKanbanStage: handleUpdateKanbanStage,
     refreshProspects,
   };
 }

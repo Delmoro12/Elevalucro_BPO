@@ -18,7 +18,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy
 } from '@dnd-kit/sortable';
-import { ProspectListItem, ProspectStatus, ProspectUpdatePayload } from '../types/prospects';
+import { ProspectListItem, ProspectKanbanStage, ProspectUpdatePayload } from '../types/prospects';
 import { KanbanColumn } from './KanbanColumn';
 import { KanbanCard } from './KanbanCard';
 import { ProspectEditModal } from './ProspectEditModal';
@@ -29,11 +29,11 @@ interface ProspectsKanbanProps {
   prospects: ProspectListItem[];
   loading: boolean;
   onDelete: (id: string) => Promise<boolean>;
-  onStatusChange: (id: string, newStatus: ProspectStatus) => Promise<boolean>;
+  onKanbanStageChange: (id: string, newStage: ProspectKanbanStage) => Promise<boolean>;
   onProspectUpdate?: () => void;
 }
 
-const statusColumns: Array<{ id: ProspectStatus; title: string; color: string }> = [
+const kanbanColumns: Array<{ id: ProspectKanbanStage; title: string; color: string }> = [
   { id: 'pending', title: 'Pendente', color: 'bg-slate-100 border-slate-200 dark:bg-slate-800/50 dark:border-slate-700' },
   { id: 'contacted', title: 'Contatado', color: 'bg-slate-100 border-slate-200 dark:bg-slate-800/50 dark:border-slate-700' },
   { id: 'contract_sent', title: 'Contrato Enviado', color: 'bg-slate-100 border-slate-200 dark:bg-slate-800/50 dark:border-slate-700' },
@@ -45,7 +45,7 @@ export const ProspectsKanban: React.FC<ProspectsKanbanProps> = ({
   prospects,
   loading,
   onDelete,
-  onStatusChange,
+  onKanbanStageChange,
   onProspectUpdate,
 }) => {
   const [activeProspect, setActiveProspect] = useState<ProspectListItem | null>(null);
@@ -71,20 +71,20 @@ export const ProspectsKanban: React.FC<ProspectsKanbanProps> = ({
     })
   );
 
-  // Organizar prospects por status e calcular valores totais
-  const { prospectsByStatus, valuesByStatus } = useMemo(() => {
-    const grouped = statusColumns.reduce((acc, column) => {
+  // Organizar prospects por kanban stage e calcular valores totais
+  const { prospectsByStage, valuesByStage } = useMemo(() => {
+    const grouped = kanbanColumns.reduce((acc, column) => {
       const prospectsInColumn = prospects.filter(prospect => 
-        (prospect.status || 'pending') === column.id
+        (prospect.kanban_stage || 'pending') === column.id
       );
-      acc.prospectsByStatus[column.id] = prospectsInColumn;
-      acc.valuesByStatus[column.id] = prospectsInColumn.reduce((sum, prospect) => 
-        sum + prospect.monthly_value, 0
+      acc.prospectsByStage[column.id] = prospectsInColumn;
+      acc.valuesByStage[column.id] = prospectsInColumn.reduce((sum, prospect) => 
+        sum + (prospect.monthly_value || 0), 0
       );
       return acc;
     }, {
-      prospectsByStatus: {} as Record<ProspectStatus, ProspectListItem[]>,
-      valuesByStatus: {} as Record<ProspectStatus, number>
+      prospectsByStage: {} as Record<ProspectKanbanStage, ProspectListItem[]>,
+      valuesByStage: {} as Record<ProspectKanbanStage, number>
     });
     
     return grouped;
@@ -107,14 +107,14 @@ export const ProspectsKanban: React.FC<ProspectsKanbanProps> = ({
     if (!over) return;
 
     const prospectId = active.id as string;
-    const newStatus = over.id as ProspectStatus;
+    const newStage = over.id as ProspectKanbanStage;
     
-    // Verificar se o status mudou
+    // Verificar se o kanban stage mudou
     const prospect = prospects.find(p => p.id === prospectId);
-    if (!prospect || prospect.status === newStatus) return;
+    if (!prospect || prospect.kanban_stage === newStage) return;
 
-    // Atualizar status
-    await onStatusChange(prospectId, newStatus);
+    // Atualizar kanban stage
+    await onKanbanStageChange(prospectId, newStage);
   };
 
   const handleDeleteClick = (prospect: ProspectListItem) => {
@@ -174,20 +174,20 @@ export const ProspectsKanban: React.FC<ProspectsKanbanProps> = ({
       >
         {/* Kanban Board */}
         <div className="flex gap-6 overflow-x-auto pb-4 flex-1">
-          {statusColumns.map((column) => (
+          {kanbanColumns.map((column) => (
             <SortableContext
               key={column.id}
-              items={prospectsByStatus[column.id]?.map(p => p.id) || []}
+              items={prospectsByStage[column.id]?.map(p => p.id) || []}
               strategy={verticalListSortingStrategy}
             >
               <KanbanColumn
                 id={column.id}
                 title={column.title}
                 color={column.color}
-                count={prospectsByStatus[column.id]?.length || 0}
-                totalValue={valuesByStatus[column.id] || 0}
+                count={prospectsByStage[column.id]?.length || 0}
+                totalValue={valuesByStage[column.id] || 0}
               >
-                {prospectsByStatus[column.id]?.map((prospect) => (
+                {prospectsByStage[column.id]?.map((prospect) => (
                   <KanbanCard
                     key={prospect.id}
                     prospect={prospect}
@@ -230,7 +230,7 @@ export const ProspectsKanban: React.FC<ProspectsKanbanProps> = ({
         isOpen={deleteModalState.isOpen}
         prospectName={deleteModalState.prospect?.contact_name || ''}
         prospectCompany={deleteModalState.prospect?.company_name || ''}
-        prospectStatus={deleteModalState.prospect?.status || 'pending'}
+        prospectStatus={deleteModalState.prospect?.kanban_stage || 'pending'}
         isDeleting={deletingId === deleteModalState.prospect?.id}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
