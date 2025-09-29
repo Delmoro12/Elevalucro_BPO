@@ -230,7 +230,7 @@ export default function OnboardingPresentation({ planName, planFeatures, monthly
                   </div>
                   <div>
                     <h3 className="font-semibold text-white">Customer Success</h3>
-                    <p className="text-sm text-slate-400">Thales</p>
+                    <p className="text-sm text-slate-400">Tales Souza</p>
                   </div>
                 </div>
                 <ul className="space-y-2 text-sm text-slate-300">
