@@ -327,6 +327,9 @@ export const OnboardingKanban: React.FC = () => {
         }
         
         if (data.success) {
+          console.log('🔍 DEBUG: Total companies received:', data.companies?.length);
+          console.log('🔍 DEBUG: Companies data:', data.companies);
+          console.log('🔍 DEBUG: Boost company found:', data.companies?.find(c => c.nome_empresa?.includes('Boost')));
           setClients(data.companies);
         } else {
           throw new Error('Resposta inválida do servidor');
@@ -443,16 +446,20 @@ export const OnboardingKanban: React.FC = () => {
         onDragEnd={handleDragEnd}
       >
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {weeks.map(week => (
-            <KanbanColumn
-              key={week.key}
-              title={week.title}
-              weekKey={week.key}
-              clients={clients.filter(c => c.semana_onboarding === week.key)}
-              setSelectedClient={setSelectedClient}
-              setIsModalOpen={setIsModalOpen}
-            />
-          ))}
+          {weeks.map(week => {
+            const weekClients = clients.filter(c => c.semana_onboarding === week.key);
+            console.log(`🔍 DEBUG: Week ${week.key} has ${weekClients.length} clients:`, weekClients.map(c => c.nome_empresa));
+            return (
+              <KanbanColumn
+                key={week.key}
+                title={week.title}
+                weekKey={week.key}
+                clients={weekClients}
+                setSelectedClient={setSelectedClient}
+                setIsModalOpen={setIsModalOpen}
+              />
+            );
+          })}
         </div>
       </DndContext>
 

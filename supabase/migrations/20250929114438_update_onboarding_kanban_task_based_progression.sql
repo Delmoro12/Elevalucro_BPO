@@ -1,10 +1,11 @@
--- ======================================
--- View: Onboarding Companies Kanban
--- ======================================
--- Single unified view for both kanban listing and modal details
--- Uses only companies_onboarding_checklist (denormalized) for performance
+-- Migration: Update onboarding kanban view to use task-based progression
+-- Description: Changes semana_onboarding logic from date-based to task completion-based
+-- Companies only advance to next week when all tasks from current week are completed
 
-CREATE OR REPLACE VIEW onboarding_companies_kanban AS
+-- Drop and recreate the view with new logic
+DROP VIEW IF EXISTS onboarding_companies_kanban;
+
+CREATE VIEW onboarding_companies_kanban AS
 SELECT 
   c.id as company_id,
   c.name as nome_empresa,
@@ -121,8 +122,10 @@ GROUP BY
   c.onboarding_progress, c.lifecycle_stage, c.created_at, s.status
 ORDER BY c.created_at ASC;  -- Mais antigas primeiro
 
--- Comentário
+-- Update comment
 COMMENT ON VIEW onboarding_companies_kanban IS 
 'View principal para o kanban de onboarding - serve tanto para listagem quanto para detalhes do modal.
 Usa apenas companies_onboarding_checklist (desnormalizada) para melhor performance.
+Progressão de semanas baseada em conclusão de tarefas por plano contratado.
+semana_onboarding avança apenas quando todas as tarefas da semana atual são completadas.
 Retorna lista vazia de checklist_items quando empresa não tem itens cadastrados.';
