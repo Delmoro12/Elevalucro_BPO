@@ -75,8 +75,8 @@ export async function PATCH(
       )
     }
     
-    // Verificar se está mudando status para "signed"
-    const isBecomingSigned = updateData.status === 'signed'
+    // Verificar se está mudando kanban_stage para "signed"
+    const isBecomingSigned = updateData.kanban_stage === 'signed'
     
     // Atualizar prospect
     const { data: prospect, error } = await supabase

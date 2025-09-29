@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
       .from('prospects')
       .select('*')
       .eq('id', prospect_id)
-      .eq('status', 'signed')
+      .eq('kanban_stage', 'signed')
       .single();
       
     if (prospectError || !prospect) {
