@@ -47,6 +47,10 @@ export function convertFormDataToProspect(formData: FormData, origem?: string): 
     plan: planoMap[formData.plano] || 'controle',
     monthly_value: formData.valorMensal,
     
+    // Status e estágio - importante para diferenciar de leads
+    status: 'prospect', // Define explicitamente como prospect (não lead)
+    kanban_stage: 'pending', // Estágio inicial para prospects vindos do pre-onboarding
+    
     // Metadados
     source: origem || 'site',
   };

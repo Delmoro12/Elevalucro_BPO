@@ -71,6 +71,10 @@ export interface ProspectData {
   plan: 'controle' | 'gerencial' | 'avancado';
   monthly_value: number;
   
+  // Status e estágio no funil
+  status?: 'lead' | 'prospect';
+  kanban_stage?: string;
+  
   // Metadados
   source?: string;
   notes?: string;
