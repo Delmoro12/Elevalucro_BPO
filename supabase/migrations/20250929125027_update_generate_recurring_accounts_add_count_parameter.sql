@@ -1,5 +1,12 @@
+-- Migration: Update generate_recurring_accounts function to accept recurrence_count parameter
+-- Description: Adds p_recurrence_count parameter to allow custom number of recurrences
+-- Date: 2025-09-29
+
+-- Drop existing function and recreate with new parameter
+DROP FUNCTION IF EXISTS generate_recurring_accounts(UUID, VARCHAR(50), JSONB);
+
 -- ======================================
--- Function: Generate Recurring Financial Transactions
+-- Function: Generate Recurring Financial Transactions (Updated)
 -- ======================================
 -- Esta função gera transações financeiras recorrentes ou parceladas baseadas na configuração
 
@@ -257,6 +264,35 @@ BEGIN
                 END IF;
             END LOOP;
             
+        WHEN 'annual' THEN
+            -- Anual - criar 1 ocorrência por ano (quantidade fixa)
+            v_installment_count := 1;
+            v_day_of_month := COALESCE((p_recurrence_config->>'day_of_month')::INTEGER, EXTRACT(DAY FROM v_account.due_date));
+            
+            -- Começar do próximo ano
+            v_current_date := DATE_TRUNC('year', v_account.due_date) + INTERVAL '1 year';
+            
+            -- Ajustar para o dia especificado
+            IF v_day_of_month > EXTRACT(DAY FROM (DATE_TRUNC('month', v_current_date) + INTERVAL '1 month' - INTERVAL '1 day')) THEN
+                v_due_date := DATE_TRUNC('month', v_current_date) + INTERVAL '1 month' - INTERVAL '1 day';
+            ELSE
+                v_due_date := DATE_TRUNC('month', v_current_date) + (v_day_of_month - 1 || ' days')::INTERVAL;
+            END IF;
+            
+            -- Gerar apenas uma conta anual
+            INSERT INTO financial_transactions (
+                company_id, type, created_by_side, value, due_date, date_of_issue, payment_method, status,
+                pix_number, bank_slip_code, companies_clients_suppliers_id, category_id, number_of_document,
+                notes, occurrence, recurrence_config, parent_account_id, series_id, installment_number,
+                installment_total, validated, created_by
+            ) VALUES (
+                v_account.company_id, v_account.type, v_account.created_by_side, v_account.value, v_due_date,
+                v_account.date_of_issue, v_account.payment_method, v_account.status, v_account.pix_number,
+                v_account.bank_slip_code, v_account.companies_clients_suppliers_id, v_account.category_id,
+                v_account.number_of_document, v_account.notes, p_occurrence_type, p_recurrence_config,
+                p_account_id, v_series_id, 1, v_installment_count, v_account.validated, v_account.created_by
+            );
+            
         WHEN 'installments' THEN
             -- Parcelado - usar a quantidade específica de parcelas
             v_installment_count := COALESCE((p_recurrence_config->>'installment_count')::INTEGER, 2);
@@ -306,4 +342,5 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Atualizar comentário
 COMMENT ON FUNCTION generate_recurring_accounts IS 'Gera contas recorrentes ou parceladas baseadas na configuração fornecida. p_recurrence_count controla quantas ocorrências criar (exceto para annual e installments que têm lógica própria)';

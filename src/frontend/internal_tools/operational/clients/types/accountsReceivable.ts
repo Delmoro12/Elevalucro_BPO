@@ -58,8 +58,8 @@ export interface AccountReceivable {
   dre_group_order?: number;
   
   // Campos de recebimento
-  receipt_date?: string;
-  received_amount?: number;
+  payment_date?: string;
+  paid_amount?: number;
   financial_account_id?: string;
   
   // Campos calculados pela VIEW
@@ -68,8 +68,8 @@ export interface AccountReceivable {
   value_formatted?: string;
   due_date_formatted?: string;
   date_of_issue_formatted?: string;
-  receipt_date_formatted?: string;
-  received_amount_formatted?: string;
+  payment_date_formatted?: string;
+  paid_amount_formatted?: string;
   search_text?: string;
   
   // Informações da conta financeira (enriquecido via JOIN)
@@ -97,6 +97,7 @@ export interface AccountReceivableFormData {
   // Campos de recorrência para o formulário
   recurrence_day_of_week?: string;
   recurrence_day_of_month?: number;
+  recurrence_count?: number; // Quantas vezes repetir a recorrência
   installment_count?: number;
   installment_day?: number;
   

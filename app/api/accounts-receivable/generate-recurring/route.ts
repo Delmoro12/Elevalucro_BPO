@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '../../../../src/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔄 API: Generating recurring accounts...')
+    console.log('🔄 API: Generating recurring receivable accounts...')
     
     const supabase = getSupabaseAdmin()
     if (!supabase) {
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log(`✅ Generated ${recurringAccounts?.length || 0} recurring accounts`)
+    console.log(`✅ Generated ${recurringAccounts?.length || 0} recurring receivable accounts`)
 
     return NextResponse.json({
       success: true,

@@ -329,7 +329,7 @@ export const OnboardingKanban: React.FC = () => {
         if (data.success) {
           console.log('🔍 DEBUG: Total companies received:', data.companies?.length);
           console.log('🔍 DEBUG: Companies data:', data.companies);
-          console.log('🔍 DEBUG: Boost company found:', data.companies?.find(c => c.nome_empresa?.includes('Boost')));
+          console.log('🔍 DEBUG: Boost company found:', data.companies?.find((c: any) => c.nome_empresa?.includes('Boost')));
           setClients(data.companies);
         } else {
           throw new Error('Resposta inválida do servidor');

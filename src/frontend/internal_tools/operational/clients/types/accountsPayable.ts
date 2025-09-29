@@ -93,6 +93,7 @@ export interface AccountPayableFormData {
   // Campos de recorrência para o formulário
   recurrence_day_of_week?: string;
   recurrence_day_of_month?: number;
+  recurrence_count?: number; // Quantas vezes repetir a recorrência
   installment_count?: number;
   installment_day?: number;
   

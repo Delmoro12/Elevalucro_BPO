@@ -30,9 +30,18 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [accountBalances, setAccountBalances] = useState<any[]>([]);
   const { accounts: financialAccounts } = useFinancialAccounts(account?.company_id || '');
+  // Função para obter data atual no formato correto sem problemas de timezone
+  const getCurrentDate = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [formData, setFormData] = useState({
     financial_account_id: '',
-    receipt_date: format(new Date(), 'yyyy-MM-dd'),
+    receipt_date: getCurrentDate(),
     received_amount: account?.value || 0,
     notes: ''
   });

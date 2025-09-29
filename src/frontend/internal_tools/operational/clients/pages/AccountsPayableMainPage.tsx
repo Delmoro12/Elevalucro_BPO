@@ -83,7 +83,7 @@ export const AccountsPayableMainPage: React.FC<AccountsPayableMainPageProps> = (
       // Chamar serviço para deletar série (todas as contas não pagas)
       const result = await accountsPayableRecurrenceService.deleteRecurringSeries(
         showSeriesDeleteConfirm, 
-        'current'
+        'future'
       );
       
       console.log('✅ Série deletada:', result);

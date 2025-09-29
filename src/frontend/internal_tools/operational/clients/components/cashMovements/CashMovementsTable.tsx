@@ -50,6 +50,10 @@ export const CashMovementsTable: React.FC<CashMovementsTableProps> = ({
   const formatDate = (dateString?: string) => {
     if (!dateString) return '-';
     try {
+      // Se for apenas uma data (YYYY-MM-DD), adicionar horário para evitar problemas de timezone
+      if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return format(new Date(dateString + 'T12:00:00'), 'dd/MM/yyyy', { locale: ptBR });
+      }
       return format(new Date(dateString), 'dd/MM/yyyy', { locale: ptBR });
     } catch {
       return '-';

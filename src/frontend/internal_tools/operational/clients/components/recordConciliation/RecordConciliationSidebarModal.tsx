@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { X, CheckCircle, Info } from 'lucide-react';
 import { ReconciliationRecord, ReconciliationValidationRequest } from '../../types/recordConciliation';
 import { FinancialCategory } from '../../types/config';
-import { useFinancialCategories } from '../../hooks/useFinancialConfig';
+import { useFinancialCategories, useFinancialAccounts } from '../../hooks/useFinancialConfig';
 import { supabase } from '@/src/lib/supabase';
 
 interface RecordConciliationSidebarModalProps {
@@ -26,11 +26,19 @@ export const RecordConciliationSidebarModal: React.FC<RecordConciliationSidebarM
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     category_id: '',
+    financial_account_id: '',
+    value: 0,
+    due_date: '',
+    payment_method: '',
+    number_of_document: '',
     notes: ''
   });
   
   // Hook para categorias
   const { categories } = useFinancialCategories(companyId);
+  
+  // Hook para contas financeiras
+  const { accounts: financialAccounts } = useFinancialAccounts(companyId);
 
   // Controles de estado
   const isReadOnly = record?.validated || false;
@@ -51,11 +59,21 @@ export const RecordConciliationSidebarModal: React.FC<RecordConciliationSidebarM
     if (isOpen && record) {
       setFormData({
         category_id: record.category_id || '',
+        financial_account_id: '',
+        value: record.value || 0,
+        due_date: record.due_date || '',
+        payment_method: record.payment_method || '',
+        number_of_document: record.number_of_document || '',
         notes: record.notes || ''
       });
     } else if (isOpen) {
       setFormData({
         category_id: '',
+        financial_account_id: '',
+        value: 0,
+        due_date: '',
+        payment_method: '',
+        number_of_document: '',
         notes: ''
       });
     }
@@ -209,9 +227,11 @@ export const RecordConciliationSidebarModal: React.FC<RecordConciliationSidebarM
                   Valor
                 </label>
                 <input
-                  type="text"
-                  value={formatCurrency(record.value)}
-                  readOnly
+                  type="number"
+                  step="0.01"
+                  value={formData.value || record.value}
+                  onChange={(e) => !isReadOnly && setFormData({ ...formData, value: parseFloat(e.target.value) || 0 })}
+                  disabled={isReadOnly}
                   className={getInputClasses()}
                 />
               </div>
@@ -222,9 +242,10 @@ export const RecordConciliationSidebarModal: React.FC<RecordConciliationSidebarM
                   Data de Vencimento
                 </label>
                 <input
-                  type="text"
-                  value={formatDate(record.due_date)}
-                  readOnly
+                  type="date"
+                  value={formData.due_date}
+                  onChange={(e) => !isReadOnly && setFormData({ ...formData, due_date: e.target.value })}
+                  disabled={isReadOnly}
                   className={getInputClasses()}
                 />
               </div>
@@ -234,12 +255,21 @@ export const RecordConciliationSidebarModal: React.FC<RecordConciliationSidebarM
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Método de Pagamento
                 </label>
-                <input
-                  type="text"
-                  value={record.payment_method || '-'}
-                  readOnly
+                <select
+                  value={formData.payment_method}
+                  onChange={(e) => !isReadOnly && setFormData({ ...formData, payment_method: e.target.value })}
+                  disabled={isReadOnly}
                   className={getInputClasses()}
-                />
+                >
+                  <option value="">Selecione um método</option>
+                  <option value="pix">PIX</option>
+                  <option value="bank_slip">Boleto</option>
+                  <option value="bank_transfer">Transferência</option>
+                  <option value="credit_card">Cartão de Crédito</option>
+                  <option value="debit_card">Cartão de Débito</option>
+                  <option value="cash">Dinheiro</option>
+                  <option value="check">Cheque</option>
+                </select>
               </div>
 
               {/* Status */}
@@ -277,9 +307,11 @@ export const RecordConciliationSidebarModal: React.FC<RecordConciliationSidebarM
                 </label>
                 <input
                   type="text"
-                  value={record.number_of_document || '-'}
-                  readOnly
+                  value={formData.number_of_document}
+                  onChange={(e) => !isReadOnly && setFormData({ ...formData, number_of_document: e.target.value })}
+                  disabled={isReadOnly}
                   className={getInputClasses()}
+                  placeholder="Digite o número do documento..."
                 />
               </div>
 
@@ -304,6 +336,26 @@ export const RecordConciliationSidebarModal: React.FC<RecordConciliationSidebarM
                 {errors.category_id && (
                   <p className="mt-1 text-sm text-red-500">{errors.category_id}</p>
                 )}
+              </div>
+
+              {/* Conta Financeira */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  Conta Financeira
+                </label>
+                <select
+                  value={formData.financial_account_id}
+                  onChange={(e) => !isReadOnly && setFormData({ ...formData, financial_account_id: e.target.value })}
+                  disabled={isReadOnly}
+                  className={getInputClasses()}
+                >
+                  <option value="">Selecione uma conta financeira</option>
+                  {financialAccounts.map(account => (
+                    <option key={account.id} value={account.id}>
+                      {account.description}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Tipo de Ocorrência */}

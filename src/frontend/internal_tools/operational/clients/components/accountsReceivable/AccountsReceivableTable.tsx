@@ -289,12 +289,12 @@ export const AccountsReceivableTable: React.FC<AccountsReceivableTableProps> = (
   const filteredData = [...dataWithSearch].sort((a, b) => {
     if (activeTab === 'received') {
       // Para tab "Recebidas", ordenar por data de recebimento (mais recentes primeiro)
-      if (a.receipt_date && b.receipt_date) {
-        return new Date(b.receipt_date).getTime() - new Date(a.receipt_date).getTime();
+      if (a.payment_date && b.payment_date) {
+        return new Date(b.payment_date).getTime() - new Date(a.payment_date).getTime();
       }
       // Se um não tem data de recebimento, priorizar o que tem
-      if (a.receipt_date && !b.receipt_date) return -1;
-      if (!a.receipt_date && b.receipt_date) return 1;
+      if (a.payment_date && !b.payment_date) return -1;
+      if (!a.payment_date && b.payment_date) return 1;
       // Se ambos não têm data de recebimento, ordenar por data de vencimento
       if (a.due_date && b.due_date) {
         return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
@@ -384,20 +384,20 @@ export const AccountsReceivableTable: React.FC<AccountsReceivableTableProps> = (
     if (activeTab === 'received') {
       baseColumns.push(
         {
-          key: 'received_amount',
+          key: 'paid_amount',
           title: 'Valor Recebido',
           render: (value: any, account: AccountReceivable) => (
             <span className="font-medium text-green-600 dark:text-green-400">
-              {formatCurrency(account?.received_amount)}
+              {formatCurrency(account?.paid_amount)}
             </span>
           )
         },
         {
-          key: 'receipt_date',
+          key: 'payment_date',
           title: 'Data Recebimento',
           render: (value: any, account: AccountReceivable) => (
             <span className="font-medium text-slate-900 dark:text-slate-100">
-              {formatDate(account?.receipt_date)}
+              {formatDate(account?.payment_date)}
             </span>
           )
         },

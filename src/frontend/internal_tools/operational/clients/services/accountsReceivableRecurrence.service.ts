@@ -53,7 +53,8 @@ export const accountsReceivableRecurrenceService = {
       body: JSON.stringify({
         account_id: parentAccount.id,
         occurrence_type: formData.occurrence,
-        recurrence_config: recurrenceConfig
+        recurrence_config: recurrenceConfig,
+        recurrence_count: formData.recurrence_count
       }),
     });
 

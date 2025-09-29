@@ -91,6 +91,7 @@ export async function POST(request: NextRequest) {
       occurrence,
       recurrence_day_of_week,
       recurrence_day_of_month,
+      recurrence_count,
       installment_count,
       installment_day,
       // Campos de validação BPO
@@ -193,7 +194,8 @@ export async function POST(request: NextRequest) {
           .rpc('generate_recurring_accounts', {
             p_account_id: account.id,
             p_occurrence_type: occurrence,
-            p_recurrence_config: recurrenceConfig
+            p_recurrence_config: recurrenceConfig,
+            p_recurrence_count: recurrence_count
           });
 
         if (recurrenceError) {

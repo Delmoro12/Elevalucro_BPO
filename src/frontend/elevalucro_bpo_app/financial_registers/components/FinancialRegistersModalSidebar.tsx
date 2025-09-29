@@ -7,6 +7,7 @@ import {
   FinancialRegisterFormData
 } from '../types/financialRegisters';
 import { useClientsSuppliers } from '../hooks/useClientsSuppliers';
+import { useFinancialAccounts } from '../../my_finance/hooks/useFinancialAccounts';
 
 // Funções para formatação de moeda
 const formatCurrency = (value: number | string | undefined): string => {
@@ -100,7 +101,7 @@ export const FinancialRegistersModalSidebar: React.FC<FinancialRegistersModalSid
     value: 0,
     occurrence: 'unique',
     status: 'pending',
-    date_of_issue: new Date().toLocaleDateString('pt-BR')
+    date_of_issue: new Date().toISOString().split('T')[0]
   });
   const [formattedValue, setFormattedValue] = useState(''); // Estado para o valor formatado
   const [loading, setLoading] = useState(false);
@@ -113,6 +114,9 @@ export const FinancialRegistersModalSidebar: React.FC<FinancialRegistersModalSid
 
   // Hook para buscar clientes/fornecedores
   const { clients, suppliers, loading: clientsLoading } = useClientsSuppliers(companyId);
+  
+  // Hook para buscar contas financeiras
+  const { financialAccounts, loading: financialAccountsLoading } = useFinancialAccounts(companyId);
 
   const isReadOnly = mode === 'view';
   const isEditMode = !!register;
@@ -168,7 +172,8 @@ export const FinancialRegistersModalSidebar: React.FC<FinancialRegistersModalSid
         type: 'receivable',
         value: 0,
         occurrence: 'unique',
-        status: 'pending'
+        status: 'pending',
+        date_of_issue: new Date().toISOString().split('T')[0] // Data atual no formato YYYY-MM-DD
       });
       setFormattedValue(''); // Limpar valor formatado
     }
@@ -206,7 +211,14 @@ export const FinancialRegistersModalSidebar: React.FC<FinancialRegistersModalSid
     }
     
     if (!formData.due_date?.trim()) newErrors.due_date = 'Data de vencimento é obrigatória';
+    if (!formData.date_of_issue?.trim()) newErrors.date_of_issue = 'Data de emissão é obrigatória';
     if (!formData.payment_method?.trim()) newErrors.payment_method = 'Método de pagamento é obrigatório';
+    if (!formData.notes?.trim()) newErrors.notes = 'Descrição é obrigatória';
+    
+    // Validar conta financeira quando status for 'paid'
+    if (formData.status === 'paid' && !formData.financial_account_id?.trim()) {
+      newErrors.financial_account_id = 'Conta financeira é obrigatória quando o status é Pago';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -226,9 +238,32 @@ export const FinancialRegistersModalSidebar: React.FC<FinancialRegistersModalSid
 
     console.log('✅ Validação passou, enviando dados...');
     
+    // Preparar dados para envio, incluindo informações adicionais no notes
+    let enhancedFormData = { ...formData };
+    
+    // Se status for 'paid' e houver conta financeira, adicionar essas informações ao notes
+    if (formData.status === 'paid' && formData.financial_account_id) {
+      const selectedAccount = financialAccounts.find(account => account.id === formData.financial_account_id);
+      
+      // Construir informações adicionais
+      const additionalInfo = [];
+      additionalInfo.push(`Status: Pago`);
+      if (selectedAccount) {
+        additionalInfo.push(`Conta Financeira: ${selectedAccount.description}`);
+      }
+      
+      // Combinar notes existente com informações adicionais
+      const originalNotes = formData.notes?.trim() || '';
+      const extraInfo = additionalInfo.join(' | ');
+      
+      enhancedFormData.notes = originalNotes 
+        ? `${originalNotes}\n\n${extraInfo}`
+        : extraInfo;
+    }
+    
     setLoading(true);
     try {
-      const success = await onSave(formData);
+      const success = await onSave(enhancedFormData);
       if (success) {
         onClose();
       }
@@ -535,15 +570,18 @@ export const FinancialRegistersModalSidebar: React.FC<FinancialRegistersModalSid
               {/* Data de Emissão */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                  Data de Emissão
+                  Data de Emissão *
                 </label>
                 <input
                   type="date"
                   value={formData.date_of_issue || ''}
                   onChange={(e) => handleChange('date_of_issue', e.target.value)}
                   disabled={isReadOnly}
-                  className={getInputClasses()}
+                  className={getInputClasses(!!errors.date_of_issue)}
                 />
+                {errors.date_of_issue && (
+                  <p className="mt-1 text-sm text-red-500">{errors.date_of_issue}</p>
+                )}
               </div>
 
               {/* Status */}
@@ -561,6 +599,33 @@ export const FinancialRegistersModalSidebar: React.FC<FinancialRegistersModalSid
                   <option value="paid">✅ Pago</option>
                 </select>
               </div>
+
+              {/* Conta Financeira (condicional - apenas quando status for 'paid') */}
+              {formData.status === 'paid' && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Conta Financeira *
+                  </label>
+                  <select
+                    value={formData.financial_account_id || ''}
+                    onChange={(e) => handleChange('financial_account_id', e.target.value)}
+                    disabled={isReadOnly || financialAccountsLoading}
+                    className={getInputClasses(!!errors.financial_account_id)}
+                  >
+                    <option value="">
+                      {financialAccountsLoading ? 'Carregando contas...' : 'Selecione a conta utilizada'}
+                    </option>
+                    {financialAccounts.map((account) => (
+                      <option key={account.id} value={account.id}>
+                        {account.description}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.financial_account_id && (
+                    <p className="mt-1 text-sm text-red-500">{errors.financial_account_id}</p>
+                  )}
+                </div>
+              )}
 
               {/* Número do Documento */}
               <div>
@@ -677,20 +742,23 @@ export const FinancialRegistersModalSidebar: React.FC<FinancialRegistersModalSid
             </div>
 
 
-            {/* Observações (span completo) */}
+            {/* Descrição (span completo) */}
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                Observações *
+                Descrição *
               </label>
               <textarea
                 rows={3}
                 value={formData.notes || ''}
                 onChange={(e) => handleChange('notes', e.target.value)}
                 disabled={isReadOnly}
-                className={`${getInputClasses()} resize-none`}
-                placeholder="Digite observações sobre a conta..."
+                className={`${getInputClasses(!!errors.notes)} resize-none`}
+                placeholder="Digite a descrição do registro financeiro..."
                 required
               />
+              {errors.notes && (
+                <p className="mt-1 text-sm text-red-500">{errors.notes}</p>
+              )}
             </div>
 
             {/* Campos de Validação (apenas quando validado) */}

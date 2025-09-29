@@ -121,7 +121,6 @@ export const AccountsReceivableModalSidebar: React.FC<AccountsReceivableModalSid
   // Get filtered clients
   const getFilteredClients = () => {
     return clients
-      .filter(s => s.type === 'client')
       .filter(s => 
         s.name.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
         (s.cnpj && s.cnpj.includes(clientSearchTerm)) ||
@@ -482,6 +481,36 @@ export const AccountsReceivableModalSidebar: React.FC<AccountsReceivableModalSid
                           : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500'
                     }`}
                     placeholder="Ex: 15 (dia 15 de cada mês/período)"
+                  />
+                </div>
+              )}
+
+              {/* Campo de quantidade de repetições - Para todas exceto parcelas, anual e única */}
+              {(formData.occurrence === 'weekly' || 
+                formData.occurrence === 'biweekly' || 
+                formData.occurrence === 'monthly' || 
+                formData.occurrence === 'quarterly' || 
+                formData.occurrence === 'semiannual') && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Quantas repetições?
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="120"
+                    value={formData.recurrence_count || ''}
+                    onChange={(e) => !isReadOnly && !isEditMode && setFormData({ ...formData, recurrence_count: parseInt(e.target.value) || undefined })}
+                    readOnly={isReadOnly || isEditMode}
+                    className={getInputClasses()}
+                    placeholder={
+                      formData.occurrence === 'weekly' ? '52 (padrão: 1 ano)' :
+                      formData.occurrence === 'biweekly' ? '26 (padrão: 1 ano)' :
+                      formData.occurrence === 'monthly' ? '12 (padrão: 1 ano)' :
+                      formData.occurrence === 'quarterly' ? '4 (padrão: 1 ano)' :
+                      formData.occurrence === 'semiannual' ? '2 (padrão: 1 ano)' :
+                      'Ex: 12'
+                    }
                   />
                 </div>
               )}

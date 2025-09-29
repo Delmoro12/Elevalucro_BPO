@@ -220,14 +220,13 @@ export const LeadEditModal: React.FC<LeadEditModalProps> = ({
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                      Email *
+                      Email
                     </label>
                     <input
                       type="email"
                       value={formData.contact_email || ''}
                       onChange={(e) => updateFormData('contact_email', e.target.value)}
                       className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
-                      required
                     />
                   </div>
 
