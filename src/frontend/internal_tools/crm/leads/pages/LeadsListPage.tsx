@@ -1,17 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Target, LayoutGrid, Table, Plus } from 'lucide-react';
+import { Target, LayoutGrid, Table, Plus, FileText } from 'lucide-react';
 import { useLeads } from '../hooks/useLeads';
 import { LeadsFilters } from '../components/LeadsFilters';
 import { LeadsTable } from '../components/LeadsTable';
 import { LeadsKanban } from '../components/LeadsKanban';
 import { LeadEditModal } from '../components/LeadEditModal';
+import { ICPDocumentPage } from './ICPDocumentPage';
 import { convertLeadToProspect, updateLead, getLeadById, createLead } from '../services/leadsCrud';
 import { LeadEditData, LeadUpdatePayload } from '../types/leads';
 
 export const LeadsListPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'kanban' | 'table'>('kanban');
+  const [currentPage, setCurrentPage] = useState<'leads' | 'icp'>('leads');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingLead, setEditingLead] = useState<LeadEditData | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
@@ -101,6 +103,19 @@ export const LeadsListPage: React.FC = () => {
     setModalError(null);
   };
 
+  const handleICPDocumentView = () => {
+    setCurrentPage('icp');
+  };
+
+  const handleBackToLeads = () => {
+    setCurrentPage('leads');
+  };
+
+  // Se estiver visualizando o documento ICP, renderizar a página do ICP
+  if (currentPage === 'icp') {
+    return <ICPDocumentPage onBack={handleBackToLeads} />;
+  }
+
   return (
     <div className="flex flex-col h-[calc(100vh-2rem)] space-y-4">
       {/* Header */}
@@ -116,6 +131,15 @@ export const LeadsListPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Botão ICP */}
+          <button
+            onClick={handleICPDocumentView}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          >
+            <FileText className="h-4 w-4" />
+            ICP
+          </button>
+
           {/* Botão Novo Lead */}
           <button
             onClick={handleCreateLead}
